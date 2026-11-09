@@ -77,6 +77,21 @@ Candidate techniques include:
 - Purpose-built interpolation for topology-compatible geometry
 - Animated face-plane extension for an approved stellation demonstration
 
+### Dual transformation topology
+
+Dual animation uses one continuous boundary mesh rather than overlapping source
+and target solids. Each source face is subdivided into flag triangles whose
+points represent an original vertex, an edge midpoint, and a face center. The
+same flags also describe the dual: the source face center becomes a dual
+vertex, the source edge midpoint maps to its dual-edge midpoint, and the source
+vertex becomes a dual-face center.
+
+Interpolating corresponding flag points produces a single, generally
+non-regular intermediate polyhedron. At the source and target endpoints,
+coplanar flag triangles visually merge into the regular faces. The solid
+selector and property data change to the target only when the animation
+completes. Camera state remains unchanged throughout the transformation.
+
 The design should prefer mathematical legibility over a visually smooth but
 incorrect vertex morph. React Three Fiber's frame loop and Three.js math tools
 are sufficient initially; an animation dependency should be introduced only
