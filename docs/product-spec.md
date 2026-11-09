@@ -46,8 +46,8 @@ to be useful as a reference.
 The page opens with one solid centered in a 3D stage. A visitor can:
 
 - Rotate/orbit the camera by dragging
-- Zoom with the wheel, trackpad, or equivalent touch gesture
-- Pan the camera where the input method supports it
+- Zoom by moving the camera with the wheel, trackpad, or a two-finger pinch
+- Use a one-finger drag to orbit on touch devices
 - Reset the camera to a useful default view
 - Select any supported solid
 - Read its most important properties without leaving the page
@@ -59,6 +59,12 @@ The page opens with one solid centered in a 3D stage. A visitor can:
 
 The information panel and controls must remain understandable when animation
 is disabled or unavailable.
+
+All solids use the same circumradius: the distance from the center to the
+outermost vertex. Changing solids therefore preserves a mathematically
+consistent scale. Zooming changes camera distance and never changes the solid's
+geometry or normalized radius. Panning is disabled so the solid remains
+centered and cannot be accidentally lost outside the viewport.
 
 ## Solid information
 
@@ -119,17 +125,62 @@ a separate review before implementation.
 The first release is a single-page experience:
 
 - Header with project title, theme-aware navigation, and About access
-- Solid selector suitable for keyboard and small screens
+- Grouped solid selector at the upper-left of the stage, suitable for keyboard
+  and small screens
 - Main 3D stage
-- A compact toolbar for camera and transformation actions
-- Property panel beside the stage on wide screens and below it on narrow
-  screens
+- Compact camera controls at the upper-right of the stage
+- Relationship actions centered below the stage
+- Property panel below the stage on desktop and mobile
 - Optional explanatory text for the active transformation
 - Footer with source and reference links
 
 The active solid should be represented in the URL so a view can be bookmarked
 or shared. A query parameter such as `?solid=icosahedron` avoids requiring a
 client-side routing fallback on GitHub Pages.
+
+## HUD and controls
+
+The HUD is divided into three predictable zones so the solid remains the visual
+focus.
+
+### Solid selector
+
+The upper-left selector displays the active solid and groups its options under
+**Platonic solids** and **Kepler–Poinsot polyhedra**. A dropdown is preferred to
+nine permanently visible buttons, especially on smaller screens.
+
+### Camera controls
+
+The upper-right camera group provides:
+
+- **Reset view** to restore the default camera position and target
+- **Auto-rotate** as an explicit on/off control
+- Accessible zoom-out and zoom-in buttons where they improve keyboard and
+  touch operation
+
+Pointer, trackpad, touch, and keyboard interaction remain available even when
+the equivalent visible control is not shown. Important actions use text labels;
+Lucide icons support those labels rather than replacing them.
+
+### Relationship actions
+
+The primary relationship actions appear below the scene:
+
+- **Show dual** changes to a return label appropriate to the original solid
+- **Stellate** changes to **Return to convex form** in the reverse direction
+
+Actions are contextual. An unavailable or mathematically undefined
+transformation is hidden or disabled with a concise explanation. While a
+transformation runs, conflicting controls are disabled and **Pause** and **Skip
+animation** are available.
+
+### Property panel
+
+The property panel sits below the scene at all breakpoints. Essential facts are
+immediately visible: name, Schläfli symbol, faces, edges, vertices, face type,
+face angle, dihedral angle, and dual. **More details** expands the description,
+symmetry group, vertex configuration, Euler-characteristic notes, convexity or
+self-intersection status, and external references.
 
 ## Accessibility
 
@@ -145,11 +196,13 @@ client-side routing fallback on GitHub Pages.
 
 ## Responsive behavior
 
-- Desktop: stage and property panel use a two-column layout
-- Tablet: proportions tighten while preserving the two-column layout when
-  practical
-- Mobile: stage, controls, and property panel stack vertically
+- Desktop: the stage receives the available width and the property panel sits
+  below it
+- Tablet: the same hierarchy is retained with tighter spacing
+- Mobile: selector, stage, camera control row, relationship actions, and
+  property panel stack vertically
 - Camera controls support pointer, touch, wheel, and trackpad input
+- Mobile controls do not obscure the lower portion of the solid
 
 ## Out of scope for the first release
 

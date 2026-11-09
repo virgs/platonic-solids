@@ -13,6 +13,15 @@
 - Mathematical data and geometry are separated from UI components.
 - Duality and stellation are presented as mathematical relationships, not
   arbitrary mesh effects.
+- Every solid is normalized to the same circumradius.
+- Zooming moves the camera rather than scaling solid geometry.
+- Camera panning is disabled; orbit, zoom, reset, and optional auto-rotation
+  keep the solid centered.
+- The HUD uses a grouped solid selector at the upper-left, camera actions at the
+  upper-right, relationship actions below the scene, and a property panel below
+  the stage at every breakpoint.
+- Relationship actions use contextual text labels such as **Show dual**,
+  **Stellate**, and **Return to convex form**.
 
 ## Decisions needed before implementation
 
