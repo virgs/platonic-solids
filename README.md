@@ -46,7 +46,10 @@ npm run build
 
 ## Status
 
-The first implementation milestone includes the responsive HUD, normalized 3D
-geometry for all five Platonic solids, camera controls, dual navigation, and
-the core property catalog. Kepler–Poinsot geometry and transformation
-animations are the next major milestone.
+All five Platonic solids and four Kepler–Poinsot polyhedra can be inspected at
+the same circumradius. Platonic dual transformations use progressive corner
+cuts, with a configurable duration of 0.5–6 seconds. Star-polyhedron dual and
+stellation animations are planned; their controls remain disabled until those
+transformations are implemented.
+
+Star models use explicit face definitions; see [geometry sources](docs/geometry-sources.md).

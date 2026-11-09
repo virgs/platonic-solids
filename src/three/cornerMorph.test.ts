@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { EdgesGeometry } from 'three'
 import { createCornerMorph } from './cornerMorph'
-import { solids, getSolid } from '../data/solids'
+import { platonicSolids as solids, getSolid } from '../data/solids'
 
 describe('corner-cut dual morph', () => {
   it.each(solids)('$name reaches the expected dual edge count', (solid) => {

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { solids } from '../data/solids'
+import { platonicSolids as solids } from '../data/solids'
 import {
   createDualMorphGeometry,
   createSolidGeometry,

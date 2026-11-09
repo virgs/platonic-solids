@@ -1,9 +1,9 @@
 import { BufferGeometry, Float32BufferAttribute, Vector3 } from 'three'
-import type { SolidId } from '../data/solids'
+import type { PlatonicId } from '../data/solids'
 import { createSolidGeometry } from './geometry'
 
 /** Clip the original surface by moving corner planes, retaining only its boundary. */
-export function createCornerMorph(id: SolidId) {
+export function createCornerMorph(id: PlatonicId) {
   const source = createSolidGeometry(id)
   const positions = source.getAttribute('position')
   const corners: Vector3[] = []

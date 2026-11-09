@@ -7,7 +7,7 @@ import {
   OctahedronGeometry,
   TetrahedronGeometry,
 } from 'three'
-import type { SolidId } from '../data/solids'
+import type { PlatonicId } from '../data/solids'
 
 export function normalizeCircumradius(
   source: BufferGeometry,
@@ -36,7 +36,7 @@ export function normalizeCircumradius(
   return geometry
 }
 
-export function createSolidGeometry(id: SolidId): BufferGeometry {
+export function createSolidGeometry(id: PlatonicId): BufferGeometry {
   const source = (() => {
     switch (id) {
       case 'tetrahedron':
@@ -70,7 +70,7 @@ function vectorKey(x: number, y: number, z: number): string {
   return `${x.toFixed(5)},${y.toFixed(5)},${z.toFixed(5)}`
 }
 
-function extractPolyhedron(id: SolidId) {
+function extractPolyhedron(id: PlatonicId) {
   const geometry = createSolidGeometry(id)
   const positions = geometry.getAttribute('position')
   const vertices: Array<[number, number, number]> = []
@@ -171,7 +171,7 @@ function extractPolyhedron(id: SolidId) {
   return { vertices, faces }
 }
 
-export function createDualMorphGeometry(id: SolidId): DualMorphGeometry {
+export function createDualMorphGeometry(id: PlatonicId): DualMorphGeometry {
   const { vertices, faces } = extractPolyhedron(id)
   const edges = new Map<string, { vertices: [number, number]; faces: number[] }>()
 

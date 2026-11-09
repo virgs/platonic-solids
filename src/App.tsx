@@ -17,6 +17,7 @@ import {
   Col,
   Container,
   Dropdown,
+  Form,
   Navbar,
   Row,
   Stack,
@@ -24,8 +25,8 @@ import {
 import { SolidScene } from './components/SolidScene'
 import {
   getSolid,
-  plannedStarSolids,
-  solids,
+  platonicSolids,
+  starSolids,
   type SolidDefinition,
   type SolidId,
 } from './data/solids'
@@ -48,6 +49,7 @@ export function App() {
   const [autoRotate, setAutoRotate] = useState(false)
   const [dualTransition, setDualTransition] = useState(false)
   const [selectionKey, setSelectionKey] = useState(0)
+  const [duration, setDuration] = useState(1.8)
   const [resetNonce, setResetNonce] = useState(0)
   const [zoom, setZoom] = useState<{
     nonce: number
@@ -168,7 +170,7 @@ export function App() {
                   </Dropdown.Toggle>
                   <Dropdown.Menu>
                     <Dropdown.Header>Platonic solids</Dropdown.Header>
-                    {solids.map((option) => (
+                    {platonicSolids.map((option) => (
                       <Dropdown.Item
                         key={option.id}
                         active={option.id === solidId}
@@ -178,10 +180,10 @@ export function App() {
                       </Dropdown.Item>
                     ))}
                     <Dropdown.Divider />
-                    <Dropdown.Header>Kepler–Poinsot · coming next</Dropdown.Header>
-                    {plannedStarSolids.map((name) => (
-                      <Dropdown.Item key={name} disabled>
-                        {name}
+                    <Dropdown.Header>Kepler–Poinsot</Dropdown.Header>
+                    {starSolids.map((option) => (
+                      <Dropdown.Item key={option.id} active={option.id === solidId} onClick={() => changeSolid(option.id)}>
+                        {option.name}
                       </Dropdown.Item>
                     ))}
                   </Dropdown.Menu>
@@ -240,8 +242,8 @@ export function App() {
                     type="button"
                     className="btn btn-primary"
                     onClick={startDualTransition}
-                    disabled={dualTransition}
-                    title={`Show dual: ${getSolid(solid.dualId).name}`}
+                    disabled={dualTransition || solid.family !== 'Platonic solid'}
+                    title={solid.family === 'Platonic solid' ? `Show dual: ${getSolid(solid.dualId).name}` : 'Star-polyhedron dual animation is coming next'}
                   >
                     <RefreshCw size={16} aria-hidden="true" /> Dual
                   </button>
@@ -256,6 +258,15 @@ export function App() {
                 </ButtonGroup>
               </Col>
             </Row>
+            <div className="d-flex justify-content-end align-items-center gap-2 mt-2">
+              <Form.Label htmlFor="duration" className="small mb-0 text-nowrap">
+                Duration: {duration.toFixed(1)} s
+              </Form.Label>
+              <div className="col-4 col-md-2">
+                <Form.Range id="duration" min={0.5} max={6} step={0.1} value={duration}
+                  disabled={dualTransition} onChange={(event) => setDuration(Number(event.target.value))} />
+              </div>
+            </div>
           </Card.Header>
 
           <Card.Body className="p-0 bg-body">
@@ -268,6 +279,7 @@ export function App() {
               zoom={zoom}
               dualTransition={dualTransition}
               onDualComplete={completeDualTransition}
+              duration={duration}
             />
           </Card.Body>
         </Card>

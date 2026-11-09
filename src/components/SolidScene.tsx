@@ -4,8 +4,9 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { Alert } from 'react-bootstrap'
 import { DoubleSide, EdgesGeometry, type LineSegments, type Mesh } from 'three'
 import type { OrbitControls as OrbitControlsImpl } from 'three-stdlib'
-import type { SolidId } from '../data/solids'
+import type { SolidId, PlatonicId } from '../data/solids'
 import { createCornerMorph } from '../three/cornerMorph'
+import { createStarGeometry, starModels, type StarSolidId } from '../three/starPolyhedra'
 
 interface SolidSceneProps {
   solidId: SolidId
@@ -14,16 +15,19 @@ interface SolidSceneProps {
   resetNonce: number
   zoom: { nonce: number; direction: 'in' | 'out' }
   dualTransition: boolean
+  duration: number
   onDualComplete: () => void
 }
 
 function DualMorphMesh({
   solidId,
   active,
+  duration,
   onComplete,
 }: {
-  solidId: SolidId
+  solidId: PlatonicId
   active: boolean
+  duration: number
   onComplete: () => void
 }) {
   const [origin] = useState(solidId)
@@ -53,7 +57,7 @@ function DualMorphMesh({
     if (!running.current || !mesh.current) return
     startedAt.current ??= clock.elapsedTime
     const elapsed = clock.elapsedTime - startedAt.current
-    const rawProgress = Math.min(1, elapsed / 1.8)
+    const rawProgress = Math.min(1, elapsed / duration)
     const progress = rawProgress * rawProgress * (3 - 2 * rawProgress)
     const geometry = build(endpoint.current === 0 ? progress : 1 - progress)
     mesh.current.geometry.dispose()
@@ -88,6 +92,24 @@ function DualMorphMesh({
       </mesh>
       <lineSegments ref={lines}>
         <edgesGeometry args={[initialGeometry, 1]} />
+        <lineBasicMaterial color="#f8f9fa" transparent opacity={0.88} />
+      </lineSegments>
+    </group>
+  )
+}
+
+function StarMesh({ id }: { id: StarSolidId }) {
+  const model = useMemo(() => createStarGeometry(id), [id])
+  useEffect(() => () => {
+    model.geometry.dispose()
+    model.edgeGeometry.dispose()
+  }, [model])
+  return (
+    <group rotation={[0.35, 0.45, 0]}>
+      <mesh geometry={model.geometry}>
+        <meshStandardMaterial color="#4cc9f0" side={DoubleSide} transparent opacity={0.58} depthWrite={false} roughness={0.38} flatShading />
+      </mesh>
+      <lineSegments geometry={model.edgeGeometry}>
         <lineBasicMaterial color="#f8f9fa" transparent opacity={0.88} />
       </lineSegments>
     </group>
@@ -149,7 +171,11 @@ export function SolidScene(props: SolidSceneProps) {
       <ambientLight intensity={1.2} />
       <directionalLight position={[3, 4, 5]} intensity={2.4} />
       <directionalLight position={[-4, -2, -3]} intensity={0.8} />
-      <DualMorphMesh solidId={props.solidId} active={props.dualTransition} onComplete={props.onDualComplete} />
+      {props.solidId in starModels ? (
+        <StarMesh id={props.solidId as StarSolidId} />
+      ) : (
+        <DualMorphMesh solidId={props.solidId as PlatonicId} active={props.dualTransition} duration={props.duration} onComplete={props.onDualComplete} />
+      )}
       <CameraControls
         autoRotate={props.autoRotate}
         resetNonce={props.resetNonce}

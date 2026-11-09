@@ -1,9 +1,11 @@
-export type SolidId =
+export type PlatonicId =
   | 'tetrahedron'
   | 'cube'
   | 'octahedron'
   | 'dodecahedron'
   | 'icosahedron'
+
+export type SolidId = PlatonicId | import('../three/starPolyhedra').StarSolidId
 
 export type SolidFamily = 'Platonic solid' | 'Kepler–Poinsot polyhedron'
 
@@ -26,7 +28,7 @@ export interface SolidDefinition {
   wikipediaUrl: string
 }
 
-export const solids: readonly SolidDefinition[] = [
+export const platonicSolids: readonly (SolidDefinition & { id: PlatonicId })[] = [
   {
     id: 'tetrahedron',
     name: 'Tetrahedron',
@@ -123,12 +125,23 @@ export const solids: readonly SolidDefinition[] = [
   },
 ] as const
 
-export const plannedStarSolids = [
-  'Small stellated dodecahedron',
-  'Great dodecahedron',
-  'Great stellated dodecahedron',
-  'Great icosahedron',
-] as const
+export const starSolids: readonly SolidDefinition[] = [
+  { id: 'small-stellated-dodecahedron', name: 'Small stellated dodecahedron', symbol: '{5/2,5}', faces: 12, edges: 30, vertices: 12, faceType: 'Pentagram', faceAngle: '36° (tip)', dualId: 'great-dodecahedron', vertexConfiguration: '(5/2)⁵' },
+  { id: 'great-dodecahedron', name: 'Great dodecahedron', symbol: '{5,5/2}', faces: 12, edges: 30, vertices: 12, faceType: 'Regular pentagon', faceAngle: '108°', dualId: 'small-stellated-dodecahedron', vertexConfiguration: '5^(5/2)' },
+  { id: 'great-stellated-dodecahedron', name: 'Great stellated dodecahedron', symbol: '{5/2,3}', faces: 12, edges: 30, vertices: 20, faceType: 'Pentagram', faceAngle: '36° (tip)', dualId: 'great-icosahedron', vertexConfiguration: '(5/2)³' },
+  { id: 'great-icosahedron', name: 'Great icosahedron', symbol: '{3,5/2}', faces: 20, edges: 30, vertices: 12, faceType: 'Equilateral triangle', faceAngle: '60°', dualId: 'great-stellated-dodecahedron', vertexConfiguration: '3^(5/2)' },
+].map((solid) => ({
+  ...solid,
+  id: solid.id as SolidId,
+  dualId: solid.dualId as SolidId,
+  family: 'Kepler–Poinsot polyhedron',
+  dihedralAngle: 'Not listed yet',
+  symmetry: 'Ih',
+  description: 'A regular self-intersecting star polyhedron. Face and edge crossings are not counted as extra vertices.',
+  wikipediaUrl: `https://en.wikipedia.org/wiki/${solid.name.replaceAll(' ', '_')}`,
+}))
+
+export const solids = [...platonicSolids, ...starSolids]
 
 export function getSolid(id: string | null): SolidDefinition {
   return solids.find((solid) => solid.id === id) ?? solids[0]

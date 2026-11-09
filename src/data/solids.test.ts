@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { getSolid, solids } from './solids'
+import { getSolid, platonicSolids as solids } from './solids'
 
 describe('solid catalog', () => {
   it('contains all five Platonic solids', () => {
