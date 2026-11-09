@@ -1,15 +1,11 @@
-import { Edges, OrbitControls } from '@react-three/drei'
+import { OrbitControls } from '@react-three/drei'
 import { Canvas, useFrame, useThree } from '@react-three/fiber'
-import { useEffect, useMemo, useRef } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { Alert } from 'react-bootstrap'
-import { DoubleSide, EdgesGeometry, type LineSegments } from 'three'
+import { DoubleSide, EdgesGeometry, type LineSegments, type Mesh } from 'three'
 import type { OrbitControls as OrbitControlsImpl } from 'three-stdlib'
 import type { SolidId } from '../data/solids'
-import {
-  createDualMorphGeometry,
-  createSolidGeometry,
-  updateDualMorphGeometry,
-} from '../three/geometry'
+import { createCornerMorph } from '../three/cornerMorph'
 
 interface SolidSceneProps {
   solidId: SolidId
@@ -21,69 +17,64 @@ interface SolidSceneProps {
   onDualComplete: () => void
 }
 
-function SolidMesh({ solidId }: { solidId: SolidId }) {
-  const geometry = useMemo(() => createSolidGeometry(solidId), [solidId])
-
-  useEffect(() => () => geometry.dispose(), [geometry])
-
-  return (
-    <mesh geometry={geometry} rotation={[0.35, 0.45, 0]}>
-      <meshStandardMaterial
-        color="#4cc9f0"
-        depthWrite={false}
-        metalness={0.08}
-        opacity={0.58}
-        roughness={0.38}
-        side={DoubleSide}
-        transparent
-      />
-      <Edges color="#f8f9fa" threshold={15} />
-    </mesh>
-  )
-}
-
 function DualMorphMesh({
   solidId,
+  active,
   onComplete,
 }: {
   solidId: SolidId
+  active: boolean
   onComplete: () => void
 }) {
-  const morph = useMemo(() => createDualMorphGeometry(solidId), [solidId])
+  const [origin] = useState(solidId)
+  const build = useMemo(() => createCornerMorph(origin), [origin])
+  const initialGeometry = useMemo(() => build(0), [build])
+  const mesh = useRef<Mesh>(null)
   const lines = useRef<LineSegments>(null)
   const startedAt = useRef<number | null>(null)
-  const completed = useRef(false)
+  const endpoint = useRef(0)
+  const running = useRef(false)
+
+  useEffect(() => {
+    if (active) {
+      running.current = true
+      startedAt.current = null
+    }
+  }, [active])
 
   useEffect(
     () => () => {
-      morph.geometry.dispose()
-      lines.current?.geometry.dispose()
+      initialGeometry.dispose()
     },
-    [morph],
+    [initialGeometry],
   )
 
   useFrame(({ clock }) => {
+    if (!running.current || !mesh.current) return
     startedAt.current ??= clock.elapsedTime
     const elapsed = clock.elapsedTime - startedAt.current
     const rawProgress = Math.min(1, elapsed / 1.8)
     const progress = rawProgress * rawProgress * (3 - 2 * rawProgress)
-    updateDualMorphGeometry(morph, progress)
+    const geometry = build(endpoint.current === 0 ? progress : 1 - progress)
+    mesh.current.geometry.dispose()
+    mesh.current.geometry = geometry
 
     if (lines.current) {
       const previous = lines.current.geometry
-      lines.current.geometry = new EdgesGeometry(morph.geometry, 12)
+      lines.current.geometry = new EdgesGeometry(geometry, 1)
       previous.dispose()
     }
 
-    if (rawProgress === 1 && !completed.current) {
-      completed.current = true
+    if (rawProgress === 1) {
+      running.current = false
+      endpoint.current = 1 - endpoint.current
       onComplete()
     }
   })
 
   return (
     <group rotation={[0.35, 0.45, 0]}>
-      <mesh geometry={morph.geometry}>
+      <mesh ref={mesh} geometry={initialGeometry}>
         <meshStandardMaterial
           color="#4cc9f0"
           depthWrite={false}
@@ -96,6 +87,7 @@ function DualMorphMesh({
         />
       </mesh>
       <lineSegments ref={lines}>
+        <edgesGeometry args={[initialGeometry, 1]} />
         <lineBasicMaterial color="#f8f9fa" transparent opacity={0.88} />
       </lineSegments>
     </group>
@@ -157,11 +149,7 @@ export function SolidScene(props: SolidSceneProps) {
       <ambientLight intensity={1.2} />
       <directionalLight position={[3, 4, 5]} intensity={2.4} />
       <directionalLight position={[-4, -2, -3]} intensity={0.8} />
-      {props.dualTransition ? (
-        <DualMorphMesh solidId={props.solidId} onComplete={props.onDualComplete} />
-      ) : (
-        <SolidMesh solidId={props.solidId} />
-      )}
+      <DualMorphMesh solidId={props.solidId} active={props.dualTransition} onComplete={props.onDualComplete} />
       <CameraControls
         autoRotate={props.autoRotate}
         resetNonce={props.resetNonce}

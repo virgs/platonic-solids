@@ -47,6 +47,7 @@ export function App() {
   const [solidId, setSolidId] = useState<SolidId>(() => initialSolid().id)
   const [autoRotate, setAutoRotate] = useState(false)
   const [dualTransition, setDualTransition] = useState(false)
+  const [selectionKey, setSelectionKey] = useState(0)
   const [resetNonce, setResetNonce] = useState(0)
   const [zoom, setZoom] = useState<{
     nonce: number
@@ -63,6 +64,7 @@ export function App() {
   function changeSolid(nextId: SolidId) {
     if (dualTransition) return
     setSolidId(nextId)
+    setSelectionKey((value) => value + 1)
     setResetNonce((value) => value + 1)
   }
 
@@ -190,7 +192,7 @@ export function App() {
                 <ButtonGroup size="sm" aria-label="Camera controls">
                   <button
                     type="button"
-                    className="btn btn-outline-secondary"
+                    className="btn btn-primary"
                     onClick={() => changeZoom('out')}
                     aria-label="Zoom out"
                     title="Zoom out"
@@ -199,7 +201,7 @@ export function App() {
                   </button>
                   <button
                     type="button"
-                    className="btn btn-outline-secondary"
+                    className="btn btn-primary"
                     onClick={() => setResetNonce((value) => value + 1)}
                     aria-label="Reset view"
                     title="Reset view"
@@ -208,7 +210,7 @@ export function App() {
                   </button>
                   <button
                     type="button"
-                    className="btn btn-outline-secondary"
+                    className="btn btn-primary"
                     onClick={() => changeZoom('in')}
                     aria-label="Zoom in"
                     title="Zoom in"
@@ -217,7 +219,7 @@ export function App() {
                   </button>
                   <button
                     type="button"
-                    className={`btn ${autoRotate ? 'btn-info' : 'btn-outline-secondary'}`}
+                    className={`btn ${autoRotate ? 'btn-info' : 'btn-primary'}`}
                     onClick={() => setAutoRotate((value) => !value)}
                     aria-label="Toggle automatic rotation"
                     aria-pressed={autoRotate}
@@ -258,6 +260,7 @@ export function App() {
 
           <Card.Body className="p-0 bg-body">
             <SolidScene
+              key={selectionKey}
               solidId={solid.id}
               solidName={solid.name}
               autoRotate={autoRotate}

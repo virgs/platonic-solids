@@ -79,6 +79,15 @@ Candidate techniques include:
 
 ### Dual transformation topology
 
+The implemented path now uses progressive corner cuts: each original vertex
+splits along its incident edges, original edges collapse, and the original
+faces eventually shrink to dual vertices. The surface is the convex boundary
+after clipping by the moving corner planes, normalized to circumradius one.
+Cube to octahedron passes through a cuboctahedron. The endpoint geometry stays
+mounted and the reverse transformation retraces the same construction, keeping
+orientation and camera state continuous. This supersedes the flag interpolation
+proposal below, which made the target appear to emerge inside the source.
+
 Dual animation uses one continuous boundary mesh rather than overlapping source
 and target solids. Each source face is subdivided into flag triangles whose
 points represent an original vertex, an edge midpoint, and a face center. The
