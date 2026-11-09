@@ -9,6 +9,7 @@ import {
   ZoomIn,
 } from 'lucide-react'
 import { useEffect, useState } from 'react'
+import { version } from '../package.json'
 import {
   Badge,
   ButtonGroup,
@@ -72,16 +73,27 @@ export function App() {
       <Navbar bg="primary" data-bs-theme="dark" className="py-1">
         <Container>
           <Navbar.Brand href="./" className="fw-semibold py-1">
+            <img
+              src={`${import.meta.env.BASE_URL}favicon.svg`}
+              width="28"
+              height="28"
+              className="d-inline-block align-top me-2"
+              alt=""
+              aria-hidden="true"
+            />
             Platonic Solids Explorer
           </Navbar.Brand>
-          <a
-            className="btn btn-outline-light btn-sm"
-            href="https://github.com/virgs/platonic-solids"
-            target="_blank"
-            rel="noreferrer"
-          >
-            <Github size={16} aria-hidden="true" /> GitHub
-          </a>
+          <Stack direction="horizontal" gap={2}>
+            <Badge bg="dark">v{version}</Badge>
+            <a
+              className="btn btn-outline-light btn-sm"
+              href="https://github.com/virgs/platonic-solids"
+              target="_blank"
+              rel="noreferrer"
+            >
+              <Github size={16} aria-hidden="true" /> GitHub
+            </a>
+          </Stack>
         </Container>
       </Navbar>
 

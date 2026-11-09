@@ -1,5 +1,16 @@
 import { expect, test } from '@playwright/test'
 
+test('release identity is visible and uses the shared favicon', async ({ page }) => {
+  await page.goto('./')
+
+  await expect(page.getByText('v0.2.0', { exact: true })).toBeVisible()
+  await expect(page.locator('nav img[src$="favicon.svg"]')).toBeVisible()
+  await expect(page.locator('link[rel="icon"]')).toHaveAttribute(
+    'href',
+    '/platonic-solids/favicon.svg',
+  )
+})
+
 test('the canvas occupies one responsive 21:9 stage without a spacer gap', async ({
   page,
 }) => {
