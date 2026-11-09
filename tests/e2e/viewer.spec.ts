@@ -3,7 +3,7 @@ import { expect, test } from '@playwright/test'
 test('release identity is visible and uses the shared favicon', async ({ page }) => {
   await page.goto('./')
 
-  await expect(page.getByText('v0.2.0', { exact: true })).toBeVisible()
+  await expect(page.getByText('v0.3.0', { exact: true })).toBeVisible()
   await expect(page.locator('nav img[src$="favicon.svg"]')).toBeVisible()
   await expect(page.locator('link[rel="icon"]')).toHaveAttribute(
     'href',
@@ -36,6 +36,32 @@ test('solid selection updates the model, properties, and URL', async ({ page }) 
   await expect(page.getByRole('heading', { name: 'Cube' })).toBeVisible()
   await expect(page).toHaveURL(/solid=cube/)
   await expect(page.getByLabel('Interactive 3D model of a Cube')).toBeVisible()
+})
+
+test('dual animates before committing the target solid', async ({ page }) => {
+  await page.goto('./?solid=cube')
+
+  const dual = page.getByRole('button', { name: 'Dual' })
+  await dual.click()
+  await expect(dual).toBeDisabled()
+  await expect(page.getByRole('heading', { name: 'Cube' })).toBeVisible()
+
+  await expect(page.getByRole('heading', { name: 'Octahedron' })).toBeVisible({
+    timeout: 3_000,
+  })
+  await expect(page).toHaveURL(/solid=octahedron/)
+  await expect(dual).toBeEnabled()
+})
+
+test('rotation defaults off and zoom out uses the expected icon', async ({ page }) => {
+  await page.goto('./')
+
+  await expect(
+    page.getByRole('button', { name: 'Toggle automatic rotation' }),
+  ).toHaveAttribute('aria-pressed', 'false')
+  await expect(
+    page.getByRole('button', { name: 'Zoom out' }).locator('.lucide-zoom-out'),
+  ).toBeVisible()
 })
 
 test('transformation controls remain above the stage', async ({ page }) => {
