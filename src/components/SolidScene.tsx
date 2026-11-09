@@ -1,11 +1,15 @@
 import { Edges, OrbitControls } from '@react-three/drei'
-import { Canvas, useThree } from '@react-three/fiber'
+import { Canvas, useFrame, useThree } from '@react-three/fiber'
 import { useEffect, useMemo, useRef } from 'react'
 import { Alert } from 'react-bootstrap'
-import { DoubleSide } from 'three'
+import { DoubleSide, EdgesGeometry, type LineSegments } from 'three'
 import type { OrbitControls as OrbitControlsImpl } from 'three-stdlib'
 import type { SolidId } from '../data/solids'
-import { createSolidGeometry } from '../three/geometry'
+import {
+  createDualMorphGeometry,
+  createSolidGeometry,
+  updateDualMorphGeometry,
+} from '../three/geometry'
 
 interface SolidSceneProps {
   solidId: SolidId
@@ -13,6 +17,8 @@ interface SolidSceneProps {
   autoRotate: boolean
   resetNonce: number
   zoom: { nonce: number; direction: 'in' | 'out' }
+  dualTransition: boolean
+  onDualComplete: () => void
 }
 
 function SolidMesh({ solidId }: { solidId: SolidId }) {
@@ -33,6 +39,66 @@ function SolidMesh({ solidId }: { solidId: SolidId }) {
       />
       <Edges color="#f8f9fa" threshold={15} />
     </mesh>
+  )
+}
+
+function DualMorphMesh({
+  solidId,
+  onComplete,
+}: {
+  solidId: SolidId
+  onComplete: () => void
+}) {
+  const morph = useMemo(() => createDualMorphGeometry(solidId), [solidId])
+  const lines = useRef<LineSegments>(null)
+  const startedAt = useRef<number | null>(null)
+  const completed = useRef(false)
+
+  useEffect(
+    () => () => {
+      morph.geometry.dispose()
+      lines.current?.geometry.dispose()
+    },
+    [morph],
+  )
+
+  useFrame(({ clock }) => {
+    startedAt.current ??= clock.elapsedTime
+    const elapsed = clock.elapsedTime - startedAt.current
+    const rawProgress = Math.min(1, elapsed / 1.8)
+    const progress = rawProgress * rawProgress * (3 - 2 * rawProgress)
+    updateDualMorphGeometry(morph, progress)
+
+    if (lines.current) {
+      const previous = lines.current.geometry
+      lines.current.geometry = new EdgesGeometry(morph.geometry, 12)
+      previous.dispose()
+    }
+
+    if (rawProgress === 1 && !completed.current) {
+      completed.current = true
+      onComplete()
+    }
+  })
+
+  return (
+    <group rotation={[0.35, 0.45, 0]}>
+      <mesh geometry={morph.geometry}>
+        <meshStandardMaterial
+          color="#4cc9f0"
+          depthWrite={false}
+          flatShading
+          metalness={0.08}
+          opacity={0.58}
+          roughness={0.38}
+          side={DoubleSide}
+          transparent
+        />
+      </mesh>
+      <lineSegments ref={lines}>
+        <lineBasicMaterial color="#f8f9fa" transparent opacity={0.88} />
+      </lineSegments>
+    </group>
   )
 }
 
@@ -91,7 +157,11 @@ export function SolidScene(props: SolidSceneProps) {
       <ambientLight intensity={1.2} />
       <directionalLight position={[3, 4, 5]} intensity={2.4} />
       <directionalLight position={[-4, -2, -3]} intensity={0.8} />
-      <SolidMesh solidId={props.solidId} />
+      {props.dualTransition ? (
+        <DualMorphMesh solidId={props.solidId} onComplete={props.onDualComplete} />
+      ) : (
+        <SolidMesh solidId={props.solidId} />
+      )}
       <CameraControls
         autoRotate={props.autoRotate}
         resetNonce={props.resetNonce}

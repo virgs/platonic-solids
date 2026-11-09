@@ -1,12 +1,12 @@
 import {
   Github,
-  Minus,
   Pause,
   Play,
   RefreshCw,
   RotateCcw,
   Sparkles,
   ZoomIn,
+  ZoomOut,
 } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { version } from '../package.json'
@@ -45,7 +45,8 @@ function Property({ label, value }: { label: string; value: string | number }) {
 
 export function App() {
   const [solidId, setSolidId] = useState<SolidId>(() => initialSolid().id)
-  const [autoRotate, setAutoRotate] = useState(true)
+  const [autoRotate, setAutoRotate] = useState(false)
+  const [dualTransition, setDualTransition] = useState(false)
   const [resetNonce, setResetNonce] = useState(0)
   const [zoom, setZoom] = useState<{
     nonce: number
@@ -60,8 +61,19 @@ export function App() {
   }, [solidId])
 
   function changeSolid(nextId: SolidId) {
+    if (dualTransition) return
     setSolidId(nextId)
     setResetNonce((value) => value + 1)
+  }
+
+  function startDualTransition() {
+    setAutoRotate(false)
+    setDualTransition(true)
+  }
+
+  function completeDualTransition() {
+    setSolidId(solid.dualId)
+    setDualTransition(false)
   }
 
   function changeZoom(direction: 'in' | 'out') {
@@ -144,7 +156,12 @@ export function App() {
             <Row className="align-items-center g-2">
               <Col xs={12} md={4}>
                 <Dropdown>
-                  <Dropdown.Toggle variant="primary" size="sm" id="solid-selector">
+                  <Dropdown.Toggle
+                    variant="primary"
+                    size="sm"
+                    id="solid-selector"
+                    disabled={dualTransition}
+                  >
                     {solid.name}
                   </Dropdown.Toggle>
                   <Dropdown.Menu>
@@ -178,7 +195,7 @@ export function App() {
                     aria-label="Zoom out"
                     title="Zoom out"
                   >
-                    <Minus size={16} aria-hidden="true" />
+                    <ZoomOut size={16} aria-hidden="true" />
                   </button>
                   <button
                     type="button"
@@ -220,7 +237,8 @@ export function App() {
                   <button
                     type="button"
                     className="btn btn-primary"
-                    onClick={() => changeSolid(solid.dualId)}
+                    onClick={startDualTransition}
+                    disabled={dualTransition}
                     title={`Show dual: ${getSolid(solid.dualId).name}`}
                   >
                     <RefreshCw size={16} aria-hidden="true" /> Dual
@@ -245,6 +263,8 @@ export function App() {
               autoRotate={autoRotate}
               resetNonce={resetNonce}
               zoom={zoom}
+              dualTransition={dualTransition}
+              onDualComplete={completeDualTransition}
             />
           </Card.Body>
         </Card>
