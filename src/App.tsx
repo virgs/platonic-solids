@@ -1,24 +1,12 @@
-import {
-  ExternalLink,
-  Github,
-  Minus,
-  Pause,
-  Play,
-  RotateCcw,
-  Sparkles,
-  ZoomIn,
-} from 'lucide-react'
+import { Github, Minus, Pause, Play, RotateCcw, Sparkles, ZoomIn } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import {
-  Accordion,
   Badge,
   ButtonGroup,
   Card,
-  Col,
   Container,
   Dropdown,
   Navbar,
-  Row,
   Stack,
 } from 'react-bootstrap'
 import { SolidScene } from './components/SolidScene'
@@ -36,10 +24,10 @@ function initialSolid(): SolidDefinition {
 
 function Property({ label, value }: { label: string; value: string | number }) {
   return (
-    <Col xs={6} md={4} lg={3}>
-      <div className="text-body-secondary small">{label}</div>
-      <div className="fw-semibold">{value}</div>
-    </Col>
+    <div>
+      <span className="text-body-secondary small me-1">{label}</span>
+      <span className="fw-semibold small">{value}</span>
+    </div>
   )
 }
 
@@ -70,45 +58,73 @@ export function App() {
 
   return (
     <>
-      <Navbar bg="primary" data-bs-theme="dark" expand="md">
+      <Navbar bg="primary" data-bs-theme="dark" className="py-1">
         <Container>
-          <Navbar.Brand href="./" className="fw-semibold">
+          <Navbar.Brand href="./" className="fw-semibold py-1">
             Platonic Solids Explorer
           </Navbar.Brand>
-          <Stack direction="horizontal" gap={2}>
-            <a
-              className="btn btn-outline-light btn-sm"
-              href="https://github.com/virgs/platonic-solids"
-              target="_blank"
-              rel="noreferrer"
-            >
-              <Github size={16} aria-hidden="true" /> GitHub
-            </a>
-          </Stack>
+          <a
+            className="btn btn-outline-light btn-sm"
+            href="https://github.com/virgs/platonic-solids"
+            target="_blank"
+            rel="noreferrer"
+          >
+            <Github size={16} aria-hidden="true" /> GitHub
+          </a>
         </Container>
       </Navbar>
 
-      <Container as="main" className="py-4">
-        <header className="mb-4">
-          <Badge bg="info" text="dark" className="mb-2">
-            Interactive geometry
-          </Badge>
-          <h1 className="display-6 mb-2">Meet the regular polyhedra</h1>
-          <p className="lead text-body-secondary mb-0">
-            Orbit each solid, compare its properties, and discover its dual.
-            Every model shares the same circumradius.
-          </p>
-        </header>
+      <Container as="main" className="py-2">
+        <Card className="border-0 bg-body mb-2">
+          <Card.Body className="px-2 py-1">
+            <Stack
+              direction="horizontal"
+              gap={3}
+              className="justify-content-between align-items-center flex-wrap"
+            >
+              <Stack direction="horizontal" gap={2}>
+                <div>
+                  <div className="text-info small fw-semibold text-uppercase">
+                    {solid.family}
+                  </div>
+                  <h1 className="h4 mb-0">{solid.name}</h1>
+                </div>
+                <Badge bg="secondary">{solid.symbol}</Badge>
+              </Stack>
 
-        <Card className="shadow mb-4">
-          <Card.Header>
+              <Stack
+                direction="horizontal"
+                gap={3}
+                className="flex-wrap justify-content-end"
+              >
+                <Property label="Faces" value={solid.faces} />
+                <Property label="Edges" value={solid.edges} />
+                <Property label="Vertices" value={solid.vertices} />
+                <Property label="Face" value={solid.faceType} />
+                <Property label="Face angle" value={solid.faceAngle} />
+                <Property label="Dihedral" value={solid.dihedralAngle} />
+                <a
+                  className="link-info small"
+                  href={solid.wikipediaUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  Wikipedia
+                </a>
+              </Stack>
+            </Stack>
+          </Card.Body>
+        </Card>
+
+        <Card className="border-0 bg-body">
+          <Card.Header className="border-0 bg-body px-2 py-1">
             <Stack
               direction="horizontal"
               gap={2}
-              className="justify-content-between flex-wrap"
+              className="justify-content-between align-items-center flex-wrap"
             >
               <Dropdown>
-                <Dropdown.Toggle variant="primary" id="solid-selector">
+                <Dropdown.Toggle variant="primary" size="sm" id="solid-selector">
                   {solid.name}
                 </Dropdown.Toggle>
                 <Dropdown.Menu>
@@ -132,50 +148,74 @@ export function App() {
                 </Dropdown.Menu>
               </Dropdown>
 
-              <ButtonGroup aria-label="Camera controls">
-                <button
-                  type="button"
-                  className="btn btn-outline-secondary"
-                  onClick={() => changeZoom('out')}
-                  aria-label="Zoom out"
-                  title="Zoom out"
-                >
-                  <Minus size={18} aria-hidden="true" />
-                </button>
-                <button
-                  type="button"
-                  className="btn btn-outline-secondary"
-                  onClick={() => setResetNonce((value) => value + 1)}
-                >
-                  <RotateCcw size={18} aria-hidden="true" /> Reset
-                </button>
-                <button
-                  type="button"
-                  className="btn btn-outline-secondary"
-                  onClick={() => changeZoom('in')}
-                  aria-label="Zoom in"
-                  title="Zoom in"
-                >
-                  <ZoomIn size={18} aria-hidden="true" />
-                </button>
-                <button
-                  type="button"
-                  className={`btn ${autoRotate ? 'btn-info' : 'btn-outline-secondary'}`}
-                  onClick={() => setAutoRotate((value) => !value)}
-                  aria-pressed={autoRotate}
-                >
-                  {autoRotate ? (
-                    <Pause size={18} aria-hidden="true" />
-                  ) : (
-                    <Play size={18} aria-hidden="true" />
-                  )}{' '}
-                  Rotate
-                </button>
-              </ButtonGroup>
+              <Stack direction="horizontal" gap={2} className="flex-wrap ms-auto">
+                <ButtonGroup size="sm" aria-label="Camera controls">
+                  <button
+                    type="button"
+                    className="btn btn-outline-secondary"
+                    onClick={() => changeZoom('out')}
+                    aria-label="Zoom out"
+                    title="Zoom out"
+                  >
+                    <Minus size={16} aria-hidden="true" />
+                  </button>
+                  <button
+                    type="button"
+                    className="btn btn-outline-secondary"
+                    onClick={() => setResetNonce((value) => value + 1)}
+                    aria-label="Reset view"
+                    title="Reset view"
+                  >
+                    <RotateCcw size={16} aria-hidden="true" />
+                  </button>
+                  <button
+                    type="button"
+                    className="btn btn-outline-secondary"
+                    onClick={() => changeZoom('in')}
+                    aria-label="Zoom in"
+                    title="Zoom in"
+                  >
+                    <ZoomIn size={16} aria-hidden="true" />
+                  </button>
+                  <button
+                    type="button"
+                    className={`btn ${autoRotate ? 'btn-info' : 'btn-outline-secondary'}`}
+                    onClick={() => setAutoRotate((value) => !value)}
+                    aria-label="Toggle automatic rotation"
+                    aria-pressed={autoRotate}
+                    title="Toggle automatic rotation"
+                  >
+                    {autoRotate ? (
+                      <Pause size={16} aria-hidden="true" />
+                    ) : (
+                      <Play size={16} aria-hidden="true" />
+                    )}
+                  </button>
+                </ButtonGroup>
+
+                <ButtonGroup size="sm" aria-label="Solid transformations">
+                  <button
+                    type="button"
+                    className="btn btn-primary"
+                    onClick={() => changeSolid(solid.dualId)}
+                    title={`Show dual: ${getSolid(solid.dualId).name}`}
+                  >
+                    Dual
+                  </button>
+                  <button
+                    type="button"
+                    className="btn btn-outline-info"
+                    disabled
+                    title="Stellation geometry is planned for the next milestone"
+                  >
+                    <Sparkles size={16} aria-hidden="true" /> Stellate
+                  </button>
+                </ButtonGroup>
+              </Stack>
             </Stack>
           </Card.Header>
 
-          <Card.Body className="p-0">
+          <Card.Body className="p-0 bg-body">
             <SolidScene
               solidId={solid.id}
               solidName={solid.name}
@@ -183,94 +223,6 @@ export function App() {
               resetNonce={resetNonce}
               zoom={zoom}
             />
-          </Card.Body>
-
-          <Card.Footer>
-            <Stack
-              direction="horizontal"
-              gap={2}
-              className="justify-content-center flex-wrap"
-            >
-              <button
-                type="button"
-                className="btn btn-primary"
-                onClick={() => changeSolid(solid.dualId)}
-              >
-                Show dual: {getSolid(solid.dualId).name}
-              </button>
-              <button
-                type="button"
-                className="btn btn-outline-info"
-                disabled
-                title="Stellation geometry is planned for the next milestone"
-              >
-                <Sparkles size={18} aria-hidden="true" /> Stellate
-              </button>
-            </Stack>
-            <p className="text-center text-body-secondary small mt-2 mb-0">
-              Drag to orbit · Scroll or pinch to zoom
-            </p>
-          </Card.Footer>
-        </Card>
-
-        <Card className="shadow-sm mb-4">
-          <Card.Body>
-            <Stack
-              direction="horizontal"
-              className="justify-content-between align-items-start flex-wrap mb-3"
-              gap={2}
-            >
-              <div>
-                <div className="text-info small fw-semibold text-uppercase">
-                  {solid.family}
-                </div>
-                <h2 className="mb-1">{solid.name}</h2>
-                {solid.alternateName && (
-                  <div className="text-body-secondary">{solid.alternateName}</div>
-                )}
-              </div>
-              <Badge bg="secondary" className="fs-5">
-                {solid.symbol}
-              </Badge>
-            </Stack>
-
-            <Row className="g-3 mb-4">
-              <Property label="Faces" value={solid.faces} />
-              <Property label="Edges" value={solid.edges} />
-              <Property label="Vertices" value={solid.vertices} />
-              <Property label="Face" value={solid.faceType} />
-              <Property label="Face angle" value={solid.faceAngle} />
-              <Property label="Dihedral angle" value={solid.dihedralAngle} />
-              <Property label="Dual" value={getSolid(solid.dualId).name} />
-              <Property label="Circumradius" value="1 (normalized)" />
-            </Row>
-
-            <Accordion flush>
-              <Accordion.Item eventKey="details">
-                <Accordion.Header>More details</Accordion.Header>
-                <Accordion.Body>
-                  <p>{solid.description}</p>
-                  <Row className="g-3 mb-3">
-                    <Property
-                      label="Vertex configuration"
-                      value={solid.vertexConfiguration}
-                    />
-                    <Property label="Symmetry" value={solid.symmetry} />
-                    <Property label="Convexity" value="Convex" />
-                    <Property label="Euler characteristic" value="2" />
-                  </Row>
-                  <a
-                    className="btn btn-outline-info"
-                    href={solid.wikipediaUrl}
-                    target="_blank"
-                    rel="noreferrer"
-                  >
-                    Read on Wikipedia{' '}
-                    <ExternalLink size={16} aria-hidden="true" />
-                  </a>
-                </Accordion.Body>
-              </Accordion.Item>
-            </Accordion>
           </Card.Body>
         </Card>
       </Container>

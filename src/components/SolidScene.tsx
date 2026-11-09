@@ -69,7 +69,7 @@ export function SolidScene(props: SolidSceneProps) {
     <Canvas
       aria-label={`Interactive 3D model of a ${props.solidName}`}
       camera={{ position: [2.4, 1.7, 2.4], fov: 42 }}
-      className="ratio ratio-16x9"
+      className="ratio ratio-21x9"
       dpr={[1, 2]}
       fallback={
         <Alert variant="warning" className="m-3">
@@ -78,7 +78,7 @@ export function SolidScene(props: SolidSceneProps) {
         </Alert>
       }
     >
-      <color attach="background" args={['#101418']} />
+      <color attach="background" args={['#222222']} />
       <ambientLight intensity={1.2} />
       <directionalLight position={[3, 4, 5]} intensity={2.4} />
       <directionalLight position={[-4, -2, -3]} intensity={0.8} />
