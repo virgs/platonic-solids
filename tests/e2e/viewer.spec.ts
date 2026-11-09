@@ -3,7 +3,7 @@ import { expect, test } from '@playwright/test'
 test('release identity is visible and uses the shared favicon', async ({ page }) => {
   await page.goto('./')
 
-  await expect(page.getByText('v0.3.0', { exact: true })).toBeVisible()
+  await expect(page.getByText('v0.4.0', { exact: true })).toBeVisible()
   await expect(page.locator('nav img[src$="favicon.svg"]')).toBeVisible()
   await expect(page.locator('link[rel="icon"]')).toHaveAttribute(
     'href',
@@ -50,6 +50,10 @@ test('dual animates before committing the target solid', async ({ page }) => {
     timeout: 3_000,
   })
   await expect(page).toHaveURL(/solid=octahedron/)
+  await expect(dual).toBeEnabled()
+  await dual.click()
+  await expect(dual).toBeDisabled()
+  await expect(page.getByRole('heading', { name: 'Cube' })).toBeVisible({ timeout: 3_000 })
   await expect(dual).toBeEnabled()
 })
 
