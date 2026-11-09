@@ -37,6 +37,11 @@ components. Built-in Three.js Platonic geometries may be used after verifying
 their topology and orientation. Kepler–Poinsot meshes will likely require
 reviewed vertex/face datasets or explicit construction algorithms.
 
+Every completed geometry is centered at the origin and normalized to a unit
+circumradius. The normalization uses the greatest distance from the origin to
+any vertex, including the outermost vertices of a star polyhedron. Runtime
+selection and camera interaction must not change the mesh scale.
+
 ### State model
 
 The initial state is small enough for React state and context:
@@ -81,8 +86,11 @@ if it materially simplifies orchestration or accessibility.
 
 - Perspective camera with bounded zoom distance
 - Orbit controls with damping
-- Pan enabled but constrained so the solid is not easily lost
-- Reset and fit-to-object action
+- Pan disabled and the orbit target fixed at the solid's center
+- Wheel and trackpad zoom implemented as camera dolly movement
+- One-finger touch orbit and two-finger pinch zoom
+- Reset action that restores the standard target, distance, and orientation
+- Explicit auto-rotate toggle, paused during direct manipulation
 - Neutral lighting that keeps faces and edges readable
 - Optional edge overlay with adequate contrast
 - Device pixel ratio capped to protect performance on dense displays
@@ -98,6 +106,9 @@ not yet fixed.
 - **Playwright** for selection, URL sharing, responsive layout, and deployment
   smoke tests
 - Geometry integrity checks for expected vertex, edge, and face counts
+- Geometry normalization checks asserting a common circumradius
+- Interaction checks asserting that zoom changes the camera rather than mesh
+  scale
 
 Canvas pixel snapshots should be used sparingly because they are brittle across
 renderers. Prefer topology checks and user-observable behavior.
