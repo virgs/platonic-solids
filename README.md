@@ -29,8 +29,24 @@ utilities. There will be no project CSS/SCSS files, CSS Modules, CSS-in-JS, or
 component style overrides. WebGL material and scene configuration is geometry
 and rendering data, not page CSS.
 
+## Development
+
+```bash
+npm install
+npm run dev
+```
+
+Quality checks:
+
+```bash
+npm run lint
+npm test
+npm run build
+```
+
 ## Status
 
-No application code has been started yet. The next step is to resolve the open
-questions in the project documents and approve the first implementation
-milestone.
+The first implementation milestone includes the responsive HUD, normalized 3D
+geometry for all five Platonic solids, camera controls, dual navigation, and
+the core property catalog. Kepler–Poinsot geometry and transformation
+animations are the next major milestone.
