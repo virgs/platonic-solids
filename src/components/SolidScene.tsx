@@ -2,6 +2,7 @@ import { Edges, OrbitControls } from '@react-three/drei'
 import { Canvas, useThree } from '@react-three/fiber'
 import { useEffect, useMemo, useRef } from 'react'
 import { Alert } from 'react-bootstrap'
+import { DoubleSide } from 'three'
 import type { OrbitControls as OrbitControlsImpl } from 'three-stdlib'
 import type { SolidId } from '../data/solids'
 import { createSolidGeometry } from '../three/geometry'
@@ -21,7 +22,15 @@ function SolidMesh({ solidId }: { solidId: SolidId }) {
 
   return (
     <mesh geometry={geometry} rotation={[0.35, 0.45, 0]}>
-      <meshStandardMaterial color="#4cc9f0" roughness={0.38} metalness={0.08} />
+      <meshStandardMaterial
+        color="#4cc9f0"
+        depthWrite={false}
+        metalness={0.08}
+        opacity={0.58}
+        roughness={0.38}
+        side={DoubleSide}
+        transparent
+      />
       <Edges color="#f8f9fa" threshold={15} />
     </mesh>
   )

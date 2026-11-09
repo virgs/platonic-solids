@@ -1,12 +1,23 @@
-import { Github, Minus, Pause, Play, RotateCcw, Sparkles, ZoomIn } from 'lucide-react'
+import {
+  Github,
+  Minus,
+  Pause,
+  Play,
+  RefreshCw,
+  RotateCcw,
+  Sparkles,
+  ZoomIn,
+} from 'lucide-react'
 import { useEffect, useState } from 'react'
 import {
   Badge,
   ButtonGroup,
   Card,
+  Col,
   Container,
   Dropdown,
   Navbar,
+  Row,
   Stack,
 } from 'react-bootstrap'
 import { SolidScene } from './components/SolidScene'
@@ -118,37 +129,35 @@ export function App() {
 
         <Card className="border-0 bg-body">
           <Card.Header className="border-0 bg-body px-2 py-1">
-            <Stack
-              direction="horizontal"
-              gap={2}
-              className="justify-content-between align-items-center flex-wrap"
-            >
-              <Dropdown>
-                <Dropdown.Toggle variant="primary" size="sm" id="solid-selector">
-                  {solid.name}
-                </Dropdown.Toggle>
-                <Dropdown.Menu>
-                  <Dropdown.Header>Platonic solids</Dropdown.Header>
-                  {solids.map((option) => (
-                    <Dropdown.Item
-                      key={option.id}
-                      active={option.id === solidId}
-                      onClick={() => changeSolid(option.id)}
-                    >
-                      {option.name}
-                    </Dropdown.Item>
-                  ))}
-                  <Dropdown.Divider />
-                  <Dropdown.Header>Kepler–Poinsot · coming next</Dropdown.Header>
-                  {plannedStarSolids.map((name) => (
-                    <Dropdown.Item key={name} disabled>
-                      {name}
-                    </Dropdown.Item>
-                  ))}
-                </Dropdown.Menu>
-              </Dropdown>
+            <Row className="align-items-center g-2">
+              <Col xs={12} md={4}>
+                <Dropdown>
+                  <Dropdown.Toggle variant="primary" size="sm" id="solid-selector">
+                    {solid.name}
+                  </Dropdown.Toggle>
+                  <Dropdown.Menu>
+                    <Dropdown.Header>Platonic solids</Dropdown.Header>
+                    {solids.map((option) => (
+                      <Dropdown.Item
+                        key={option.id}
+                        active={option.id === solidId}
+                        onClick={() => changeSolid(option.id)}
+                      >
+                        {option.name}
+                      </Dropdown.Item>
+                    ))}
+                    <Dropdown.Divider />
+                    <Dropdown.Header>Kepler–Poinsot · coming next</Dropdown.Header>
+                    {plannedStarSolids.map((name) => (
+                      <Dropdown.Item key={name} disabled>
+                        {name}
+                      </Dropdown.Item>
+                    ))}
+                  </Dropdown.Menu>
+                </Dropdown>
+              </Col>
 
-              <Stack direction="horizontal" gap={2} className="flex-wrap ms-auto">
+              <Col xs={12} md={4} className="text-center">
                 <ButtonGroup size="sm" aria-label="Camera controls">
                   <button
                     type="button"
@@ -192,7 +201,9 @@ export function App() {
                     )}
                   </button>
                 </ButtonGroup>
+              </Col>
 
+              <Col xs={12} md={4} className="text-md-end">
                 <ButtonGroup size="sm" aria-label="Solid transformations">
                   <button
                     type="button"
@@ -200,7 +211,7 @@ export function App() {
                     onClick={() => changeSolid(solid.dualId)}
                     title={`Show dual: ${getSolid(solid.dualId).name}`}
                   >
-                    Dual
+                    <RefreshCw size={16} aria-hidden="true" /> Dual
                   </button>
                   <button
                     type="button"
@@ -211,8 +222,8 @@ export function App() {
                     <Sparkles size={16} aria-hidden="true" /> Stellate
                   </button>
                 </ButtonGroup>
-              </Stack>
-            </Stack>
+              </Col>
+            </Row>
           </Card.Header>
 
           <Card.Body className="p-0 bg-body">

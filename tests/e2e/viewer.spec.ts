@@ -51,3 +51,14 @@ test('the complete desktop HUD fits within one viewport', async ({ page }) => {
 
   expect(dimensions.document).toBeLessThanOrEqual(dimensions.viewport)
 })
+
+test('camera controls are horizontally centered on desktop', async ({ page }) => {
+  test.skip((page.viewportSize()?.width ?? 0) < 768)
+  await page.goto('./')
+
+  const controls = await page.getByRole('group', { name: 'Camera controls' }).boundingBox()
+  const viewportWidth = page.viewportSize()!.width
+
+  expect(controls).not.toBeNull()
+  expect(controls!.x + controls!.width / 2).toBeCloseTo(viewportWidth / 2, -1)
+})
