@@ -1,9 +1,10 @@
 import { expect, test } from '@playwright/test'
+import packageInfo from '../../package.json' with { type: 'json' }
 
 test('release identity is visible and uses the shared favicon', async ({ page }) => {
   await page.goto('./')
 
-  await expect(page.getByText('v0.4.0', { exact: true })).toBeVisible()
+  await expect(page.getByText(`v${packageInfo.version}`, { exact: true })).toBeVisible()
   await expect(page.locator('nav img[src$="favicon.svg"]')).toBeVisible()
   await expect(page.locator('link[rel="icon"]')).toHaveAttribute(
     'href',
@@ -66,6 +67,32 @@ test('rotation defaults off and zoom out uses the expected icon', async ({ page 
   await expect(
     page.getByRole('button', { name: 'Zoom out' }).locator('.lucide-zoom-out'),
   ).toBeVisible()
+})
+
+test('duration controls the dual animation and locks while running', async ({ page }) => {
+  await page.goto('./?solid=cube')
+  const slider = page.getByRole('slider', { name: /Duration/ })
+  await slider.fill('0.5')
+  await page.getByRole('button', { name: 'Dual' }).click()
+  await expect(slider).toBeDisabled()
+  await expect(page.getByRole('heading', { name: 'Octahedron' })).toBeVisible({ timeout: 2000 })
+  await expect(slider).toBeEnabled()
+})
+
+test('all four Kepler–Poinsot models are selectable', async ({ page }) => {
+  const errors: string[] = []
+  page.on('pageerror', (error) => errors.push(error.message))
+  await page.goto('./')
+  for (const name of ['Small stellated dodecahedron', 'Great dodecahedron', 'Great stellated dodecahedron', 'Great icosahedron']) {
+    await page.locator('#solid-selector').click()
+    await page.getByRole('button', { name, exact: true }).click()
+    await expect(page.getByRole('heading', { name, exact: true })).toBeVisible()
+    await expect(page.getByRole('button', { name: 'Dual', exact: true })).toBeDisabled()
+  }
+  expect(errors).toEqual([])
+  await expect(page.locator('canvas')).toHaveAttribute('data-engine', /three.js/)
+  await page.evaluate(() => new Promise<void>((resolve) => requestAnimationFrame(() => requestAnimationFrame(() => resolve()))))
+  await page.screenshot({ path: test.info().outputPath('star-viewer.png') })
 })
 
 test('transformation controls remain above the stage', async ({ page }) => {
