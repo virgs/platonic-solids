@@ -71,12 +71,37 @@ test('rotation defaults off and zoom out uses the expected icon', async ({ page 
 
 test('duration controls the dual animation and locks while running', async ({ page }) => {
   await page.goto('./?solid=cube')
-  const slider = page.getByRole('slider', { name: /Duration/ })
+  const slider = page.getByRole('slider', { name: /Transformation time/ })
   await slider.fill('0.5')
   await page.getByRole('button', { name: 'Dual' }).click()
   await expect(slider).toBeDisabled()
   await expect(page.getByRole('heading', { name: 'Octahedron' })).toBeVisible({ timeout: 2000 })
   await expect(slider).toBeEnabled()
+})
+
+test('the player can seek, hold an intermediate shape, and resume', async ({ page }) => {
+  await page.goto('./?solid=cube')
+  const progress = page.getByRole('slider', { name: /Transformation progress/ })
+  await progress.fill('0.5')
+  await expect(progress).toHaveValue('0.5')
+  await expect(page.getByRole('heading', { name: 'Cube', exact: true })).toBeVisible()
+  await expect(page.getByRole('button', { name: 'Play transformation', exact: true })).toBeVisible()
+  await page.getByRole('button', { name: 'Play transformation', exact: true }).click()
+  await expect(page.getByRole('button', { name: 'Pause transformation', exact: true })).toBeVisible()
+  await expect(page.getByRole('heading', { name: 'Octahedron', exact: true })).toBeVisible()
+  await progress.fill('0.25')
+  await expect(progress).toHaveValue('0.25')
+  await progress.fill('0')
+  await expect(page.getByRole('heading', { name: 'Cube', exact: true })).toBeVisible()
+  await expect(page.locator('#solid-selector')).toBeEnabled()
+})
+
+test('face opacity defaults to 85 percent and is adjustable', async ({ page }) => {
+  await page.goto('./')
+  const opacity = page.getByRole('slider', { name: /Face opacity/ })
+  await expect(opacity).toHaveValue('0.85')
+  await opacity.fill('1')
+  await expect(page.getByText('Face opacity: 100%', { exact: true })).toBeVisible()
 })
 
 test('all four Kepler–Poinsot models are selectable', async ({ page }) => {
