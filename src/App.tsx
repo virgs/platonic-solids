@@ -4,6 +4,7 @@ import {
   Play,
   RefreshCw,
   RotateCcw,
+  Rotate3D,
   Sparkles,
   ZoomIn,
   ZoomOut,
@@ -245,7 +246,7 @@ export function App() {
                     aria-label="Reset view"
                     title="Reset view"
                   >
-                    <RotateCcw size={16} aria-hidden="true" />
+                    <RotateCcw size={16} aria-hidden="true" /> Reset view
                   </button>
                   <button
                     type="button"
@@ -264,11 +265,7 @@ export function App() {
                     aria-pressed={autoRotate}
                     title="Toggle automatic rotation"
                   >
-                    {autoRotate ? (
-                      <Pause size={16} aria-hidden="true" />
-                    ) : (
-                      <Play size={16} aria-hidden="true" />
-                    )}
+                    <Rotate3D size={16} aria-hidden="true" /> Auto-rotate
                   </button>
                 </ButtonGroup>
               </Col>
@@ -293,6 +290,11 @@ export function App() {
                     <Sparkles size={16} aria-hidden="true" /> Stellate
                   </button>
                 </ButtonGroup>
+                {solid.family !== 'Platonic solid' && (
+                  <div className="small text-body-secondary mt-1">
+                    Star transformations are not implemented yet.
+                  </div>
+                )}
               </Col>
             </Row>
             <Row className="align-items-center g-2 mt-1">
