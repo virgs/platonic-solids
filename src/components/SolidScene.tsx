@@ -69,6 +69,7 @@ export function SolidScene(props: SolidSceneProps) {
     <Canvas
       aria-label={`Interactive 3D model of a ${props.solidName}`}
       camera={{ position: [2.4, 1.7, 2.4], fov: 42 }}
+      className="ratio ratio-16x9"
       dpr={[1, 2]}
       fallback={
         <Alert variant="warning" className="m-3">

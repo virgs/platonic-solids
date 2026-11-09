@@ -176,15 +176,13 @@ export function App() {
           </Card.Header>
 
           <Card.Body className="p-0">
-            <div className="ratio ratio-16x9">
-              <SolidScene
-                solidId={solid.id}
-                solidName={solid.name}
-                autoRotate={autoRotate}
-                resetNonce={resetNonce}
-                zoom={zoom}
-              />
-            </div>
+            <SolidScene
+              solidId={solid.id}
+              solidName={solid.name}
+              autoRotate={autoRotate}
+              resetNonce={resetNonce}
+              zoom={zoom}
+            />
           </Card.Body>
 
           <Card.Footer>
