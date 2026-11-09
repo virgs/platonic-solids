@@ -1,5 +1,5 @@
 import { OrbitControls } from '@react-three/drei'
-import { Canvas, useFrame, useThree } from '@react-three/fiber'
+import { Canvas, useThree } from '@react-three/fiber'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { Alert } from 'react-bootstrap'
 import { DoubleSide, EdgesGeometry, type LineSegments, type Mesh } from 'three'
@@ -14,37 +14,24 @@ interface SolidSceneProps {
   autoRotate: boolean
   resetNonce: number
   zoom: { nonce: number; direction: 'in' | 'out' }
-  dualTransition: boolean
-  duration: number
-  onDualComplete: () => void
+  progress: number
+  opacity: number
 }
 
 function DualMorphMesh({
   solidId,
-  active,
-  duration,
-  onComplete,
+  progress,
+  opacity,
 }: {
   solidId: PlatonicId
-  active: boolean
-  duration: number
-  onComplete: () => void
+  progress: number
+  opacity: number
 }) {
   const [origin] = useState(solidId)
   const build = useMemo(() => createCornerMorph(origin), [origin])
   const initialGeometry = useMemo(() => build(0), [build])
   const mesh = useRef<Mesh>(null)
   const lines = useRef<LineSegments>(null)
-  const startedAt = useRef<number | null>(null)
-  const endpoint = useRef(0)
-  const running = useRef(false)
-
-  useEffect(() => {
-    if (active) {
-      running.current = true
-      startedAt.current = null
-    }
-  }, [active])
 
   useEffect(
     () => () => {
@@ -53,13 +40,9 @@ function DualMorphMesh({
     [initialGeometry],
   )
 
-  useFrame(({ clock }) => {
-    if (!running.current || !mesh.current) return
-    startedAt.current ??= clock.elapsedTime
-    const elapsed = clock.elapsedTime - startedAt.current
-    const rawProgress = Math.min(1, elapsed / duration)
-    const progress = rawProgress * rawProgress * (3 - 2 * rawProgress)
-    const geometry = build(endpoint.current === 0 ? progress : 1 - progress)
+  useEffect(() => {
+    if (!mesh.current) return
+    const geometry = build(progress)
     mesh.current.geometry.dispose()
     mesh.current.geometry = geometry
 
@@ -69,22 +52,17 @@ function DualMorphMesh({
       previous.dispose()
     }
 
-    if (rawProgress === 1) {
-      running.current = false
-      endpoint.current = 1 - endpoint.current
-      onComplete()
-    }
-  })
+  }, [build, progress])
 
   return (
     <group rotation={[0.35, 0.45, 0]}>
       <mesh ref={mesh} geometry={initialGeometry}>
         <meshStandardMaterial
           color="#4cc9f0"
-          depthWrite={false}
+          depthWrite={opacity === 1}
           flatShading
           metalness={0.08}
-          opacity={0.58}
+          opacity={opacity}
           roughness={0.38}
           side={DoubleSide}
           transparent
@@ -98,7 +76,7 @@ function DualMorphMesh({
   )
 }
 
-function StarMesh({ id }: { id: StarSolidId }) {
+function StarMesh({ id, opacity }: { id: StarSolidId; opacity: number }) {
   const model = useMemo(() => createStarGeometry(id), [id])
   useEffect(() => () => {
     model.geometry.dispose()
@@ -107,7 +85,7 @@ function StarMesh({ id }: { id: StarSolidId }) {
   return (
     <group rotation={[0.35, 0.45, 0]}>
       <mesh geometry={model.geometry}>
-        <meshStandardMaterial color="#4cc9f0" side={DoubleSide} transparent opacity={0.58} depthWrite={false} roughness={0.38} flatShading />
+        <meshStandardMaterial color="#4cc9f0" side={DoubleSide} transparent opacity={opacity} depthWrite={opacity === 1} roughness={0.38} flatShading />
       </mesh>
       <lineSegments geometry={model.edgeGeometry}>
         <lineBasicMaterial color="#f8f9fa" transparent opacity={0.88} />
@@ -172,9 +150,9 @@ export function SolidScene(props: SolidSceneProps) {
       <directionalLight position={[3, 4, 5]} intensity={2.4} />
       <directionalLight position={[-4, -2, -3]} intensity={0.8} />
       {props.solidId in starModels ? (
-        <StarMesh id={props.solidId as StarSolidId} />
+        <StarMesh id={props.solidId as StarSolidId} opacity={props.opacity} />
       ) : (
-        <DualMorphMesh solidId={props.solidId as PlatonicId} active={props.dualTransition} duration={props.duration} onComplete={props.onDualComplete} />
+        <DualMorphMesh solidId={props.solidId as PlatonicId} progress={props.progress} opacity={props.opacity} />
       )}
       <CameraControls
         autoRotate={props.autoRotate}

@@ -52,4 +52,8 @@ cuts, with a configurable duration of 0.5–6 seconds. Star-polyhedron dual and
 stellation animations are planned; their controls remain disabled until those
 transformations are implemented.
 
+The centered transformation player supports play, pause, and direct progress
+scrubbing. Dragging progress pauses playback and preserves the intermediate
+surface. Face opacity defaults to 85% and can be adjusted from 20% to 100%.
+
 Star models use explicit face definitions; see [geometry sources](docs/geometry-sources.md).
