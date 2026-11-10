@@ -2,7 +2,6 @@ import {
   Github,
   Network,
   History,
-  Blend,
   ArrowLeft,
   ArrowRight,
   RefreshCw,
@@ -18,7 +17,6 @@ import {
   Badge,
   ButtonGroup,
   Card,
-  Collapse,
   Col,
   Container,
   Dropdown,
@@ -31,6 +29,7 @@ import {
 } from 'react-bootstrap'
 import { SolidScene } from './components/SolidScene'
 import { RelationshipMap } from './components/RelationshipMap'
+import { OpacityControl } from './components/OpacityControl'
 import { TransformationPlayer, TransformationExplanation } from './components/TransformationPlayer'
 import { routesFrom } from './data/routes'
 import { stellationTargets, type TransformationKind, type Polyhedron } from './three/transformations'
@@ -361,7 +360,7 @@ export function App() {
                   <Form.Label htmlFor="solid-color" className="visually-hidden">Color</Form.Label>
                   <Form.Control type="color" id="solid-color" size="sm" className="ms-2" value={color}
                     title="Solid color" onChange={(event) => setColor(event.target.value)} />
-                  <button className="btn btn-primary btn-sm ms-2" aria-label="Toggle face opacity" title="Face opacity" aria-expanded={showDisplay} aria-controls="display-settings" onClick={() => setShowDisplay((value) => !value)}><Blend size={16} /></button>
+                  <OpacityControl value={opacity} onChange={setOpacity} show={showDisplay} onToggle={setShowDisplay} />
                 </ButtonGroup>
               </Col>
 
@@ -372,10 +371,10 @@ export function App() {
                 </div>
               </Col>
             </Row>
-            <div className="d-flex gap-2 justify-content-center flex-wrap mt-2" role="group" aria-label="Solid transformations">
+            <div className="d-flex gap-2 justify-content-center flex-wrap mt-4" role="group" aria-label="Solid transformations">
                   <button
                     type="button"
-                    className="btn btn-info btn-sm px-3 py-2 text-nowrap"
+                    className="btn btn-warning btn-sm px-3 py-2 text-nowrap"
                     onClick={() => startDualTransition('dual')}
                     disabled={dualTransition}
                     aria-label="Dual"
@@ -407,12 +406,6 @@ export function App() {
                   </Dropdown>
                 </div>
             </div>
-            <Collapse in={showDisplay}>
-              <div id="display-settings">
-                <Form.Label htmlFor="opacity" className="small mb-0 mt-2">Face opacity: {Math.round(opacity*100)}%</Form.Label>
-                <Form.Range id="opacity" min={0.2} max={1} step={0.05} value={opacity} onChange={(event) => setOpacity(Number(event.target.value))} />
-              </div>
-            </Collapse>
             <Row className="align-items-center g-2 mt-1">
               <Col xs={12}>
                 <TransformationPlayer originId={originId} destinationId={destinationId} progress={progress} playing={playing} kind={kind} onSeek={seek}

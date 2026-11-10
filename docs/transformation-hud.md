@@ -31,7 +31,7 @@ Solid properties support that task rather than dominating the interface.
 5. **Route history:** up to 30 session stops retain the reached geometry and
    camera view. Back/forward and direct selection restore these snapshots;
    browser tests compare the rendered canvas before and after restoration.
-6. **Compact display settings:** opacity is collapsible from its button beside the color picker, and that
+6. **Compact display settings:** opacity opens in a vertical popup from the half-filled circle beside the color picker, and that
    preference is persisted. Camera controls stay centered, with the color picker
    immediately after Reset view, as explicitly requested. Actions have a separate
    centered full-width row so destination names stay on one line.

@@ -68,7 +68,7 @@ inspect it, then choose a route. The player has named endpoints, 1% steps, and
 geometry checkpoints; its clock button opens a vertical timing slider. “How it
 works”, in the player toolbar, opens an explanation. Session history
 stores up to 30 endpoint geometry/view snapshots, so retracing a route preserves
-the reached orientation. The opacity button beside the color picker collapses the opacity settings; its open state
+the reached orientation. The half-filled circle beside the color picker opens a vertical opacity slider; its open state
 is remembered. No before/after property-comparison panel is included.
 
 The color picker changes face color. Color, opacity, transformation time,
