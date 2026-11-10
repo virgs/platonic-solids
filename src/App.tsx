@@ -24,6 +24,7 @@ import {
   Stack,
 } from 'react-bootstrap'
 import { SolidScene } from './components/SolidScene'
+import { stellationTargets, type TransformationKind } from './three/transformations'
 import {
   getSolid,
   platonicSolids,
@@ -53,6 +54,8 @@ export function App() {
   const progressRef = useRef(0)
   const [playing, setPlaying] = useState(false)
   const [target, setTarget] = useState(1)
+  const [kind, setKind] = useState<TransformationKind>('dual')
+  const [transitionNonce, setTransitionNonce] = useState(0)
   const [opacity, setOpacity] = useState(0.85)
   const dualTransition = playing || (progress > 0 && progress < 1)
   const [selectionKey, setSelectionKey] = useState(0)
@@ -64,6 +67,7 @@ export function App() {
   }>({ nonce: 0, direction: 'in' })
   const solid = getSolid(solidId)
   const origin = getSolid(originId)
+  const destinationId = kind === 'dual' ? origin.dualId : stellationTargets[originId] ?? originId
 
   useEffect(() => {
     if (!playing) return
@@ -78,14 +82,14 @@ export function App() {
       setProgress(next)
       if (next === target) {
         setPlaying(false)
-        setSolidId(target === 0 ? originId : getSolid(originId).dualId)
+        setSolidId(target === 0 ? originId : destinationId)
       } else {
         frame = requestAnimationFrame(tick)
       }
     }
     frame = requestAnimationFrame(tick)
     return () => cancelAnimationFrame(frame)
-  }, [playing, target, duration, originId])
+  }, [playing, target, duration, originId, destinationId])
 
   useEffect(() => {
     const url = new URL(window.location.href)
@@ -97,15 +101,25 @@ export function App() {
     if (dualTransition) return
     setSolidId(nextId)
     setOriginId(nextId)
+    setKind('dual')
     setProgress(0)
     progressRef.current = 0
     setSelectionKey((value) => value + 1)
     setResetNonce((value) => value + 1)
   }
 
-  function startDualTransition() {
+  function startDualTransition(nextKind: TransformationKind = 'dual') {
     setAutoRotate(false)
-    setTarget(progress === 1 ? 0 : 1)
+    if (nextKind !== kind) {
+      setOriginId(solidId)
+      setKind(nextKind)
+      setTransitionNonce((n) => n+1)
+      progressRef.current = 0
+      setProgress(0)
+      setTarget(1)
+    } else {
+      setTarget(progress === 1 ? 0 : 1)
+    }
     setPlaying(true)
   }
 
@@ -115,7 +129,7 @@ export function App() {
     progressRef.current = value
     setProgress(value)
     if (value === 0) setSolidId(originId)
-    if (value === 1) setSolidId(origin.dualId)
+    if (value === 1) setSolidId(destinationId)
   }
 
   function changeZoom(direction: 'in' | 'out') {
@@ -242,15 +256,6 @@ export function App() {
                   <button
                     type="button"
                     className="btn btn-primary"
-                    onClick={() => setResetNonce((value) => value + 1)}
-                    aria-label="Reset view"
-                    title="Reset view"
-                  >
-                    <RotateCcw size={16} aria-hidden="true" /> Reset view
-                  </button>
-                  <button
-                    type="button"
-                    className="btn btn-primary"
                     onClick={() => changeZoom('in')}
                     aria-label="Zoom in"
                     title="Zoom in"
@@ -259,13 +264,18 @@ export function App() {
                   </button>
                   <button
                     type="button"
-                    className={`btn ${autoRotate ? 'btn-info' : 'btn-primary'}`}
+                    className={`btn ms-3 ${autoRotate ? 'btn-info' : 'btn-primary'}`}
                     onClick={() => setAutoRotate((value) => !value)}
                     aria-label="Toggle automatic rotation"
                     aria-pressed={autoRotate}
                     title="Toggle automatic rotation"
                   >
                     <Rotate3D size={16} aria-hidden="true" /> Auto-rotate
+                  </button>
+                  <button type="button" className="btn btn-primary"
+                    onClick={() => setResetNonce((value) => value + 1)}
+                    aria-label="Reset view" title="Reset view">
+                    <RotateCcw size={16} aria-hidden="true" /> Reset view
                   </button>
                 </ButtonGroup>
               </Col>
@@ -275,26 +285,22 @@ export function App() {
                   <button
                     type="button"
                     className="btn btn-primary"
-                    onClick={startDualTransition}
-                    disabled={dualTransition || solid.family !== 'Platonic solid'}
-                    title={solid.family === 'Platonic solid' ? `Show dual: ${getSolid(solid.dualId).name}` : 'Star-polyhedron dual animation is coming next'}
+                    onClick={() => startDualTransition('dual')}
+                    disabled={dualTransition}
+                    title={`Show dual: ${getSolid(solid.dualId).name}`}
                   >
                     <RefreshCw size={16} aria-hidden="true" /> Dual
                   </button>
                   <button
                     type="button"
                     className="btn btn-outline-info"
-                    disabled
-                    title="Stellation geometry is planned for the next milestone"
+                    disabled={dualTransition || !stellationTargets[solidId]}
+                    onClick={() => startDualTransition('stellate')}
+                    title={stellationTargets[solidId] ? `Transform to ${getSolid(stellationTargets[solidId]!).name}` : 'No pentagonal stellation path for this solid'}
                   >
-                    <Sparkles size={16} aria-hidden="true" /> Stellate
+                    <Sparkles size={16} aria-hidden="true" /> {solid.faceType === 'Pentagram' ? 'Unstellate' : 'Stellate'}
                   </button>
                 </ButtonGroup>
-                {solid.family !== 'Platonic solid' && (
-                  <div className="small text-body-secondary mt-1">
-                    Star transformations are not implemented yet.
-                  </div>
-                )}
               </Col>
             </Row>
             <Row className="align-items-center g-2 mt-1">
@@ -312,17 +318,15 @@ export function App() {
                 <div className="d-flex gap-2 align-items-center">
                   <button type="button" className="btn btn-primary btn-sm"
                     aria-label={playing ? 'Pause transformation' : 'Play transformation'}
-                    disabled={solid.family !== 'Platonic solid'}
                     onClick={() => {
                       if (playing) setPlaying(false)
                       else if (progress > 0 && progress < 1) setPlaying(true)
-                      else startDualTransition()
+                      else startDualTransition(kind)
                     }}>
                     {playing ? <Pause size={16} /> : <Play size={16} />}
                   </button>
                   <Form.Range id="progress" min={0} max={1} step={0.01} value={progress}
-                    disabled={solid.family !== 'Platonic solid'}
-                    aria-valuetext={`${Math.round(progress * 100)} percent, ${origin.name} to ${getSolid(origin.dualId).name}`}
+                    aria-valuetext={`${Math.round(progress * 100)} percent, ${origin.name} to ${getSolid(destinationId).name}`}
                     onChange={(event) => seek(Number(event.target.value))} />
                 </div>
               </Col>
@@ -346,6 +350,9 @@ export function App() {
               zoom={zoom}
               progress={progress}
               opacity={opacity}
+              originId={originId}
+              kind={kind}
+              transitionNonce={transitionNonce}
             />
           </Card.Body>
         </Card>

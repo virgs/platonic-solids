@@ -2,11 +2,12 @@ import { OrbitControls } from '@react-three/drei'
 import { Canvas, useThree } from '@react-three/fiber'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { Alert } from 'react-bootstrap'
-import { DoubleSide, EdgesGeometry, type LineSegments, type Mesh } from 'three'
+import { BufferGeometry, DoubleSide, EdgesGeometry, Float32BufferAttribute, type LineSegments, type Mesh } from 'three'
 import type { OrbitControls as OrbitControlsImpl } from 'three-stdlib'
 import type { SolidId, PlatonicId } from '../data/solids'
+import { getSolid } from '../data/solids'
 import { createCornerMorph } from '../three/cornerMorph'
-import { createStarGeometry, starModels, type StarSolidId } from '../three/starPolyhedra'
+import { createStarDual, createStellation, createDestellation, dualModel, loadPolyhedron, renderPolyhedron, type TransformationKind, type Polyhedron } from '../three/transformations'
 
 interface SolidSceneProps {
   solidId: SolidId
@@ -16,20 +17,42 @@ interface SolidSceneProps {
   zoom: { nonce: number; direction: 'in' | 'out' }
   progress: number
   opacity: number
+  originId: SolidId
+  kind: TransformationKind
+  transitionNonce: number
 }
 
-function DualMorphMesh({
-  solidId,
-  progress,
-  opacity,
-}: {
-  solidId: PlatonicId
-  progress: number
-  opacity: number
-}) {
-  const [origin] = useState(solidId)
-  const build = useMemo(() => createCornerMorph(origin), [origin])
-  const initialGeometry = useMemo(() => build(0), [build])
+function TransformationMesh({ originId, progress, opacity, kind, transitionNonce }: Pick<SolidSceneProps, 'originId' | 'progress' | 'opacity' | 'kind' | 'transitionNonce'>) {
+  const [initialModel] = useState(() => loadPolyhedron(originId))
+  const current = useRef(initialModel)
+  const pair = useRef<{ source: Polyhedron; target: Polyhedron; render: (t: number) => ReturnType<typeof renderPolyhedron> } | null>(null)
+  useEffect(() => {
+    const source = current.current
+    const makePair = () => {
+    if (kind === 'stellate') {
+      const reverse = originId === 'small-stellated-dodecahedron' || originId === 'great-stellated-dodecahedron'
+      const model = reverse ? createDestellation(source) : createStellation(source)
+      return { ...model, render: (t: number) => renderPolyhedron(model.at(t)) }
+    }
+    if (getSolid(originId).family !== 'Platonic solid') {
+      const model = createStarDual(source)
+      return { ...model, render: (t: number) => renderPolyhedron(model.at(t)) }
+    }
+    const rendered = renderPolyhedron(source)
+    rendered.edgeGeometry.dispose()
+    const build = createCornerMorph(originId as PlatonicId, rendered.geometry)
+    return { source, target: dualModel(source), render: (t: number) => {
+      const geometry = build(t)
+      return { geometry, edgeGeometry: new EdgesGeometry(geometry, 1) }
+    } }
+    }
+    pair.current = makePair()
+  }, [originId, kind, transitionNonce])
+  const initialGeometry = useMemo(() => {
+    const geometry = new BufferGeometry()
+    geometry.setAttribute('position', new Float32BufferAttribute([], 3))
+    return geometry
+  }, [])
   const mesh = useRef<Mesh>(null)
   const lines = useRef<LineSegments>(null)
 
@@ -41,18 +64,21 @@ function DualMorphMesh({
   )
 
   useEffect(() => {
-    if (!mesh.current) return
-    const geometry = build(progress)
+    const path = pair.current
+    if (!mesh.current || !path) return
+    const { geometry, edgeGeometry } = path.render(progress)
     mesh.current.geometry.dispose()
     mesh.current.geometry = geometry
 
     if (lines.current) {
       const previous = lines.current.geometry
-      lines.current.geometry = new EdgesGeometry(geometry, 1)
+      lines.current.geometry = edgeGeometry
       previous.dispose()
     }
 
-  }, [build, progress])
+    if (progress === 0) current.current = path.source
+    if (progress === 1) current.current = path.target
+  }, [originId, kind, transitionNonce, progress])
 
   return (
     <group rotation={[0.35, 0.45, 0]}>
@@ -69,25 +95,7 @@ function DualMorphMesh({
         />
       </mesh>
       <lineSegments ref={lines}>
-        <edgesGeometry args={[initialGeometry, 1]} />
-        <lineBasicMaterial color="#f8f9fa" transparent opacity={0.88} />
-      </lineSegments>
-    </group>
-  )
-}
-
-function StarMesh({ id, opacity }: { id: StarSolidId; opacity: number }) {
-  const model = useMemo(() => createStarGeometry(id), [id])
-  useEffect(() => () => {
-    model.geometry.dispose()
-    model.edgeGeometry.dispose()
-  }, [model])
-  return (
-    <group rotation={[0.35, 0.45, 0]}>
-      <mesh geometry={model.geometry}>
-        <meshStandardMaterial color="#4cc9f0" side={DoubleSide} transparent opacity={opacity} depthWrite={opacity === 1} roughness={0.38} flatShading />
-      </mesh>
-      <lineSegments geometry={model.edgeGeometry}>
+        <bufferGeometry />
         <lineBasicMaterial color="#f8f9fa" transparent opacity={0.88} />
       </lineSegments>
     </group>
@@ -149,11 +157,7 @@ export function SolidScene(props: SolidSceneProps) {
       <ambientLight intensity={1.2} />
       <directionalLight position={[3, 4, 5]} intensity={2.4} />
       <directionalLight position={[-4, -2, -3]} intensity={0.8} />
-      {props.solidId in starModels ? (
-        <StarMesh id={props.solidId as StarSolidId} opacity={props.opacity} />
-      ) : (
-        <DualMorphMesh solidId={props.solidId as PlatonicId} progress={props.progress} opacity={props.opacity} />
-      )}
+      <TransformationMesh originId={props.originId} progress={props.progress} opacity={props.opacity} kind={props.kind} transitionNonce={props.transitionNonce} />
       <CameraControls
         autoRotate={props.autoRotate}
         resetNonce={props.resetNonce}

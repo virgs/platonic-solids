@@ -70,7 +70,7 @@ function vectorKey(x: number, y: number, z: number): string {
   return `${x.toFixed(5)},${y.toFixed(5)},${z.toFixed(5)}`
 }
 
-function extractPolyhedron(id: PlatonicId) {
+export function extractPolyhedron(id: PlatonicId) {
   const geometry = createSolidGeometry(id)
   const positions = geometry.getAttribute('position')
   const vertices: Array<[number, number, number]> = []
