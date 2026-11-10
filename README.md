@@ -58,6 +58,15 @@ The centered transformation player supports play, pause, and direct progress
 scrubbing. Dragging progress pauses playback and preserves the intermediate
 surface. Face opacity defaults to 85% and can be adjusted from 20% to 100%.
 
+The Map dialog shows all nine solids and distinguishes implemented and planned
+paths. Select a node to inspect it, then choose an available route. The
+stellation destination menu also exposes planned routes without pretending they
+are playable. The player has named endpoints, 1% steps, and geometry milestones;
+its information button opens a short geometric explanation. Session history
+stores up to 30 endpoint geometry/view snapshots, so retracing a route preserves
+the reached orientation. Display collapses the opacity settings; its open state
+is remembered. No before/after property-comparison panel is included.
+
 The color picker changes face color. Color, opacity, transformation time,
 auto-rotation, the last completed solid, and the camera position (including zoom
 and orbit angle) are saved in local storage. An explicit solid in the URL takes

@@ -38,7 +38,7 @@ export function TransformationPlayer({ originId, destinationId, progress, playin
       <span className="text-end">{getSolid(destinationId).name}</span>
     </div>
     <Modal show={explain} onHide={() => setExplain(false)} centered aria-labelledby="explanation-title">
-      <Modal.Header closeButton><Modal.Title id="explanation-title">How this transformation works</Modal.Title></Modal.Header>
+      <Modal.Header closeButton closeVariant="white"><Modal.Title id="explanation-title">How this transformation works</Modal.Title></Modal.Header>
       <Modal.Body>
         <p>{getSolid(originId).name} → {getSolid(destinationId).name}</p>
         <p>At {percent}%: {caption}</p>

@@ -16,7 +16,7 @@ export function RelationshipMap({ show, onHide, current, activeRoute, onInspect,
   onTransform: (kind: TransformationKind) => void
 }) {
   return <Modal show={show} onHide={onHide} size="xl" scrollable centered aria-labelledby="map-title">
-    <Modal.Header closeButton><Modal.Title id="map-title">Transformation map</Modal.Title></Modal.Header>
+    <Modal.Header closeButton closeVariant="white"><Modal.Title id="map-title">Transformation map</Modal.Title></Modal.Header>
     <Modal.Body>
       <div className="d-flex gap-3 small flex-wrap mb-2">
         <span className="text-info">Blue: dual</span><span className="text-warning">Gold: stellation</span>

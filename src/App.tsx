@@ -452,7 +452,7 @@ export function App() {
       <RelationshipMap show={showMap} onHide={() => setShowMap(false)} current={solidId}
         activeRoute={[originId,destinationId]} onInspect={changeSolid} onTransform={startDualTransition} />
       <Modal show={showHistory} onHide={() => setShowHistory(false)} centered scrollable aria-labelledby="history-title">
-        <Modal.Header closeButton><Modal.Title id="history-title">Route history</Modal.Title></Modal.Header>
+        <Modal.Header closeButton closeVariant="white"><Modal.Title id="history-title">Route history</Modal.Title></Modal.Header>
         <Modal.Body>
           <div className="d-flex gap-2 mb-3">
             <button className="btn btn-primary btn-sm" disabled={history.index <= 0} onClick={() => restoreStop(history.index-1)}><ArrowLeft size={16} /> Back</button>

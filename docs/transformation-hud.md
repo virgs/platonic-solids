@@ -1,4 +1,4 @@
-# Transformation-first HUD proposal
+# Transformation-first HUD
 
 The primary task is discovering and understanding relationships between solids.
 Solid properties support that task rather than dominating the interface.
@@ -7,35 +7,37 @@ Solid properties support that task rather than dominating the interface.
 
 - Enabled actions use filled buttons and name the destination.
 - Unsupported stellation reads “No regular stellation”.
-- Ready, Playing, Paused, and Complete are explicit states.
-- The route and operation remain visible after completion, including direction
-  when reversing a path.
+- Status badges and the general “choose a transformation” / unlock messages
+  were removed at the user's request. Endpoints are named directly on the player.
 - Playing progress does not report 100% before the endpoint is reached.
 - The stage fills remaining viewport space using Bootstrap utilities.
 - All nine completed dual endpoints have browser coverage for action availability.
 
-## Recommended next improvements
+## Implemented exploration controls
 
-1. **Relationship map:** show all nine solids, with distinct dual and stellation
-   edges. Highlight the current node and traversed edge. Distinguish implemented
-   routes from planned routes; selecting a destination starts an available path.
+1. **Relationship map:** a dialog shows all nine solids, with distinct dual and
+   stellation edges, the current node, and the player route. Selecting a node
+   inspects it; its available route list starts transformations. A native solid
+   selector also makes the map usable on small screens and by keyboard.
 2. **Stellation destination menu:** the dodecahedron has multiple regular star
    stellations. Replace its single preferred route with explicit destination
-   choices once the extra animations are implemented.
-3. **Source/target comparison:** display vertex, edge, and face counts as
-   `8 → 6`, `12 → 12`, and `6 → 8` for cube to octahedron. Keep endpoint facts
-   distinct from the intermediate mesh, whose regular-solid properties do not
-   apply.
-4. **Geometric explanation:** a short operation-specific caption, such as
-   “Corners split; original edges collapse” or “Face regions extend within
-   their planes”, synchronized with meaningful stages of playback.
-5. **Player milestones:** label both ends with solid names, mark the midpoint
-   where informative, and add step-back/step-forward controls for teaching.
-6. **Route history:** let users retrace their exploration while preserving
-   geometry orientation and camera view.
-7. **Compact display settings:** group color, opacity, auto-rotation, and camera
-   controls in a collapsible display panel, particularly on mobile, so the map,
-   player, and solid receive most of the available space.
+   choices. Implemented routes are selectable; the two missing D12 paths are
+   explicitly marked Planned and disabled until their animations exist.
+3. **Geometric explanation:** the player's information button pauses playback
+   and opens a short description of the current operation and progress region.
+4. **Player milestones:** named endpoints, start/end jumps, and 1% forward/back
+   steps support teaching. The cuboctahedron is marked at 50% on the cube-origin
+   path and 75% on the octahedron-origin path, matching the actual corner cuts.
+5. **Route history:** up to 30 session stops retain the reached geometry and
+   camera view. Back/forward and direct selection restore these snapshots;
+   browser tests compare the rendered canvas before and after restoration.
+6. **Compact display settings:** opacity is collapsible under Display, and that
+   preference is persisted. Camera controls stay centered, with the color picker
+   immediately after Reset view, as explicitly requested. Actions have a separate
+   full-width row so destination names stay on one line.
+
+The user explicitly excluded the proposed before/after property comparison.
+No such panel is implemented.
 
 ## Current route inventory
 
@@ -47,5 +49,5 @@ path. Reversible stellation paths currently implemented are:
 - Great dodecahedron ↔ great stellated dodecahedron
 
 The direct dodecahedron → great dodecahedron and dodecahedron → great stellated
-dodecahedron animations are still missing. The map should show these as planned,
+dodecahedron animations are still missing. The map shows these as planned,
 not as mathematical impossibilities. See [the dodecahedron stellation family](https://mathworld.wolfram.com/DodecahedronStellations.html).
