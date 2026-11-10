@@ -35,41 +35,40 @@ quadrilaterals keep the surface connected. The endpoints have the reviewed
 regular face and edge counts. Self-intersecting faces are tessellated with
 libtess using the nonzero winding rule, filling pentagram centers once.
 
-Pentagonal stellation extends each face's edges into a pentagram, retaining its
-central pentagon and opening five tips. The supported reversible paths are
-dodecahedron ↔ small stellated dodecahedron and great dodecahedron ↔ great
-stellated dodecahedron. The geometry at an endpoint is retained when a different
-operation starts, preserving its orientation across chained transformations.
+## Direct face-extension animation
 
-Construction reference: [Ghent University: the four regular non-convex polyhedra](https://cage.ugent.be/~hs/polyhedra/keplerpoinsot.html).
+All five stellation paths animate growing face regions in their original planes:
+dodecahedron ↔ each of its three regular stellations, great dodecahedron ↔ great
+stellated dodecahedron, and icosahedron ↔ great icosahedron.
 
-## Composed D12 routes
+The exact endpoint coordinates are constructed using the existing pentagram,
+polar-dual, and triangular constructions. Those operations determine geometry
+only; no dualization stage is played within a stellation animation. Each target
+face is matched to a source face by its outward plane normal, then uniformly
+rescaled into that source plane before animation.
 
-The additional D12 destinations are continuous staged routes through the
-existing constructions. Dodecahedron → great dodecahedron consists of stellation
-to the small stellated dodecahedron followed by dualization. Dodecahedron → great
-stellated dodecahedron adds a final stellation stage. Both reverse through the
-same intermediate solids. The map, destination menu, player checkpoints, and
-explanation identify the stages explicitly.
+At the start, each face region is bounded by its original convex polygon.
+The polygon's edge bounds expand within the plane, revealing the target contour
+until its intersections are reached. Sutherland–Hodgman clipping preserves the
+target's contour winding; libtess fills the nonzero-winding region, including
+pentagram centers. There is one face region per original plane throughout.
+The construction can pass through open or self-intersecting configurations;
+intermediate shapes are not claimed to be regular closed polyhedra.
 
-Each stage starts from the preceding stage's exact endpoint. Stage durations
-divide the selected total time equally; unit circumradius is preserved. Tests
-check every checkpoint's topology, finite geometry through the path, equal
-endpoint edge lengths, and orientation-preserving round trips. These composed
-animations expose the destination family without claiming that all intermediate
-motion is a single planar stellation.
+A uniform scale at every sample preserves unit circumradius, so face planes
+keep their directions while their offsets scale together. Reverse playback
+retracts the exact same face regions. Completed endpoint geometry is retained
+when another operation starts, preserving orientation across chained actions.
 
-## Icosahedron stellation
+Tests cover all five paths, including rotated sources, coplanarity, a common
+plane-offset scale, unit radius, finite tessellation, exact endpoint counts and
+edge lengths, continuous rendered area and edge positions at both endpoints, and matching forward
+and reverse samples. Browser tests exercise all five routes on desktop and
+mobile, including progress scrubbing and reverse playback.
 
-Icosahedron ↔ great icosahedron extends the twenty triangular face regions into
-larger inverted triangles in the same planes, with a factor of φ⁴ in face-local
-coordinates. During animation, new tips open along the original triangle edges
-while the old corners move to the new edges' midpoints. At completion, collinear
-points are removed and coincident tips are welded into twelve vertices, thirty
-edges, and twenty equilateral triangles. The reverse uses the same construction.
-Circumradius normalization is applied at every step.
+Construction references:
 
-The great icosahedron is the Kepler–Poinsot member among the regular
-icosahedron's stellations; adding spikes to an icosahedron does not uniquely
-identify this result. See [Paulo Freire's polyhedron constructions](https://www3.mpifr-bonn.mpg.de/staff/pfreire/polyhedra/polyhedra.htm)
-and [MathWorld's icosahedron stellations](https://mathworld.wolfram.com/IcosahedronStellations.html).
+- [MathWorld: stellation](https://mathworld.wolfram.com/Stellation.html)
+- [MathWorld: dodecahedron stellations](https://mathworld.wolfram.com/DodecahedronStellations.html)
+- [MathWorld: icosahedron stellations](https://mathworld.wolfram.com/IcosahedronStellations.html)
+- [Ghent University: the four regular non-convex polyhedra](https://cage.ugent.be/~hs/polyhedra/keplerpoinsot.html)

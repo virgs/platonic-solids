@@ -10,7 +10,7 @@ test('the map supports inspection and all implemented destinations', async ({ pa
   await page.screenshot({ path: test.info().outputPath('relationship-map.png'), animations: 'disabled' })
   await map.getByRole('button', { name: 'Inspect Dodecahedron', exact: true }).click()
   await expect(map.getByRole('heading', { name: 'From Dodecahedron' })).toBeVisible()
-  await expect(map.getByRole('button', { name: 'Stellation → Great dodecahedron · 2-stage route', exact: true })).toBeEnabled()
+  await expect(map.getByRole('button', { name: 'Stellation → Great dodecahedron', exact: true })).toBeEnabled()
   await map.getByRole('button', { name: 'Stellation → Small stellated dodecahedron', exact: true }).click()
   await expect(page.getByRole('heading', { name: 'Small stellated dodecahedron', exact: true })).toBeVisible()
   await expect(map).not.toBeVisible()

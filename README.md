@@ -49,13 +49,11 @@ npm run build
 All five Platonic solids and four Kepler–Poinsot polyhedra can be inspected at
 the same circumradius. Platonic dual transformations use progressive corner
 cuts, with a configurable duration of 0.5–10 seconds. Both Kepler–Poinsot dual
-pairs are animated. Pentagonal stellation is available for dodecahedron ↔ small
-stellated dodecahedron and great dodecahedron ↔ great stellated dodecahedron.
-Icosahedron ↔ great icosahedron is also available. The additional D12 destinations
-are explicit staged routes: dodecahedron ↔ great dodecahedron passes through the
-small stellated dodecahedron, and dodecahedron ↔ great stellated dodecahedron also
-passes through the great dodecahedron. All routes listed in the map are playable
-in both directions.
+pairs are animated. All five stellation paths use direct face extension:
+dodecahedron ↔ each of its three regular stellations, great dodecahedron ↔ great
+stellated dodecahedron, and icosahedron ↔ great icosahedron. Original face regions
+grow within their planes toward the target intersections, without dualization
+stages. All routes listed in the map are playable in both directions.
 
 The centered transformation player supports play, pause, and direct progress
 scrubbing. Dragging progress pauses playback and preserves the intermediate
@@ -63,9 +61,8 @@ surface. Face opacity defaults to 85% and can be adjusted from 20% to 100%.
 
 The Map dialog shows all nine solids with arrowheads at both ends of reversible
 links. Solid lines/diamonds identify duals, dashed lines/stars identify
-stellations, and dotted lines identify completed multi-step transformations. Select a node to
-inspect it, then choose a route. The player has named endpoints, 1% steps, and
-geometry checkpoints; its clock button opens a vertical timing slider. “How it
+stellations. Select a node to inspect it, then choose a route. The player has
+named endpoints, 1% steps, and a clock button that opens a vertical timing slider. “How it
 works”, in the player toolbar, opens an explanation. Session history
 stores up to 30 endpoint geometry/view snapshots, so retracing a route preserves
 the reached orientation. The half-filled circle beside the color picker opens a vertical opacity slider; its open state

@@ -1,21 +1,34 @@
 import { expect, test } from '@playwright/test'
 import { setTransformationTime } from './controls'
 
-test('both formerly planned destinations play, expose checkpoints, and reverse', async ({ page }) => {
-  for (const [name,stages] of [['Great dodecahedron',2],['Great stellated dodecahedron',3]] as const) {
-    await page.goto('./?solid=dodecahedron')
+for (const [from,origin,name] of [
+  ['dodecahedron','Dodecahedron','Small stellated dodecahedron'],
+  ['dodecahedron','Dodecahedron','Great dodecahedron'],
+  ['dodecahedron','Dodecahedron','Great stellated dodecahedron'],
+  ['icosahedron','Icosahedron','Great icosahedron'],
+  ['great-dodecahedron','Great dodecahedron','Great stellated dodecahedron'],
+] as const) {
+  test(`${origin} extends directly into ${name} and reverses`, async ({ page }) => {
+    await page.goto(`./?solid=${from}`)
     await setTransformationTime(page,0.5)
     await page.getByRole('button', { name: 'Choose stellation destination' }).click()
-    await page.getByRole('button', { name: `${name} · ${stages}-stage route`, exact: true }).click()
+    await page.getByRole('button', { name, exact: true }).click()
     await expect(page.getByRole('heading', { name, exact: true })).toBeVisible()
-    await expect(page.getByRole('button', { name: 'Seek to Small stellated dodecahedron checkpoint' })).toBeVisible()
+    const player = page.getByRole('group', { name: 'Transformation player' })
+    await expect(player.getByRole('button', { name: /checkpoint/ })).toHaveCount(0)
+    const progress = player.getByRole('slider', { name: /Transformation progress/ })
+    await progress.fill('0.5')
+    await expect(page.getByRole('button', { name: 'Dual', exact: true })).toBeDisabled()
+    await expect(page.locator('canvas')).toHaveAttribute('data-engine', /three.js/)
+    await page.screenshot({ path: test.info().outputPath('face-extension-midpoint.png'), animations: 'disabled' })
     await page.getByRole('button', { name: 'Explain this transformation' }).click()
-    await expect(page.getByRole('dialog', { name: 'How this transformation works' })).toContainText('staged route')
+    await expect(page.getByRole('dialog', { name: 'How this transformation works' })).toContainText('one direct face-extension animation')
     await page.getByRole('button', { name: 'Close', exact: true }).click()
+    await player.getByRole('button', { name: 'Go to transformation end' }).click()
     await page.getByRole('button', { name: 'Play transformation', exact: true }).click()
-    await expect(page.getByRole('heading', { name: 'Dodecahedron', exact: true })).toBeVisible()
-  }
-})
+    await expect(page.getByRole('heading', { name: origin, exact: true })).toBeVisible()
+  })
+}
 
 test('time and explanation controls belong to playback, with centered transformation actions', async ({ page }) => {
   await page.goto('./')
@@ -60,10 +73,11 @@ test('map arrows and line patterns distinguish reversible relationships without 
   await expect(edges).toHaveCount(10)
   expect(await edges.evaluateAll((paths) => paths.every((path) => path.hasAttribute('marker-start') && path.hasAttribute('marker-end')))).toBe(true)
   await expect(map.locator('path[data-route-kind="dual"]')).toHaveCount(5)
-  await expect(map.locator('path[data-route-kind="stellate"]')).toHaveCount(3)
-  await expect(map.locator('path[data-route-kind="staged"]')).toHaveCount(2)
+  await expect(map.locator('path[data-route-kind="stellate"]')).toHaveCount(5)
+  await expect(map.locator('path[data-route-kind="staged"]')).toHaveCount(0)
+  await expect(map.getByText(/Dotted|multi-step|staged/)).toHaveCount(0)
   expect((await map.locator('svg text').allTextContents()).filter((text) => /^\d+$/.test(text))).toEqual([])
   await page.screenshot({ path: test.info().outputPath('map-arrows.png'), animations: 'disabled' })
-  await map.getByRole('button', { name: 'Stellation → Great stellated dodecahedron · 3-stage route', exact: true }).click()
+  await map.getByRole('button', { name: 'Stellation → Great stellated dodecahedron', exact: true }).click()
   await expect(page.getByRole('heading', { name: 'Great stellated dodecahedron', exact: true })).toBeVisible()
 })
