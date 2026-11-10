@@ -51,18 +51,22 @@ the same circumradius. Platonic dual transformations use progressive corner
 cuts, with a configurable duration of 0.5–6 seconds. Both Kepler–Poinsot dual
 pairs are animated. Pentagonal stellation is available for dodecahedron ↔ small
 stellated dodecahedron and great dodecahedron ↔ great stellated dodecahedron.
-Icosahedron ↔ great icosahedron is also available. Other stellation paths remain
-unavailable.
+Icosahedron ↔ great icosahedron is also available. The additional D12 destinations
+are explicit staged routes: dodecahedron ↔ great dodecahedron passes through the
+small stellated dodecahedron, and dodecahedron ↔ great stellated dodecahedron also
+passes through the great dodecahedron. All routes listed in the map are playable
+in both directions.
 
 The centered transformation player supports play, pause, and direct progress
 scrubbing. Dragging progress pauses playback and preserves the intermediate
 surface. Face opacity defaults to 85% and can be adjusted from 20% to 100%.
 
-The Map dialog shows all nine solids and distinguishes implemented and planned
-paths. Select a node to inspect it, then choose an available route. The
-stellation destination menu also exposes planned routes without pretending they
-are playable. The player has named endpoints, 1% steps, and geometry milestones;
-its information button opens a short geometric explanation. Session history
+The Map dialog shows all nine solids with arrowheads at both ends of reversible
+links. Solid lines/diamonds identify duals, dashed lines/stars identify
+stellations, and dotted lines/numbers identify staged routes. Select a node to
+inspect it, then choose a route. The player has named endpoints, 1% steps, and
+geometry checkpoints; its clock button opens a vertical timing slider. “How it
+works”, beside the transformation actions, opens an explanation. Session history
 stores up to 30 endpoint geometry/view snapshots, so retracing a route preserves
 the reached orientation. Display collapses the opacity settings; its open state
 is remembered. No before/after property-comparison panel is included.

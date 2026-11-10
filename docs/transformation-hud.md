@@ -21,9 +21,9 @@ Solid properties support that task rather than dominating the interface.
    selector also makes the map usable on small screens and by keyboard.
 2. **Stellation destination menu:** the dodecahedron has multiple regular star
    stellations. Replace its single preferred route with explicit destination
-   choices. Implemented routes are selectable; the two missing D12 paths are
-   explicitly marked Planned and disabled until their animations exist.
-3. **Geometric explanation:** the player's information button pauses playback
+   choices. All listed destinations are now selectable, including the two-stage
+   and three-stage D12 routes with named intermediate checkpoints.
+3. **Geometric explanation:** “How it works” in the transformation action row pauses playback
    and opens a short description of the current operation and progress region.
 4. **Player milestones:** named endpoints, start/end jumps, and 1% forward/back
    steps support teaching. The cuboctahedron is marked at 50% on the cube-origin
@@ -35,6 +35,12 @@ Solid properties support that task rather than dominating the interface.
    preference is persisted. Camera controls stay centered, with the color picker
    immediately after Reset view, as explicitly requested. Actions have a separate
    full-width row so destination names stay on one line.
+
+The clock button beside Play opens a vertical SVG timing slider. It supports
+mouse, touch, and keyboard interaction without a project-authored stylesheet.
+Map links have arrowheads at both ends. Solid lines with diamonds identify duals;
+dashed lines with stars identify stellation; dotted lines with numbers identify
+the number of stages in a composed route. Color is an additional cue only.
 
 The user explicitly excluded the proposed before/after property comparison.
 No such panel is implemented.
@@ -48,6 +54,8 @@ path. Reversible stellation paths currently implemented are:
 - Icosahedron ↔ great icosahedron
 - Great dodecahedron ↔ great stellated dodecahedron
 
-The direct dodecahedron → great dodecahedron and dodecahedron → great stellated
-dodecahedron animations are still missing. The map shows these as planned,
-not as mathematical impossibilities. See [the dodecahedron stellation family](https://mathworld.wolfram.com/DodecahedronStellations.html).
+The additional D12 destinations are implemented as continuous staged routes:
+dodecahedron → small stellated dodecahedron → great dodecahedron, with a further
+stellation stage for the great stellated dodecahedron. Adjacent stages share
+exact geometry. These are composed routes, not a claim that every stage is a
+single face-extension operation. See [the dodecahedron stellation family](https://mathworld.wolfram.com/DodecahedronStellations.html).

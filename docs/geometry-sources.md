@@ -43,6 +43,22 @@ operation starts, preserving its orientation across chained transformations.
 
 Construction reference: [Ghent University: the four regular non-convex polyhedra](https://cage.ugent.be/~hs/polyhedra/keplerpoinsot.html).
 
+## Composed D12 routes
+
+The additional D12 destinations are continuous staged routes through the
+existing constructions. Dodecahedron → great dodecahedron consists of stellation
+to the small stellated dodecahedron followed by dualization. Dodecahedron → great
+stellated dodecahedron adds a final stellation stage. Both reverse through the
+same intermediate solids. The map, destination menu, player checkpoints, and
+explanation identify the stages explicitly.
+
+Each stage starts from the preceding stage's exact endpoint. Stage durations
+divide the selected total time equally; unit circumradius is preserved. Tests
+check every checkpoint's topology, finite geometry through the path, equal
+endpoint edge lengths, and orientation-preserving round trips. These composed
+animations expose the destination family without claiming that all intermediate
+motion is a single planar stellation.
+
 ## Icosahedron stellation
 
 Icosahedron ↔ great icosahedron extends the twenty triangular face regions into
