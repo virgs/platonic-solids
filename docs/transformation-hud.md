@@ -8,6 +8,9 @@ The public title is Polyhedra Explorer; the repository and Pages path remain
 
 The grouped selector contains five Platonic solids, four Kepler–Poinsot
 polyhedra, and two rectified solids. The summary follows the completed endpoint.
+Property rows and the title reserve consistent line slots across all solids,
+including mixed face descriptions and long dual names, so changing the solid
+does not resize the summary. These slots use Bootstrap utilities only.
 
 Cuboctahedron and icosidodecahedron summaries include their mixed face counts,
 per-face angles, vertex configuration, dihedral angle, and named Catalan dual.
@@ -47,8 +50,9 @@ solid; the route list starts an operation to an explicit destination.
 - Stellation: dashed line and star.
 - Rectification: dash-dot line and scissors.
 
-Color is supplemental. Every link has arrowheads at both ends. Long routes
-detour around intermediate nodes. The map dialog expands on smaller screens,
+Color is supplemental. Every link has arrowheads at both ends. The nodes form
+two planar groups, with no crossing links. All operation symbols are Lucide SVG
+icons rather than emoji characters. The map dialog expands on smaller screens,
 and the native solid selector and route list provide a readable mobile fallback.
 
 ## Scope
