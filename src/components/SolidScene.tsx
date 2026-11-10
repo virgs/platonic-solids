@@ -8,6 +8,7 @@ import type { SolidId, PlatonicId } from '../data/solids'
 import { getSolid } from '../data/solids'
 import { createCornerMorph } from '../three/cornerMorph'
 import { createStarDual, createStellation, createDestellation, dualModel, loadPolyhedron, renderPolyhedron, type TransformationKind, type Polyhedron } from '../three/transformations'
+import { defaults, type CameraPosition } from '../settings'
 
 interface SolidSceneProps {
   solidId: SolidId
@@ -20,9 +21,12 @@ interface SolidSceneProps {
   originId: SolidId
   kind: TransformationKind
   transitionNonce: number
+  color: string
+  initialCameraPosition: CameraPosition
+  onCameraChange: (position: CameraPosition) => void
 }
 
-function TransformationMesh({ originId, progress, opacity, kind, transitionNonce }: Pick<SolidSceneProps, 'originId' | 'progress' | 'opacity' | 'kind' | 'transitionNonce'>) {
+function TransformationMesh({ originId, progress, opacity, kind, transitionNonce, color }: Pick<SolidSceneProps, 'originId' | 'progress' | 'opacity' | 'kind' | 'transitionNonce' | 'color'>) {
   const [initialModel] = useState(() => loadPolyhedron(originId))
   const current = useRef(initialModel)
   const pair = useRef<{ source: Polyhedron; target: Polyhedron; render: (t: number) => ReturnType<typeof renderPolyhedron> } | null>(null)
@@ -30,7 +34,7 @@ function TransformationMesh({ originId, progress, opacity, kind, transitionNonce
     const source = current.current
     const makePair = () => {
     if (kind === 'stellate') {
-      const reverse = originId === 'small-stellated-dodecahedron' || originId === 'great-stellated-dodecahedron'
+      const reverse = originId === 'small-stellated-dodecahedron' || originId === 'great-stellated-dodecahedron' || originId === 'great-icosahedron'
       const model = reverse ? createDestellation(source) : createStellation(source)
       return { ...model, render: (t: number) => renderPolyhedron(model.at(t)) }
     }
@@ -84,7 +88,7 @@ function TransformationMesh({ originId, progress, opacity, kind, transitionNonce
     <group rotation={[0.35, 0.45, 0]}>
       <mesh ref={mesh} geometry={initialGeometry}>
         <meshStandardMaterial
-          color="#4cc9f0"
+          color={color}
           depthWrite={opacity === 1}
           flatShading
           metalness={0.08}
@@ -106,24 +110,51 @@ function CameraControls({
   autoRotate,
   resetNonce,
   zoom,
-}: Pick<SolidSceneProps, 'autoRotate' | 'resetNonce' | 'zoom'>) {
+  onCameraChange,
+}: Pick<SolidSceneProps, 'autoRotate' | 'resetNonce' | 'zoom' | 'onCameraChange'>) {
   const controls = useRef<OrbitControlsImpl>(null)
   const { camera } = useThree()
+  const lastReset = useRef(resetNonce)
+  const lastZoom = useRef(zoom.nonce)
 
   useEffect(() => {
-    camera.position.set(2.4, 1.7, 2.4)
+    if (lastReset.current === resetNonce) return
+    lastReset.current = resetNonce
+    camera.position.set(...defaults.cameraPosition)
     camera.lookAt(0, 0, 0)
     controls.current?.target.set(0, 0, 0)
     controls.current?.update()
-  }, [camera, resetNonce])
+    onCameraChange(camera.position.toArray() as CameraPosition)
+  }, [camera, resetNonce, onCameraChange])
 
   useEffect(() => {
-    if (zoom.nonce === 0) return
+    const orbit = controls.current
+    let timer: ReturnType<typeof setTimeout> | undefined
+    const save = () => onCameraChange(camera.position.toArray() as CameraPosition)
+    const changed = () => {
+      if (timer !== undefined) return
+      timer = setTimeout(() => { timer = undefined; save() }, 200)
+    }
+    orbit?.addEventListener('change', changed)
+    orbit?.addEventListener('end', save)
+    window.addEventListener('pagehide', save)
+    return () => {
+      orbit?.removeEventListener('change', changed)
+      orbit?.removeEventListener('end', save)
+      window.removeEventListener('pagehide', save)
+      if (timer !== undefined) clearTimeout(timer)
+    }
+  }, [camera, onCameraChange])
+
+  useEffect(() => {
+    if (zoom.nonce === lastZoom.current) return
+    lastZoom.current = zoom.nonce
     const distance = camera.position.length()
     const multiplier = zoom.direction === 'in' ? 0.82 : 1.22
     camera.position.setLength(Math.min(6, Math.max(1.8, distance * multiplier)))
     controls.current?.update()
-  }, [camera, zoom])
+    onCameraChange(camera.position.toArray() as CameraPosition)
+  }, [camera, zoom, onCameraChange])
 
   return (
     <OrbitControls
@@ -143,7 +174,7 @@ export function SolidScene(props: SolidSceneProps) {
   return (
     <Canvas
       aria-label={`Interactive 3D model of a ${props.solidName}`}
-      camera={{ position: [2.4, 1.7, 2.4], fov: 42 }}
+      camera={{ position: props.initialCameraPosition, fov: 42 }}
       className="ratio ratio-21x9"
       dpr={[1, 2]}
       fallback={
@@ -157,11 +188,12 @@ export function SolidScene(props: SolidSceneProps) {
       <ambientLight intensity={1.2} />
       <directionalLight position={[3, 4, 5]} intensity={2.4} />
       <directionalLight position={[-4, -2, -3]} intensity={0.8} />
-      <TransformationMesh originId={props.originId} progress={props.progress} opacity={props.opacity} kind={props.kind} transitionNonce={props.transitionNonce} />
+      <TransformationMesh originId={props.originId} progress={props.progress} opacity={props.opacity} kind={props.kind} transitionNonce={props.transitionNonce} color={props.color} />
       <CameraControls
         autoRotate={props.autoRotate}
         resetNonce={props.resetNonce}
         zoom={props.zoom}
+        onCameraChange={props.onCameraChange}
       />
     </Canvas>
   )

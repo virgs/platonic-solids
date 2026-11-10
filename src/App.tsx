@@ -9,7 +9,7 @@ import {
   ZoomIn,
   ZoomOut,
 } from 'lucide-react'
-import { useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { version } from '../package.json'
 import {
   Badge,
@@ -25,6 +25,7 @@ import {
 } from 'react-bootstrap'
 import { SolidScene } from './components/SolidScene'
 import { stellationTargets, type TransformationKind } from './three/transformations'
+import { readSettings, writeSettings, type CameraPosition, type Settings } from './settings'
 import {
   getSolid,
   platonicSolids,
@@ -33,8 +34,9 @@ import {
   type SolidId,
 } from './data/solids'
 
-function initialSolid(): SolidDefinition {
-  return getSolid(new URLSearchParams(window.location.search).get('solid'))
+function initialSolid(settings: Settings): SolidDefinition {
+  const query = new URLSearchParams(window.location.search).get('solid')
+  return getSolid(query ?? settings.solidId)
 }
 
 function Property({ label, value }: { label: string; value: string | number }) {
@@ -47,19 +49,23 @@ function Property({ label, value }: { label: string; value: string | number }) {
 }
 
 export function App() {
-  const [solidId, setSolidId] = useState<SolidId>(() => initialSolid().id)
-  const [autoRotate, setAutoRotate] = useState(false)
-  const [originId, setOriginId] = useState<SolidId>(() => initialSolid().id)
+  const [saved] = useState(readSettings)
+  const [solidId, setSolidId] = useState<SolidId>(() => initialSolid(saved).id)
+  const [autoRotate, setAutoRotate] = useState(saved.autoRotate)
+  const [originId, setOriginId] = useState<SolidId>(() => initialSolid(saved).id)
   const [progress, setProgress] = useState(0)
   const progressRef = useRef(0)
   const [playing, setPlaying] = useState(false)
   const [target, setTarget] = useState(1)
   const [kind, setKind] = useState<TransformationKind>('dual')
   const [transitionNonce, setTransitionNonce] = useState(0)
-  const [opacity, setOpacity] = useState(0.85)
+  const [opacity, setOpacity] = useState(saved.opacity)
+  const [color, setColor] = useState(saved.color)
+  const cameraPosition = useRef<CameraPosition>(saved.cameraPosition)
+  const [initialCameraPosition, setInitialCameraPosition] = useState(saved.cameraPosition)
   const dualTransition = playing || (progress > 0 && progress < 1)
   const [selectionKey, setSelectionKey] = useState(0)
-  const [duration, setDuration] = useState(1.8)
+  const [duration, setDuration] = useState(saved.duration)
   const [resetNonce, setResetNonce] = useState(0)
   const [zoom, setZoom] = useState<{
     nonce: number
@@ -68,6 +74,18 @@ export function App() {
   const solid = getSolid(solidId)
   const origin = getSolid(originId)
   const destinationId = kind === 'dual' ? origin.dualId : stellationTargets[originId] ?? originId
+  const latestSettings = useRef<Settings>(saved)
+
+  useEffect(() => {
+    latestSettings.current = { solidId, autoRotate, duration, opacity, color, cameraPosition: cameraPosition.current }
+    writeSettings(latestSettings.current)
+  }, [solidId, autoRotate, duration, opacity, color])
+
+  const saveCamera = useCallback((position: CameraPosition) => {
+    cameraPosition.current = position
+    latestSettings.current = { ...latestSettings.current, cameraPosition: position }
+    writeSettings(latestSettings.current)
+  }, [])
 
   useEffect(() => {
     if (!playing) return
@@ -105,7 +123,7 @@ export function App() {
     setProgress(0)
     progressRef.current = 0
     setSelectionKey((value) => value + 1)
-    setResetNonce((value) => value + 1)
+    setInitialCameraPosition(cameraPosition.current)
   }
 
   function startDualTransition(nextKind: TransformationKind = 'dual') {
@@ -296,18 +314,23 @@ export function App() {
                     className="btn btn-outline-info"
                     disabled={dualTransition || !stellationTargets[solidId]}
                     onClick={() => startDualTransition('stellate')}
-                    title={stellationTargets[solidId] ? `Transform to ${getSolid(stellationTargets[solidId]!).name}` : 'No pentagonal stellation path for this solid'}
+                    title={stellationTargets[solidId] ? `Transform to ${getSolid(stellationTargets[solidId]!).name}` : 'No regular Kepler–Poinsot stellation for this solid'}
                   >
-                    <Sparkles size={16} aria-hidden="true" /> {solid.faceType === 'Pentagram' ? 'Unstellate' : 'Stellate'}
+                    <Sparkles size={16} aria-hidden="true" /> {solid.faceType === 'Pentagram' || solidId === 'great-icosahedron' ? 'Unstellate' : 'Stellate'}
                   </button>
                 </ButtonGroup>
               </Col>
             </Row>
             <Row className="align-items-center g-2 mt-1">
               <Col xs={12} md={4}>
-                <Form.Label htmlFor="opacity" className="small mb-0">
-                  Face opacity: {Math.round(opacity * 100)}%
-                </Form.Label>
+                <div className="d-flex align-items-center justify-content-between gap-2">
+                  <Form.Label htmlFor="opacity" className="small mb-0">
+                    Face opacity: {Math.round(opacity * 100)}%
+                  </Form.Label>
+                  <Form.Label htmlFor="solid-color" className="small mb-0 ms-auto">Color</Form.Label>
+                  <Form.Control type="color" id="solid-color" size="sm" value={color}
+                    title="Solid color" onChange={(event) => setColor(event.target.value)} />
+                </div>
                 <Form.Range id="opacity" min={0.2} max={1} step={0.05} value={opacity}
                   onChange={(event) => setOpacity(Number(event.target.value))} />
               </Col>
@@ -353,6 +376,9 @@ export function App() {
               originId={originId}
               kind={kind}
               transitionNonce={transitionNonce}
+              color={color}
+              initialCameraPosition={initialCameraPosition}
+              onCameraChange={saveCamera}
             />
           </Card.Body>
         </Card>
