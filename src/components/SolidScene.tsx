@@ -24,10 +24,13 @@ interface SolidSceneProps {
   color: string
   initialCameraPosition: CameraPosition
   onCameraChange: (position: CameraPosition) => void
+  destinationId: SolidId
+  restoredModel?: Polyhedron
+  onEndpoint: (id: SolidId, model: Polyhedron) => void
 }
 
-function TransformationMesh({ originId, progress, opacity, kind, transitionNonce, color }: Pick<SolidSceneProps, 'originId' | 'progress' | 'opacity' | 'kind' | 'transitionNonce' | 'color'>) {
-  const [initialModel] = useState(() => loadPolyhedron(originId))
+function TransformationMesh({ originId, progress, opacity, kind, transitionNonce, color, destinationId, restoredModel, onEndpoint }: Pick<SolidSceneProps, 'originId' | 'progress' | 'opacity' | 'kind' | 'transitionNonce' | 'color' | 'destinationId' | 'restoredModel' | 'onEndpoint'>) {
+  const [initialModel] = useState(() => restoredModel ?? loadPolyhedron(originId))
   const current = useRef(initialModel)
   const pair = useRef<{ source: Polyhedron; target: Polyhedron; render: (t: number) => ReturnType<typeof renderPolyhedron> } | null>(null)
   useEffect(() => {
@@ -80,9 +83,9 @@ function TransformationMesh({ originId, progress, opacity, kind, transitionNonce
       previous.dispose()
     }
 
-    if (progress === 0) current.current = path.source
-    if (progress === 1) current.current = path.target
-  }, [originId, kind, transitionNonce, progress])
+    if (progress === 0) { current.current = path.source; onEndpoint(originId,path.source) }
+    if (progress === 1) { current.current = path.target; onEndpoint(destinationId,path.target) }
+  }, [originId, kind, transitionNonce, progress, destinationId, onEndpoint])
 
   return (
     <group rotation={[0.35, 0.45, 0]}>
@@ -188,7 +191,8 @@ export function SolidScene(props: SolidSceneProps) {
       <ambientLight intensity={1.2} />
       <directionalLight position={[3, 4, 5]} intensity={2.4} />
       <directionalLight position={[-4, -2, -3]} intensity={0.8} />
-      <TransformationMesh originId={props.originId} progress={props.progress} opacity={props.opacity} kind={props.kind} transitionNonce={props.transitionNonce} color={props.color} />
+      <TransformationMesh originId={props.originId} progress={props.progress} opacity={props.opacity} kind={props.kind} transitionNonce={props.transitionNonce} color={props.color}
+        destinationId={props.destinationId} restoredModel={props.restoredModel} onEndpoint={props.onEndpoint} />
       <CameraControls
         autoRotate={props.autoRotate}
         resetNonce={props.resetNonce}

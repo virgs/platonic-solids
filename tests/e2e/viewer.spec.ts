@@ -5,6 +5,7 @@ import { solids } from '../../src/data/solids'
 test('color, display preferences, selected solid and zoom survive reload', async ({ page }) => {
   await page.goto('./?solid=cube')
   await page.getByRole('slider', { name: /Transformation time/ }).fill('4')
+  await page.getByRole('button', { name: 'Display', exact: true }).click()
   await page.getByRole('slider', { name: /Face opacity/ }).fill('0.65')
   await page.getByLabel('Color', { exact: true }).evaluate((input) => {
     Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value')!.set!.call(input, '#ff6633')
@@ -80,7 +81,7 @@ test('completed endpoints unlock the correct actions for every solid', async ({ 
     await page.goto(`./?solid=${solid.id}`)
     await page.getByRole('slider', { name: /Transformation time/ }).fill('0.5')
     await page.getByRole('button', { name: 'Dual', exact: true }).click()
-    await expect(page.getByTestId('transformation-status')).toContainText('Complete')
+    await expect(page.getByRole('slider', { name: /Transformation progress/ })).toHaveValue('1')
     const destination = solids.find((entry) => entry.id === solid.dualId)!
     await expect(page.getByRole('heading', { name: destination.name, exact: true })).toBeVisible()
     await expect(page.getByRole('button', { name: 'Dual', exact: true })).toBeEnabled()
@@ -159,6 +160,7 @@ test('the player can seek, hold an intermediate shape, and resume', async ({ pag
 
 test('face opacity defaults to 85 percent and is adjustable', async ({ page }) => {
   await page.goto('./')
+  await page.getByRole('button', { name: 'Display', exact: true }).click()
   const opacity = page.getByRole('slider', { name: /Face opacity/ })
   await expect(opacity).toHaveValue('0.85')
   await opacity.fill('1')

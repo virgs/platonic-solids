@@ -9,10 +9,11 @@ export interface Settings {
   opacity: number
   color: string
   cameraPosition: CameraPosition
+  displayOpen: boolean
 }
 export const defaults: Settings = {
   solidId: 'tetrahedron', autoRotate: false, duration: 1.8,
-  opacity: 0.85, color: '#4cc9f0', cameraPosition: [2.4,1.7,2.4],
+  opacity: 0.85, color: '#4cc9f0', cameraPosition: [2.4,1.7,2.4], displayOpen: false,
 }
 
 export function parseSettings(raw: string | null): Settings {
@@ -30,6 +31,7 @@ export function parseSettings(raw: string | null): Settings {
       opacity: inRange(value.opacity,0.2,1,defaults.opacity),
       color: typeof value.color === 'string' && /^#[\da-f]{6}$/i.test(value.color) ? value.color : defaults.color,
       cameraPosition: validPosition ? [position[0],position[1],position[2]] : [...defaults.cameraPosition],
+      displayOpen: typeof value.displayOpen === 'boolean' ? value.displayOpen : defaults.displayOpen,
     }
   } catch {
     return { ...defaults }

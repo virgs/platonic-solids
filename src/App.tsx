@@ -1,7 +1,10 @@
 import {
   Github,
-  Pause,
-  Play,
+  Network,
+  History,
+  SlidersHorizontal,
+  ArrowLeft,
+  ArrowRight,
   RefreshCw,
   RotateCcw,
   Rotate3D,
@@ -15,16 +18,22 @@ import {
   Badge,
   ButtonGroup,
   Card,
+  Collapse,
   Col,
   Container,
   Dropdown,
   Form,
   Navbar,
+  Modal,
+  ListGroup,
   Row,
   Stack,
 } from 'react-bootstrap'
 import { SolidScene } from './components/SolidScene'
-import { stellationTargets, type TransformationKind } from './three/transformations'
+import { RelationshipMap } from './components/RelationshipMap'
+import { TransformationPlayer } from './components/TransformationPlayer'
+import { routesFrom } from './data/routes'
+import { stellationTargets, type TransformationKind, type Polyhedron } from './three/transformations'
 import { readSettings, writeSettings, type CameraPosition, type Settings } from './settings'
 import {
   getSolid,
@@ -48,6 +57,8 @@ function Property({ label, value }: { label: string; value: string | number }) {
   )
 }
 
+interface HistoryStop { solidId: SolidId; model: Polyhedron; camera: CameraPosition; signature: string }
+
 export function App() {
   const [saved] = useState(readSettings)
   const [solidId, setSolidId] = useState<SolidId>(() => initialSolid(saved).id)
@@ -56,7 +67,11 @@ export function App() {
   const [progress, setProgress] = useState(0)
   const progressRef = useRef(0)
   const [playing, setPlaying] = useState(false)
-  const [hasTransformed, setHasTransformed] = useState(false)
+  const [showMap, setShowMap] = useState(false)
+  const [showHistory, setShowHistory] = useState(false)
+  const [showDisplay, setShowDisplay] = useState(saved.displayOpen)
+  const [restoredModel, setRestoredModel] = useState<Polyhedron>()
+  const [history, setHistory] = useState<{ entries: HistoryStop[]; index: number }>({ entries: [], index: -1 })
   const [target, setTarget] = useState(1)
   const [kind, setKind] = useState<TransformationKind>('dual')
   const [transitionNonce, setTransitionNonce] = useState(0)
@@ -77,20 +92,35 @@ export function App() {
   const destinationId = kind === 'dual' ? origin.dualId : stellationTargets[originId] ?? originId
   const stellationDestination = stellationTargets[solidId]
   const unstellate = solid.faceType === 'Pentagram' || solidId === 'great-icosahedron'
-  const operationName = kind === 'dual' ? 'Dual' : 'Stellation'
-  const phase = playing ? 'Playing' : dualTransition ? 'Paused' : hasTransformed ? 'Complete' : 'Ready'
-  const displayedPercent = playing ? Math.min(99, Math.floor(progress * 100)) : Math.round(progress * 100)
   const latestSettings = useRef<Settings>(saved)
 
+  const recordEndpoint = useCallback((id: SolidId, model: Polyhedron) => {
+    const signature = JSON.stringify([id,model.vertices.map((v) => v.toArray()),model.faces])
+    const camera: CameraPosition = [...cameraPosition.current]
+    setHistory((previous) => {
+      const index = previous.entries.findIndex((entry) => entry.signature === signature)
+      if (index >= 0) return index === previous.index ? previous : { ...previous, index }
+      const entries = [...previous.entries.slice(0,previous.index+1), { solidId: id, model, camera, signature }].slice(-30)
+      return { entries, index: entries.length-1 }
+    })
+  }, [])
+
   useEffect(() => {
-    latestSettings.current = { solidId, autoRotate, duration, opacity, color, cameraPosition: cameraPosition.current }
+    latestSettings.current = { solidId, autoRotate, duration, opacity, color, cameraPosition: cameraPosition.current, displayOpen: showDisplay }
     writeSettings(latestSettings.current)
-  }, [solidId, autoRotate, duration, opacity, color])
+  }, [solidId, autoRotate, duration, opacity, color, showDisplay])
 
   const saveCamera = useCallback((position: CameraPosition) => {
     cameraPosition.current = position
     latestSettings.current = { ...latestSettings.current, cameraPosition: position }
     writeSettings(latestSettings.current)
+    setHistory((previous) => {
+      const entry = previous.entries[previous.index]
+      if (!entry || entry.camera.every((value,i) => Math.abs(value-position[i]) < 1e-6)) return previous
+      const entries = [...previous.entries]
+      entries[previous.index] = { ...entry, camera: [...position] }
+      return { ...previous, entries }
+    })
   }, [])
 
   useEffect(() => {
@@ -126,7 +156,7 @@ export function App() {
     setSolidId(nextId)
     setOriginId(nextId)
     setKind('dual')
-    setHasTransformed(false)
+    setRestoredModel(undefined)
     setProgress(0)
     progressRef.current = 0
     setSelectionKey((value) => value + 1)
@@ -134,7 +164,6 @@ export function App() {
   }
 
   function startDualTransition(nextKind: TransformationKind = 'dual') {
-    setHasTransformed(true)
     setAutoRotate(false)
     if (nextKind !== kind) {
       setOriginId(solidId)
@@ -150,7 +179,7 @@ export function App() {
   }
 
   function seek(value: number) {
-    setHasTransformed(true)
+    value = Math.max(0,Math.min(1,Math.round(value*100)/100))
     setPlaying(false)
     setAutoRotate(false)
     progressRef.current = value
@@ -161,6 +190,24 @@ export function App() {
 
   function changeZoom(direction: 'in' | 'out') {
     setZoom((current) => ({ nonce: current.nonce + 1, direction }))
+  }
+
+  function restoreStop(index: number) {
+    const entry = history.entries[index]
+    if (!entry || dualTransition) return
+    setPlaying(false)
+    setAutoRotate(false)
+    setSolidId(entry.solidId)
+    setOriginId(entry.solidId)
+    setKind('dual')
+    setProgress(0)
+    progressRef.current = 0
+    cameraPosition.current = [...entry.camera]
+    setInitialCameraPosition([...entry.camera])
+    setRestoredModel(entry.model)
+    setSelectionKey((value) => value+1)
+    setHistory((previous) => ({ ...previous,index }))
+    setShowHistory(false)
   }
 
   return (
@@ -304,24 +351,35 @@ export function App() {
                     aria-label="Reset view" title="Reset view">
                     <RotateCcw size={16} aria-hidden="true" /> Reset view
                   </button>
+                  <Form.Label htmlFor="solid-color" className="visually-hidden">Color</Form.Label>
+                  <Form.Control type="color" id="solid-color" size="sm" className="ms-2" value={color}
+                    title="Solid color" onChange={(event) => setColor(event.target.value)} />
                 </ButtonGroup>
               </Col>
 
               <Col xs={12} md={4} className="text-md-end">
-                <div className="d-flex gap-2 justify-content-md-end" role="group" aria-label="Solid transformations">
+                <div className="d-flex gap-2 justify-content-md-end flex-wrap">
+                  <button className="btn btn-primary btn-sm" disabled={dualTransition} onClick={() => setShowMap(true)}><Network size={16} /> Map</button>
+                  <button className="btn btn-primary btn-sm" disabled={dualTransition} onClick={() => setShowHistory(true)}><History size={16} /> History</button>
+                  <button className="btn btn-primary btn-sm" aria-expanded={showDisplay} aria-controls="display-settings" onClick={() => setShowDisplay((value) => !value)}><SlidersHorizontal size={16} /> Display</button>
+                </div>
+              </Col>
+            </Row>
+            <div className="d-flex gap-2 justify-content-md-end flex-wrap mt-2" role="group" aria-label="Solid transformations">
                   <button
                     type="button"
-                    className="btn btn-primary btn-sm"
+                    className="btn btn-primary btn-sm px-3 py-2 text-nowrap"
                     onClick={() => startDualTransition('dual')}
                     disabled={dualTransition}
                     aria-label="Dual"
                     title={`Show dual: ${getSolid(solid.dualId).name}`}
                   >
-                    <RefreshCw size={16} aria-hidden="true" /> {dualTransition ? 'Transformation in progress' : `Dual → ${getSolid(solid.dualId).name}`}
+                    <RefreshCw size={16} aria-hidden="true" /> Dual → {getSolid(solid.dualId).name}
                   </button>
+                <div className="d-flex">
                   <button
                     type="button"
-                    className="btn btn-info btn-sm"
+                    className="btn btn-info btn-sm px-3 py-2 text-nowrap"
                     aria-label={unstellate ? 'Unstellate' : 'Stellate'}
                     disabled={dualTransition || !stellationDestination}
                     onClick={() => startDualTransition('stellate')}
@@ -329,49 +387,36 @@ export function App() {
                   >
                     <Sparkles size={16} aria-hidden="true" /> {stellationDestination ? `${unstellate ? 'Unstellate' : 'Stellate'} → ${getSolid(stellationDestination).name}` : 'No regular stellation'}
                   </button>
+                  <Dropdown>
+                    <Dropdown.Toggle variant="info" size="sm" className="h-100" split aria-label="Choose stellation destination"
+                      disabled={dualTransition || !routesFrom(solidId).some((route) => route.kind === 'stellate')} />
+                    <Dropdown.Menu>
+                      {routesFrom(solidId).filter((route) => route.kind === 'stellate').map((route) => (
+                        <Dropdown.Item key={route.destination} disabled={!route.implemented} onClick={() => startDualTransition('stellate')}>
+                          {getSolid(route.destination).name}{route.implemented ? '' : ' · Planned'}
+                        </Dropdown.Item>
+                      ))}
+                    </Dropdown.Menu>
+                  </Dropdown>
                 </div>
-              </Col>
-            </Row>
-            <div className="small text-center mt-1" data-testid="transformation-status" role="status" aria-live="polite">
-              <Badge bg={phase === 'Complete' ? 'success' : playing ? 'info' : 'secondary'} className="me-2">{phase}</Badge>
-              {hasTransformed
-                ? `${operationName}: ${target === 0 ? getSolid(destinationId).name : origin.name} → ${target === 0 ? origin.name : getSolid(destinationId).name}`
-                : `${solid.name} · choose a transformation`}
-              {dualTransition && <span className="text-body-secondary ms-2">New actions unlock when the player reaches an endpoint.</span>}
             </div>
+            <Collapse in={showDisplay}>
+              <div id="display-settings">
+                <Form.Label htmlFor="opacity" className="small mb-0 mt-2">Face opacity: {Math.round(opacity*100)}%</Form.Label>
+                <Form.Range id="opacity" min={0.2} max={1} step={0.05} value={opacity} onChange={(event) => setOpacity(Number(event.target.value))} />
+              </div>
+            </Collapse>
             <Row className="align-items-center g-2 mt-1">
-              <Col xs={12} md={4}>
-                <div className="d-flex align-items-center justify-content-between gap-2">
-                  <Form.Label htmlFor="opacity" className="small mb-0">
-                    Face opacity: {Math.round(opacity * 100)}%
-                  </Form.Label>
-                  <Form.Label htmlFor="solid-color" className="small mb-0 ms-auto">Color</Form.Label>
-                  <Form.Control type="color" id="solid-color" size="sm" value={color}
-                    title="Solid color" onChange={(event) => setColor(event.target.value)} />
-                </div>
-                <Form.Range id="opacity" min={0.2} max={1} step={0.05} value={opacity}
-                  onChange={(event) => setOpacity(Number(event.target.value))} />
-              </Col>
-              <Col xs={12} md={4} className="text-center">
-                <Form.Label htmlFor="progress" className="small mb-0">
-                  Transformation progress: {displayedPercent}%
-                </Form.Label>
-                <div className="d-flex gap-2 align-items-center">
-                  <button type="button" className="btn btn-primary btn-sm"
-                    aria-label={playing ? 'Pause transformation' : 'Play transformation'}
-                    onClick={() => {
+              <Col md={2} className="d-none d-md-block" />
+              <Col xs={12} md={8}>
+                <TransformationPlayer originId={originId} destinationId={destinationId} progress={progress} playing={playing} kind={kind} onSeek={seek}
+                  onPlay={() => {
                       if (playing) setPlaying(false)
                       else if (progress > 0 && progress < 1) setPlaying(true)
                       else startDualTransition(kind)
-                    }}>
-                    {playing ? <Pause size={16} /> : <Play size={16} />}
-                  </button>
-                  <Form.Range id="progress" min={0} max={1} step={0.01} value={progress}
-                    aria-valuetext={`${Math.round(progress * 100)} percent, ${origin.name} to ${getSolid(destinationId).name}`}
-                    onChange={(event) => seek(Number(event.target.value))} />
-                </div>
+                    }} />
               </Col>
-              <Col xs={12} md={4}>
+              <Col xs={12} md={2}>
                 <Form.Label htmlFor="duration" className="small mb-0">
                   Transformation time: {duration.toFixed(1)} s
                 </Form.Label>
@@ -397,10 +442,28 @@ export function App() {
               color={color}
               initialCameraPosition={initialCameraPosition}
               onCameraChange={saveCamera}
+              destinationId={destinationId}
+              restoredModel={restoredModel}
+              onEndpoint={recordEndpoint}
             />
           </Card.Body>
         </Card>
       </Container>
+      <RelationshipMap show={showMap} onHide={() => setShowMap(false)} current={solidId}
+        activeRoute={[originId,destinationId]} onInspect={changeSolid} onTransform={startDualTransition} />
+      <Modal show={showHistory} onHide={() => setShowHistory(false)} centered scrollable aria-labelledby="history-title">
+        <Modal.Header closeButton><Modal.Title id="history-title">Route history</Modal.Title></Modal.Header>
+        <Modal.Body>
+          <div className="d-flex gap-2 mb-3">
+            <button className="btn btn-primary btn-sm" disabled={history.index <= 0} onClick={() => restoreStop(history.index-1)}><ArrowLeft size={16} /> Back</button>
+            <button className="btn btn-primary btn-sm" disabled={history.index >= history.entries.length-1} onClick={() => restoreStop(history.index+1)}>Forward <ArrowRight size={16} /></button>
+          </div>
+          <ListGroup>{history.entries.map((entry,index) => (
+            <ListGroup.Item key={`${entry.signature}:${index}`} action active={index === history.index}
+              onClick={() => restoreStop(index)}>{index+1}. {getSolid(entry.solidId).name}</ListGroup.Item>
+          ))}</ListGroup>
+        </Modal.Body>
+      </Modal>
     </div>
   )
 }
