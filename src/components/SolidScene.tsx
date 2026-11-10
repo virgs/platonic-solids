@@ -2,7 +2,7 @@ import { OrbitControls } from '@react-three/drei'
 import { Canvas, useThree } from '@react-three/fiber'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { Alert } from 'react-bootstrap'
-import { BufferGeometry, DoubleSide, EdgesGeometry, Float32BufferAttribute, type LineSegments, type Mesh } from 'three'
+import { BufferGeometry, DoubleSide, EdgesGeometry, Float32BufferAttribute, GreaterDepth, type LineSegments, type Mesh } from 'three'
 import type { OrbitControls as OrbitControlsImpl } from 'three-stdlib'
 import type { SolidId, PlatonicId } from '../data/solids'
 import { getSolid } from '../data/solids'
@@ -61,7 +61,9 @@ function TransformationMesh({ originId, progress, opacity, kind, transitionNonce
     return geometry
   }, [])
   const mesh = useRef<Mesh>(null)
+  const depthMesh = useRef<Mesh>(null)
   const lines = useRef<LineSegments>(null)
+  const hiddenLines = useRef<LineSegments>(null)
 
   useEffect(
     () => () => {
@@ -76,10 +78,12 @@ function TransformationMesh({ originId, progress, opacity, kind, transitionNonce
     const { geometry, edgeGeometry } = path.render(progress)
     mesh.current.geometry.dispose()
     mesh.current.geometry = geometry
+    if (depthMesh.current) depthMesh.current.geometry = geometry
 
     if (lines.current) {
       const previous = lines.current.geometry
       lines.current.geometry = edgeGeometry
+      if (hiddenLines.current) hiddenLines.current.geometry = edgeGeometry
       previous.dispose()
     }
 
@@ -89,7 +93,7 @@ function TransformationMesh({ originId, progress, opacity, kind, transitionNonce
 
   return (
     <group rotation={[0.35, 0.45, 0]}>
-      <mesh ref={mesh} geometry={initialGeometry}>
+      <mesh ref={mesh} geometry={initialGeometry} renderOrder={0}>
         <meshStandardMaterial
           color={color}
           depthWrite={opacity === 1}
@@ -101,9 +105,18 @@ function TransformationMesh({ originId, progress, opacity, kind, transitionNonce
           transparent
         />
       </mesh>
-      <lineSegments ref={lines}>
-        <bufferGeometry />
-        <lineBasicMaterial color="#f8f9fa" transparent opacity={opacity} depthWrite={opacity === 1} />
+      {/* Keep edge visibility independent of the faces' transparency mode.
+          Clear the faces' depth first so the same offset mask is written at
+          100% as at 99%, avoiding flickering on visible edges as well. */}
+      <mesh ref={depthMesh} geometry={initialGeometry} renderOrder={1} onBeforeRender={(renderer) => renderer.clearDepth()}>
+        <meshBasicMaterial colorWrite={false} depthWrite transparent side={DoubleSide}
+          polygonOffset polygonOffsetFactor={1} polygonOffsetUnits={1} />
+      </mesh>
+      <lineSegments ref={hiddenLines} geometry={initialGeometry} renderOrder={2}>
+        <lineBasicMaterial color="#f8f9fa" transparent opacity={opacity*(1-opacity)} depthWrite={false} depthFunc={GreaterDepth} />
+      </lineSegments>
+      <lineSegments ref={lines} geometry={initialGeometry} renderOrder={3}>
+        <lineBasicMaterial color="#f8f9fa" transparent opacity={opacity} depthWrite={false} />
       </lineSegments>
     </group>
   )

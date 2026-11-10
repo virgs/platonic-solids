@@ -12,7 +12,7 @@ export function OpacityControl({ value, onChange, show, onToggle }: {
     </Dropdown.Toggle>
     <Dropdown.Menu renderOnMount className="p-2 text-center" aria-labelledby="opacity-button">
       <div className="small text-nowrap">Solid opacity: {Math.round(value*100)}%</div>
-      <VerticalSlider label="Solid opacity" value={value} min={0.2} max={1} step={0.05}
+      <VerticalSlider label="Solid opacity" value={value} min={0.2} max={1} step={0.01}
         format={(next) => `${Math.round(next*100)}%`} onChange={onChange} />
     </Dropdown.Menu>
   </Dropdown>

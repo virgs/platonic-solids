@@ -1,5 +1,5 @@
 import { ChevronLeft, ChevronRight, Info, Pause, Play, SkipBack, SkipForward } from 'lucide-react'
-import { Form, Modal } from 'react-bootstrap'
+import { CloseButton, Form, Modal } from 'react-bootstrap'
 import { getSolid, type SolidId } from '../data/solids'
 import type { TransformationKind } from '../three/transformations'
 import { TimingControl } from './TimingControl'
@@ -22,15 +22,15 @@ export function TransformationPlayer(props: RouteView & {
   return <div role="group" aria-label="Transformation player">
     <Form.Label htmlFor="progress" className="small mb-0">Transformation progress: {percent}%</Form.Label>
     <div className="d-flex align-items-center gap-1">
-      <button className="btn btn-primary btn-sm" aria-label="Go to transformation start" onClick={() => onSeek(0)}><SkipBack size={15} /></button>
-      <button className="btn btn-primary btn-sm" aria-label="Step transformation backward" onClick={() => step(-0.01)}><ChevronLeft size={15} /></button>
-      <button className="btn btn-primary btn-sm" aria-label={playing ? 'Pause transformation' : 'Play transformation'} onClick={onPlay}>{playing ? <Pause size={16} /> : <Play size={16} />}</button>
+      <button className="btn btn-primary btn-sm" aria-label="Go to transformation start" title="Jump to start" onClick={() => onSeek(0)}><SkipBack size={15} /></button>
+      <button className="btn btn-primary btn-sm" aria-label="Step transformation backward" title="Step back 1%" onClick={() => step(-0.01)}><ChevronLeft size={15} /></button>
+      <button className="btn btn-primary btn-sm" aria-label={playing ? 'Pause transformation' : 'Play transformation'} title={playing ? 'Pause' : 'Play'} onClick={onPlay}>{playing ? <Pause size={16} /> : <Play size={16} />}</button>
       <TimingControl value={props.duration} disabled={playing} onChange={props.onDurationChange} />
       <Form.Range id="progress" min={0} max={1} step="any" list="player-milestones" value={progress}
         aria-valuetext={`${percent} percent, ${getSolid(originId).name} to ${getSolid(destinationId).name}`}
         onChange={(event) => onSeek(Number(event.target.value))} />
-      <button className="btn btn-primary btn-sm" aria-label="Step transformation forward" onClick={() => step(0.01)}><ChevronRight size={15} /></button>
-      <button className="btn btn-primary btn-sm" aria-label="Go to transformation end" onClick={() => onSeek(1)}><SkipForward size={15} /></button>
+      <button className="btn btn-primary btn-sm" aria-label="Step transformation forward" title="Step forward 1%" onClick={() => step(0.01)}><ChevronRight size={15} /></button>
+      <button className="btn btn-primary btn-sm" aria-label="Go to transformation end" title="Jump to end" onClick={() => onSeek(1)}><SkipForward size={15} /></button>
       <button className="btn btn-primary btn-sm" aria-label="Explain this transformation" title="How it works" onClick={props.onExplain}><Info size={16} /></button>
     </div>
     <datalist id="player-milestones"><option value="0" label="Start" />{milestones.map((point) => <option key={point.value} value={point.value} label={point.label || 'Midpoint'} />)}<option value="1" label="End" /></datalist>
@@ -48,7 +48,7 @@ export function TransformationExplanation({ show,onHide,...props }: RouteView & 
   const caption = kind === 'stellate' ? retracting ? 'The extended face regions retract within their planes.' : 'The original face regions extend within their planes toward the target intersections.'
     : progress < milestone.value ? 'Corners separate and new face regions open along the original edges.' : 'The original face regions shrink toward the target vertices.'
   return <Modal show={show} onHide={onHide} centered aria-labelledby="explanation-title">
-    <Modal.Header closeButton closeVariant="white"><Modal.Title id="explanation-title">How this transformation works</Modal.Title></Modal.Header>
+    <Modal.Header><Modal.Title id="explanation-title">How this transformation works</Modal.Title><CloseButton variant="white" title="Close explanation" onClick={onHide} /></Modal.Header>
     <Modal.Body>
       <p>{getSolid(originId).name} → {getSolid(destinationId).name}</p>
       <p>At {Math.round(progress*100)}%: {caption}</p>

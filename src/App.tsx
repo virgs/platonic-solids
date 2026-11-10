@@ -17,6 +17,7 @@ import {
   Badge,
   ButtonGroup,
   Card,
+  CloseButton,
   Col,
   Container,
   Dropdown,
@@ -235,6 +236,7 @@ export function App() {
             <Badge bg="dark">v{version}</Badge>
             <a
               className="btn btn-outline-light btn-sm"
+              title="View source on GitHub"
               href="https://github.com/virgs/platonic-solids"
               target="_blank"
               rel="noreferrer"
@@ -296,6 +298,7 @@ export function App() {
                     variant="primary"
                     size="sm"
                     id="solid-selector"
+                    title="Choose a solid"
                     disabled={dualTransition}
                   >
                     {solid.name}
@@ -306,6 +309,7 @@ export function App() {
                       <Dropdown.Item
                         key={option.id}
                         active={option.id === solidId}
+                        title={`View ${option.name}`}
                         onClick={() => changeSolid(option.id)}
                       >
                         {option.name}
@@ -314,7 +318,7 @@ export function App() {
                     <Dropdown.Divider />
                     <Dropdown.Header>Kepler–Poinsot</Dropdown.Header>
                     {starSolids.map((option) => (
-                      <Dropdown.Item key={option.id} active={option.id === solidId} onClick={() => changeSolid(option.id)}>
+                      <Dropdown.Item key={option.id} title={`View ${option.name}`} active={option.id === solidId} onClick={() => changeSolid(option.id)}>
                         {option.name}
                       </Dropdown.Item>
                     ))}
@@ -358,7 +362,7 @@ export function App() {
                     <RotateCcw size={16} aria-hidden="true" /> Reset view
                   </button>
                   <Form.Label htmlFor="solid-color" className="visually-hidden">Color</Form.Label>
-                  <Form.Control type="color" id="solid-color" size="sm" className="ms-2" value={color}
+                  <Form.Control type="color" id="solid-color" size="sm" className="ms-2 bg-primary border-primary" value={color}
                     title="Solid color" onChange={(event) => setColor(event.target.value)} />
                   <OpacityControl value={opacity} onChange={setOpacity} show={showDisplay} onToggle={setShowDisplay} />
                 </ButtonGroup>
@@ -366,8 +370,8 @@ export function App() {
 
               <Col xs={12} md={3} className="text-md-end">
                 <div className="d-flex gap-2 justify-content-md-end flex-wrap">
-                  <button className="btn btn-primary btn-sm" disabled={dualTransition} onClick={() => setShowMap(true)}><Network size={16} /> Map</button>
-                  <button className="btn btn-primary btn-sm" disabled={dualTransition} onClick={() => setShowHistory(true)}><History size={16} /> History</button>
+                  <button className="btn btn-primary btn-sm" title="Explore transformations" disabled={dualTransition} onClick={() => setShowMap(true)}><Network size={16} /> Map</button>
+                  <button className="btn btn-primary btn-sm" title="Revisit previous solids" disabled={dualTransition} onClick={() => setShowHistory(true)}><History size={16} /> History</button>
                 </div>
               </Col>
             </Row>
@@ -394,11 +398,11 @@ export function App() {
                     <Sparkles size={16} aria-hidden="true" /> {stellationDestination ? `${unstellate ? 'Unstellate' : 'Stellate'} → ${getSolid(stellationDestination).name}` : 'No regular stellation'}
                   </button>
                   <Dropdown>
-                    <Dropdown.Toggle variant="warning" size="sm" className="h-100" split aria-label="Choose stellation destination"
+                    <Dropdown.Toggle variant="warning" size="sm" className="h-100" split aria-label="Choose stellation destination" title="Choose a stellation"
                       disabled={dualTransition || !routesFrom(solidId).some((route) => route.kind === 'stellate')} />
                     <Dropdown.Menu>
                       {routesFrom(solidId).filter((route) => route.kind === 'stellate').map((route) => (
-                        <Dropdown.Item key={route.destination} disabled={!route.implemented} onClick={() => startDualTransition('stellate',route.destination)}>
+                        <Dropdown.Item key={route.destination} title={`Transform to ${getSolid(route.destination).name}`} disabled={!route.implemented} onClick={() => startDualTransition('stellate',route.destination)}>
                           {getSolid(route.destination).name}
                         </Dropdown.Item>
                       ))}
@@ -447,14 +451,14 @@ export function App() {
         activeRoute={[originId,destinationId]} onInspect={changeSolid} onTransform={startDualTransition} />
       <TransformationExplanation show={showExplanation} onHide={() => setShowExplanation(false)} originId={originId} destinationId={destinationId} progress={progress} kind={kind} />
       <Modal show={showHistory} onHide={() => setShowHistory(false)} centered scrollable aria-labelledby="history-title">
-        <Modal.Header closeButton closeVariant="white"><Modal.Title id="history-title">Route history</Modal.Title></Modal.Header>
+        <Modal.Header><Modal.Title id="history-title">Route history</Modal.Title><CloseButton variant="white" title="Close history" onClick={() => setShowHistory(false)} /></Modal.Header>
         <Modal.Body>
           <div className="d-flex gap-2 mb-3">
-            <button className="btn btn-primary btn-sm" disabled={history.index <= 0} onClick={() => restoreStop(history.index-1)}><ArrowLeft size={16} /> Back</button>
-            <button className="btn btn-primary btn-sm" disabled={history.index >= history.entries.length-1} onClick={() => restoreStop(history.index+1)}>Forward <ArrowRight size={16} /></button>
+            <button className="btn btn-primary btn-sm" title="Previous history entry" disabled={history.index <= 0} onClick={() => restoreStop(history.index-1)}><ArrowLeft size={16} /> Back</button>
+            <button className="btn btn-primary btn-sm" title="Next history entry" disabled={history.index >= history.entries.length-1} onClick={() => restoreStop(history.index+1)}>Forward <ArrowRight size={16} /></button>
           </div>
           <ListGroup>{history.entries.map((entry,index) => (
-            <ListGroup.Item key={`${entry.signature}:${index}`} action active={index === history.index}
+            <ListGroup.Item key={`${entry.signature}:${index}`} title={`Restore ${getSolid(entry.solidId).name} view`} action active={index === history.index}
               onClick={() => restoreStop(index)}>{index+1}. {getSolid(entry.solidId).name}</ListGroup.Item>
           ))}</ListGroup>
         </Modal.Body>

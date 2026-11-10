@@ -1,4 +1,4 @@
-import { Col, Form, ListGroup, Modal, Row } from 'react-bootstrap'
+import { CloseButton, Col, Form, ListGroup, Modal, Row } from 'react-bootstrap'
 import { getSolid, solids, type SolidId } from '../data/solids'
 import { routes, routesFrom, type Route } from '../data/routes'
 import type { TransformationKind } from '../three/transformations'
@@ -26,7 +26,7 @@ export function RelationshipMap({ show, onHide, current, activeRoute, onInspect,
   onTransform: (kind: TransformationKind, destination?: SolidId) => void
 }) {
   return <Modal show={show} onHide={onHide} size="xl" scrollable centered aria-labelledby="map-title">
-    <Modal.Header closeButton closeVariant="white"><Modal.Title id="map-title">Transformation map</Modal.Title></Modal.Header>
+    <Modal.Header><Modal.Title id="map-title">Transformation map</Modal.Title><CloseButton variant="white" title="Close map" onClick={onHide} /></Modal.Header>
     <Modal.Body>
       <div className="d-flex gap-3 small flex-wrap mb-2">
         <span className="text-info">◇ Solid line: dual</span><span className="text-warning">★ Dashed: stellation</span>
@@ -62,6 +62,7 @@ export function RelationshipMap({ show, onHide, current, activeRoute, onInspect,
           const lines = words.length > 2 ? [words.slice(0,-1).join(' '), words.at(-1)!] : [solid.name]
           return <g key={solid.id} role="button" tabIndex={0} aria-label={`Inspect ${solid.name}`}
             onClick={() => onInspect(solid.id)} onKeyDown={(event) => { if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); onInspect(solid.id) } }}>
+            <title>Inspect {solid.name}</title>
             <rect x={x-115} y={y-28} width={230} height={56} rx={10}
               fill={solid.id === current ? '#375a7f' : '#303030'} stroke={solid.id === current ? '#4cc9f0' : '#adb5bd'} strokeWidth={solid.id === current ? 3 : 1} />
             {lines.map((line,i) => <text key={line} x={x} y={y+(lines.length === 1 ? 5 : -3+i*18)} textAnchor="middle" fill="#f8f9fa" fontSize={14}>{line}</text>)}
@@ -75,7 +76,7 @@ export function RelationshipMap({ show, onHide, current, activeRoute, onInspect,
       </Form.Select>
       <h2 className="h6">From {getSolid(current).name}</h2>
       <ListGroup>
-        {routesFrom(current).map((route) => <ListGroup.Item key={`${route.kind}:${route.destination}`} action disabled={!route.implemented}
+        {routesFrom(current).map((route) => <ListGroup.Item key={`${route.kind}:${route.destination}`} title={`Transform to ${getSolid(route.destination).name}`} action disabled={!route.implemented}
           onClick={() => { onHide(); onTransform(route.kind,route.destination) }}>
           {route.kind === 'dual' ? 'Dual' : 'Stellation'} → {getSolid(route.destination).name}
         </ListGroup.Item>)}
