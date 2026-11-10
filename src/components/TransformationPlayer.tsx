@@ -1,4 +1,4 @@
-import { ChevronLeft, ChevronRight, Pause, Play, SkipBack, SkipForward } from 'lucide-react'
+import { ChevronLeft, ChevronRight, Info, Pause, Play, SkipBack, SkipForward } from 'lucide-react'
 import { Form, Modal } from 'react-bootstrap'
 import { getSolid, type SolidId } from '../data/solids'
 import { routeStops } from '../three/stellationPaths'
@@ -16,6 +16,7 @@ function checkpoints({ originId,destinationId,kind }: RouteView) {
 export function TransformationPlayer(props: RouteView & {
   playing: boolean; onSeek: (value: number) => void; onPlay: () => void
   duration: number; onDurationChange: (value: number) => void
+  onExplain: () => void
 }) {
   const { originId,destinationId,progress,playing,onSeek,onPlay } = props
   const milestones = checkpoints(props)
@@ -33,6 +34,7 @@ export function TransformationPlayer(props: RouteView & {
         onChange={(event) => onSeek(Number(event.target.value))} />
       <button className="btn btn-primary btn-sm" aria-label="Step transformation forward" onClick={() => step(0.01)}><ChevronRight size={15} /></button>
       <button className="btn btn-primary btn-sm" aria-label="Go to transformation end" onClick={() => onSeek(1)}><SkipForward size={15} /></button>
+      <button className="btn btn-primary btn-sm" aria-label="Explain this transformation" title="How it works" onClick={props.onExplain}><Info size={16} /></button>
     </div>
     <datalist id="player-milestones"><option value="0" label="Start" />{milestones.map((point) => <option key={point.value} value={point.value} label={point.label || 'Midpoint'} />)}<option value="1" label="End" /></datalist>
     <div className="d-flex justify-content-between small text-body-secondary gap-2 flex-wrap">

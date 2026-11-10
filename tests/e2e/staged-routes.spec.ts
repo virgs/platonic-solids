@@ -17,11 +17,22 @@ test('both formerly planned destinations play, expose checkpoints, and reverse',
   }
 })
 
-test('time popup is vertical and next to playback, and explanations belong to actions', async ({ page }) => {
+test('time and explanation controls belong to playback, with centered transformation actions', async ({ page }) => {
   await page.goto('./')
   const player = page.getByRole('group', { name: 'Transformation player' })
-  await expect(player.getByRole('button', { name: 'Explain this transformation' })).toHaveCount(0)
-  await expect(page.getByRole('group', { name: 'Solid transformations' }).getByRole('button', { name: 'Explain this transformation' })).toBeVisible()
+  const explain = player.getByRole('button', { name: 'Explain this transformation' })
+  await expect(explain).toBeVisible()
+  const actions = page.getByRole('group', { name: 'Solid transformations' })
+  await expect(actions.getByRole('button', { name: 'Explain this transformation' })).toHaveCount(0)
+  const centered = await actions.evaluate((group) => {
+    const bounds = group.getBoundingClientRect()
+    const children = Array.from(group.children).map((child) => child.getBoundingClientRect())
+    return Math.abs((Math.min(...children.map((child) => child.left))+Math.max(...children.map((child) => child.right)))/2-(bounds.left+bounds.right)/2)
+  })
+  expect(centered).toBeLessThan(1)
+  await explain.click()
+  await expect(page.getByRole('dialog', { name: 'How this transformation works' })).toBeVisible()
+  await page.getByRole('button', { name: 'Close', exact: true }).click()
   await expect(page.getByRole('slider', { name: 'Transformation time', exact: true })).not.toBeVisible()
   await player.getByRole('button', { name: 'Adjust transformation time' }).click()
   const slider = page.getByRole('slider', { name: 'Transformation time', exact: true })
@@ -50,6 +61,7 @@ test('map arrows and line patterns distinguish reversible relationships without 
   await expect(map.locator('path[data-route-kind="dual"]')).toHaveCount(5)
   await expect(map.locator('path[data-route-kind="stellate"]')).toHaveCount(3)
   await expect(map.locator('path[data-route-kind="staged"]')).toHaveCount(2)
+  expect((await map.locator('svg text').allTextContents()).filter((text) => /^\d+$/.test(text))).toEqual([])
   await page.screenshot({ path: test.info().outputPath('map-arrows.png'), animations: 'disabled' })
   await map.getByRole('button', { name: 'Stellation → Great stellated dodecahedron · 3-stage route', exact: true }).click()
   await expect(page.getByRole('heading', { name: 'Great stellated dodecahedron', exact: true })).toBeVisible()

@@ -3,7 +3,6 @@ import {
   Network,
   History,
   SlidersHorizontal,
-  Info,
   ArrowLeft,
   ArrowRight,
   RefreshCw,
@@ -373,7 +372,7 @@ export function App() {
                 </div>
               </Col>
             </Row>
-            <div className="d-flex gap-2 justify-content-md-end flex-wrap mt-2" role="group" aria-label="Solid transformations">
+            <div className="d-flex gap-2 justify-content-center flex-wrap mt-2" role="group" aria-label="Solid transformations">
                   <button
                     type="button"
                     className="btn btn-primary btn-sm px-3 py-2 text-nowrap"
@@ -407,9 +406,6 @@ export function App() {
                     </Dropdown.Menu>
                   </Dropdown>
                 </div>
-                <button className="btn btn-outline-light btn-sm" aria-label="Explain this transformation" onClick={() => { setPlaying(false); setShowExplanation(true) }}>
-                  <Info size={16} /> How it works
-                </button>
             </div>
             <Collapse in={showDisplay}>
               <div id="display-settings">
@@ -421,6 +417,7 @@ export function App() {
               <Col xs={12}>
                 <TransformationPlayer originId={originId} destinationId={destinationId} progress={progress} playing={playing} kind={kind} onSeek={seek}
                   duration={duration} onDurationChange={setDuration}
+                  onExplain={() => { setPlaying(false); setShowExplanation(true) }}
                   onPlay={() => {
                       if (playing) setPlaying(false)
                       else if (progress > 0 && progress < 1) setPlaying(true)

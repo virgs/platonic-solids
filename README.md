@@ -63,10 +63,10 @@ surface. Face opacity defaults to 85% and can be adjusted from 20% to 100%.
 
 The Map dialog shows all nine solids with arrowheads at both ends of reversible
 links. Solid lines/diamonds identify duals, dashed lines/stars identify
-stellations, and dotted lines/numbers identify staged routes. Select a node to
+stellations, and dotted lines identify staged routes. Select a node to
 inspect it, then choose a route. The player has named endpoints, 1% steps, and
 geometry checkpoints; its clock button opens a vertical timing slider. “How it
-works”, beside the transformation actions, opens an explanation. Session history
+works”, in the player toolbar, opens an explanation. Session history
 stores up to 30 endpoint geometry/view snapshots, so retracing a route preserves
 the reached orientation. Display collapses the opacity settings; its open state
 is remembered. No before/after property-comparison panel is included.

@@ -23,7 +23,7 @@ Solid properties support that task rather than dominating the interface.
    stellations. Replace its single preferred route with explicit destination
    choices. All listed destinations are now selectable, including the two-stage
    and three-stage D12 routes with named intermediate checkpoints.
-3. **Geometric explanation:** “How it works” in the transformation action row pauses playback
+3. **Geometric explanation:** The info button in the player toolbar pauses playback
    and opens a short description of the current operation and progress region.
 4. **Player milestones:** named endpoints, start/end jumps, and 1% forward/back
    steps support teaching. The cuboctahedron is marked at 50% on the cube-origin
@@ -34,13 +34,14 @@ Solid properties support that task rather than dominating the interface.
 6. **Compact display settings:** opacity is collapsible under Display, and that
    preference is persisted. Camera controls stay centered, with the color picker
    immediately after Reset view, as explicitly requested. Actions have a separate
-   full-width row so destination names stay on one line.
+   centered full-width row so destination names stay on one line.
 
 The clock button beside Play opens a vertical SVG timing slider. It supports
 mouse, touch, and keyboard interaction without a project-authored stylesheet.
 Map links have arrowheads at both ends. Solid lines with diamonds identify duals;
-dashed lines with stars identify stellation; dotted lines with numbers identify
-the number of stages in a composed route. Color is an additional cue only.
+dashed lines with stars identify stellation; dotted lines identify
+composed routes. Stage counts remain in route descriptions rather than on the
+map links. Color is an additional cue only.
 
 The user explicitly excluded the proposed before/after property comparison.
 No such panel is implemented.

@@ -30,7 +30,7 @@ export function RelationshipMap({ show, onHide, current, activeRoute, onInspect,
     <Modal.Body>
       <div className="d-flex gap-3 small flex-wrap mb-2">
         <span className="text-info">◇ Solid line: dual</span><span className="text-warning">★ Dashed: stellation</span>
-        <span>②/③ Dotted: staged route</span><span>Arrowheads at both ends: reversible</span>
+        <span>⋯ Dotted: staged route</span><span>Arrowheads at both ends: reversible</span>
       </div>
       <Row className="g-3 align-items-center"><Col xs={12} md={8}>
       <svg viewBox="0 0 920 440" width="100%" role="group" aria-label="Relationships between all nine solids">
@@ -54,7 +54,7 @@ export function RelationshipMap({ show, onHide, current, activeRoute, onInspect,
               <title>{`${getSolid(route.from).name} ↔ ${getSolid(route.to).name}: ${route.stages ? `${route.stages}-stage route` : route.kind}`}</title>
             </path>
             <circle cx={shape.middle[0]} cy={shape.middle[1]} r="11" fill="#303030" />
-            <text x={shape.middle[0]} y={shape.middle[1]+5} textAnchor="middle" fill="#f8f9fa" fontSize="16">{route.stages ?? (route.kind === 'dual' ? '◇' : '★')}</text>
+            <text x={shape.middle[0]} y={shape.middle[1]+5} textAnchor="middle" fill="#f8f9fa" fontSize="16">{route.stages ? '⋯' : route.kind === 'dual' ? '◇' : '★'}</text>
           </g>
         })}
         {solids.map((solid) => {
