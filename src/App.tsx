@@ -399,7 +399,7 @@ export function App() {
                     <Dropdown.Menu>
                       {routesFrom(solidId).filter((route) => route.kind === 'stellate').map((route) => (
                         <Dropdown.Item key={route.destination} disabled={!route.implemented} onClick={() => startDualTransition('stellate',route.destination)}>
-                          {getSolid(route.destination).name}{route.stages ? ` · ${route.stages}-stage route` : ''}
+                          {getSolid(route.destination).name}
                         </Dropdown.Item>
                       ))}
                     </Dropdown.Menu>

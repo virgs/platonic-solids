@@ -1,7 +1,7 @@
 import type { SolidId } from './solids'
 import type { TransformationKind } from '../three/transformations'
 
-export interface Route { from: SolidId; to: SolidId; kind: TransformationKind; implemented: boolean; stages?: number }
+export interface Route { from: SolidId; to: SolidId; kind: TransformationKind; implemented: boolean }
 export const routes: Route[] = [
   { from: 'tetrahedron', to: 'tetrahedron', kind: 'dual', implemented: true },
   { from: 'cube', to: 'octahedron', kind: 'dual', implemented: true },
@@ -11,8 +11,8 @@ export const routes: Route[] = [
   { from: 'dodecahedron', to: 'small-stellated-dodecahedron', kind: 'stellate', implemented: true },
   { from: 'icosahedron', to: 'great-icosahedron', kind: 'stellate', implemented: true },
   { from: 'great-dodecahedron', to: 'great-stellated-dodecahedron', kind: 'stellate', implemented: true },
-  { from: 'dodecahedron', to: 'great-dodecahedron', kind: 'stellate', implemented: true, stages: 2 },
-  { from: 'dodecahedron', to: 'great-stellated-dodecahedron', kind: 'stellate', implemented: true, stages: 3 },
+  { from: 'dodecahedron', to: 'great-dodecahedron', kind: 'stellate', implemented: true },
+  { from: 'dodecahedron', to: 'great-stellated-dodecahedron', kind: 'stellate', implemented: true },
 ]
 
 export function routesFrom(id: SolidId) {
