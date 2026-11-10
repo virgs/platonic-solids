@@ -1,5 +1,10 @@
 # Technical design
 
+This document records the original architectural design. For the implemented
+v0.12.0 geometry and controls, see [geometry sources](geometry-sources.md) and
+[the transformation HUD](transformation-hud.md). The public name is now
+Polyhedra Explorer, with eleven catalog solids and reversible rectification.
+
 ## Architecture
 
 The project will be a client-only single-page application built as static

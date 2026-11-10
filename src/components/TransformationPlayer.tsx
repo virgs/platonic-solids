@@ -1,9 +1,10 @@
 import { ChevronLeft, ChevronRight, Info, Pause, Play, SkipBack, SkipForward } from 'lucide-react'
-import { CloseButton, Form, Modal } from 'react-bootstrap'
+import { Form, Modal } from 'react-bootstrap'
 import { getSolid, type SolidId } from '../data/solids'
 import type { TransformationKind } from '../three/transformations'
 import { TimingControl } from './TimingControl'
 import { rectificationTargets } from '../three/rectification'
+import { DialogCloseButton } from './DialogCloseButton'
 
 interface RouteView { originId: SolidId; destinationId: SolidId; progress: number; kind: TransformationKind }
 function checkpoints({ originId,destinationId,kind }: RouteView) {
@@ -51,7 +52,7 @@ export function TransformationExplanation({ show,onHide,...props }: RouteView & 
     : kind === 'stellate' ? pyramid ? 'The pentagonal face centers rise into pyramid tips, or retract during reverse playback.' : 'The connected exterior reshapes as old peaks retract and target peaks emerge.'
     : progress < milestone.value ? 'Corners separate and new face regions open along the original edges.' : 'The original face regions shrink toward the target vertices.'
   return <Modal show={show} onHide={onHide} centered aria-labelledby="explanation-title">
-    <Modal.Header><Modal.Title id="explanation-title">How this transformation works</Modal.Title><CloseButton title="Close explanation" onClick={onHide} /></Modal.Header>
+    <Modal.Header><Modal.Title id="explanation-title">How this transformation works</Modal.Title><DialogCloseButton title="Close explanation" onClick={onHide} /></Modal.Header>
     <Modal.Body>
       <p>{getSolid(originId).name} → {getSolid(destinationId).name}</p>
       <p>At {Math.round(progress*100)}%: {caption}</p>

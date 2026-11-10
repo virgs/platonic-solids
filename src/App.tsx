@@ -18,7 +18,6 @@ import {
   Badge,
   ButtonGroup,
   Card,
-  CloseButton,
   Col,
   Container,
   Dropdown,
@@ -32,6 +31,7 @@ import {
 import { SolidScene } from './components/SolidScene'
 import { RelationshipMap } from './components/RelationshipMap'
 import { OpacityControl } from './components/OpacityControl'
+import { DialogCloseButton } from './components/DialogCloseButton'
 import { TransformationPlayer, TransformationExplanation } from './components/TransformationPlayer'
 import { defaultRoute, routeLabel, routesFrom } from './data/routes'
 import { rectificationTargets } from './three/rectification'
@@ -482,7 +482,7 @@ export function App() {
         activeRoute={[originId,destinationId]} onInspect={changeSolid} onTransform={startTransition} />
       <TransformationExplanation show={showExplanation} onHide={() => setShowExplanation(false)} originId={originId} destinationId={destinationId} progress={progress} kind={kind} />
       <Modal show={showHistory} onHide={() => setShowHistory(false)} centered scrollable aria-labelledby="history-title">
-        <Modal.Header><Modal.Title id="history-title">Route history</Modal.Title><CloseButton title="Close history" onClick={() => setShowHistory(false)} /></Modal.Header>
+        <Modal.Header><Modal.Title id="history-title">Route history</Modal.Title><DialogCloseButton title="Close history" onClick={() => setShowHistory(false)} /></Modal.Header>
         <Modal.Body>
           <div className="d-flex gap-2 mb-3">
             <button className="btn btn-primary btn-sm" title="Previous history entry" disabled={history.index <= 0} onClick={() => restoreStop(history.index-1)}><ArrowLeft size={16} /> Back</button>

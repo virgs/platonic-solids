@@ -1,7 +1,8 @@
-import { CloseButton, Col, Form, ListGroup, Modal, Row } from 'react-bootstrap'
+import { Col, Form, ListGroup, Modal, Row } from 'react-bootstrap'
 import { getSolid, solids, type SolidId } from '../data/solids'
 import { routeLabel, routes, routesFrom, type Route } from '../data/routes'
 import type { TransformationKind } from '../three/transformations'
+import { DialogCloseButton } from './DialogCloseButton'
 
 const positions: Record<SolidId, [number, number]> = {
   tetrahedron: [150,70], cube: [150,250], octahedron: [150,550], cuboctahedron: [430,400],
@@ -32,7 +33,7 @@ export function RelationshipMap({ show, onHide, current, activeRoute, onInspect,
   onTransform: (kind: TransformationKind, destination?: SolidId) => void
 }) {
   return <Modal show={show} onHide={onHide} size="xl" fullscreen="lg-down" scrollable centered aria-labelledby="map-title">
-    <Modal.Header><Modal.Title id="map-title">Transformation map</Modal.Title><CloseButton title="Close map" onClick={onHide} /></Modal.Header>
+    <Modal.Header><Modal.Title id="map-title">Transformation map</Modal.Title><DialogCloseButton title="Close map" onClick={onHide} /></Modal.Header>
     <Modal.Body>
       <div className="d-flex gap-3 small flex-wrap mb-2">
         <span className="text-info">◇ Solid line: dual</span><span className="text-warning">★ Dashed: stellation</span>
@@ -73,7 +74,7 @@ export function RelationshipMap({ show, onHide, current, activeRoute, onInspect,
             <title>Inspect {solid.name}</title>
             <rect x={x-115} y={y-28} width={230} height={56} rx={10}
               fill={solid.id === current ? '#375a7f' : '#303030'} stroke={solid.id === current ? '#4cc9f0' : '#adb5bd'} strokeWidth={solid.id === current ? 3 : 1} />
-            {lines.map((line,i) => <text key={line} x={x} y={y+(lines.length === 1 ? 5 : -3+i*18)} textAnchor="middle" fill="#f8f9fa" fontSize={14}>{line}</text>)}
+            {lines.map((line,i) => <text key={line} x={x} y={y+(lines.length === 1 ? 6 : -4+i*22)} textAnchor="middle" fill="#f8f9fa" fontSize={18}>{line}</text>)}
           </g>
         })}
       </svg>
