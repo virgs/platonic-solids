@@ -31,6 +31,7 @@ import {
 import { SolidScene } from './components/SolidScene'
 import { RelationshipMap } from './components/RelationshipMap'
 import { OpacityControl } from './components/OpacityControl'
+import { SolidSummary } from './components/SolidSummary'
 import { DialogCloseButton } from './components/DialogCloseButton'
 import { TransformationPlayer, TransformationExplanation } from './components/TransformationPlayer'
 import { defaultRoute, routeLabel, routesFrom } from './data/routes'
@@ -49,15 +50,6 @@ import {
 function initialSolid(settings: Settings): SolidDefinition {
   const query = new URLSearchParams(window.location.search).get('solid')
   return getSolid(query ?? settings.solidId)
-}
-
-function Property({ label, value }: { label: string; value: string | number }) {
-  return (
-    <div>
-      <span className="text-body-secondary small me-1">{label}</span>
-      <span className="fw-semibold small">{value}</span>
-    </div>
-  )
 }
 
 interface HistoryStop { solidId: SolidId; model: Polyhedron; camera: CameraPosition; signature: string }
@@ -256,44 +248,7 @@ export function App() {
       <Container as="main" className="py-2 d-flex flex-column flex-grow-1 overflow-hidden">
         <Card className="border-0 bg-body mb-2 flex-shrink-0">
           <Card.Body className="px-2 py-1">
-            <Stack
-              direction="horizontal"
-              gap={3}
-              className="justify-content-between align-items-center flex-wrap"
-            >
-              <Stack direction="horizontal" gap={2}>
-                <div>
-                  <div className="text-info small fw-semibold text-uppercase">
-                    {solid.family}
-                  </div>
-                  <h1 className="h4 mb-0">{solid.name}</h1>
-                </div>
-                <Badge bg="secondary">{solid.symbol}</Badge>
-              </Stack>
-
-              <Stack
-                direction="horizontal"
-                gap={3}
-                className="flex-wrap justify-content-end"
-              >
-                <Property label="Faces" value={solid.faces} />
-                <Property label="Edges" value={solid.edges} />
-                <Property label="Vertices" value={solid.vertices} />
-                <Property label={solid.faceBreakdown ? 'Face types' : 'Face'} value={solid.faceBreakdown ?? solid.faceType} />
-                <Property label={solid.faceBreakdown ? 'Face angles' : 'Face angle'} value={solid.faceAngle} />
-                <Property label="Dihedral" value={solid.dihedralAngle} />
-                {solid.faceBreakdown && <Property label="At each vertex" value={solid.vertexConfiguration} />}
-                {solid.dualName && <Property label="Dual" value={solid.dualName} />}
-                <a
-                  className="link-info small"
-                  href={solid.wikipediaUrl}
-                  target="_blank"
-                  rel="noreferrer"
-                >
-                  Wikipedia
-                </a>
-              </Stack>
-            </Stack>
+            <SolidSummary solid={solid} />
           </Card.Body>
         </Card>
 

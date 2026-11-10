@@ -3,25 +3,23 @@ import { getSolid, solids, type SolidId } from '../data/solids'
 import { routeLabel, routes, routesFrom, type Route } from '../data/routes'
 import type { TransformationKind } from '../three/transformations'
 import { DialogCloseButton } from './DialogCloseButton'
+import { Diamond, Scissors, Star } from 'lucide-react'
 
 const positions: Record<SolidId, [number, number]> = {
-  tetrahedron: [150,70], cube: [150,250], octahedron: [150,550], cuboctahedron: [430,400],
-  dodecahedron: [800,70], icosahedron: [1100,70], icosidodecahedron: [950,235],
-  'small-stellated-dodecahedron': [700,400], 'great-dodecahedron': [700,570],
-  'great-stellated-dodecahedron': [1100,570], 'great-icosahedron': [1100,400],
+  tetrahedron: [150,590], cube: [150,100], octahedron: [150,410], cuboctahedron: [420,255],
+  dodecahedron: [800,210], icosahedron: [1110,210], icosidodecahedron: [955,70],
+  'small-stellated-dodecahedron': [620,430], 'great-dodecahedron': [800,620],
+  'great-stellated-dodecahedron': [1110,620], 'great-icosahedron': [1160,430],
 }
 const styles = {
-  dual: { color: '#3498db', dash: undefined, symbol: '◇' },
-  stellate: { color: '#f39c12', dash: '10 5', symbol: '★' },
-  rectify: { color: '#00bc8c', dash: '12 4 2 4', symbol: '✂' },
+  dual: { color: '#3498db', dash: undefined, icon: Diamond },
+  stellate: { color: '#f39c12', dash: '10 5', icon: Star },
+  rectify: { color: '#00bc8c', dash: '12 4 2 4', icon: Scissors },
 }
 
 function edgeShape(route: Route): { path: string; middle: [number,number] } {
   const [x,y] = positions[route.from], [xx,yy] = positions[route.to]
-  if (route.from === route.to) return { path: `M ${x-35} ${y-33} C ${x-110} ${y-60}, ${x+110} ${y-60}, ${x+35} ${y-33}`, middle: [x,y-53] }
-  if (route.kind === 'rectify' && route.from === 'tetrahedron') return { path: `M ${x-120} ${y} C 10 ${y}, 10 ${yy}, ${xx-120} ${yy}`, middle: [15,310] }
-  if (route.from === 'dodecahedron' && route.to === 'great-dodecahedron') return { path: `M ${x-120} ${y} L 580 150 L 580 ${yy} L ${xx-120} ${yy}`, middle: [580,350] }
-  if (route.from === 'dodecahedron' && route.to === 'great-stellated-dodecahedron') return { path: `M ${x-80} ${y+33} L 560 160 L 560 650 L ${xx} 650 L ${xx} ${yy+33}`, middle: [850,650] }
+  if (route.from === route.to) return { path: `M ${x-120} ${y-12} C 10 ${y-65}, 10 ${y+65}, ${x-120} ${y+12}`, middle: [15,y] }
   const dx = xx-x, dy = yy-y
   const f = Math.min(dx ? 120/Math.abs(dx) : Infinity,dy ? 33/Math.abs(dy) : Infinity)
   return { path: `M ${x+dx*f} ${y+dy*f} L ${xx-dx*f} ${yy-dy*f}`, middle: [(x+xx)/2,(y+yy)/2] }
@@ -36,11 +34,12 @@ export function RelationshipMap({ show, onHide, current, activeRoute, onInspect,
     <Modal.Header><Modal.Title id="map-title">Transformation map</Modal.Title><DialogCloseButton title="Close map" onClick={onHide} /></Modal.Header>
     <Modal.Body>
       <div className="d-flex gap-3 small flex-wrap mb-2">
-        <span className="text-info">◇ Solid line: dual</span><span className="text-warning">★ Dashed: stellation</span>
-        <span className="text-success">✂ Dash-dot: rectification</span>
+        <span className="text-info"><Diamond size={16} aria-hidden="true" /> Solid line: dual</span>
+        <span className="text-warning"><Star size={16} aria-hidden="true" /> Dashed: stellation</span>
+        <span className="text-success"><Scissors size={16} aria-hidden="true" /> Dash-dot: rectification</span>
       </div>
       <Row className="g-3 align-items-center"><Col xs={12} lg={9}>
-      <svg viewBox="0 0 1260 700" width="100%" role="group" aria-label={`Relationships between all ${solids.length} solids`}>
+      <svg viewBox="0 0 1320 700" width="100%" role="group" aria-label={`Relationships between all ${solids.length} solids`}>
         <defs>
           {Object.entries(styles).map(([id,{ color }]) => (
             <marker key={id} id={`map-arrow-${id}`} viewBox="0 0 10 10" refX="8" refY="5" markerWidth="12" markerHeight="12" markerUnits="userSpaceOnUse" orient="auto-start-reverse">
@@ -53,6 +52,7 @@ export function RelationshipMap({ show, onHide, current, activeRoute, onInspect,
           const shape = edgeShape(route)
           const style = route.kind
           const appearance = styles[style]
+          const Icon = appearance.icon
           const marker = `url(#map-arrow-${style})`
           return <g key={`${route.from}:${route.to}:${route.kind}`}>
             <path d={shape.path} fill="none" data-route-kind={style}
@@ -61,8 +61,8 @@ export function RelationshipMap({ show, onHide, current, activeRoute, onInspect,
               markerStart={marker} markerEnd={marker}>
               <title>{`${getSolid(route.from).name} ↔ ${getSolid(route.to).name}: ${route.kind}`}</title>
             </path>
-            <circle cx={shape.middle[0]} cy={shape.middle[1]} r="11" fill="#303030" />
-            <text x={shape.middle[0]} y={shape.middle[1]+5} textAnchor="middle" fill="#f8f9fa" fontSize="16">{appearance.symbol}</text>
+            <circle cx={shape.middle[0]} cy={shape.middle[1]} r="13" fill="#303030" />
+            <Icon x={shape.middle[0]-9} y={shape.middle[1]-9} width={18} height={18} stroke="#f8f9fa" aria-hidden="true" />
           </g>
         })}
         {solids.map((solid) => {
