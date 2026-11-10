@@ -28,7 +28,7 @@ export function SolidSummary({ solid }: { solid: SolidDefinition }) {
     </div>
     <div className="lh-sm mt-2">
       <Row className="g-1">
-        <Col xs={12} lg={3}>
+        <Col xs={12} lg={4}>
           <div className="d-flex justify-content-between gap-2">
             <Property label="Faces" value={solid.faces} />
             <Property label="Edges" value={solid.edges} />
@@ -37,7 +37,7 @@ export function SolidSummary({ solid }: { solid: SolidDefinition }) {
           </div>
         </Col>
         <Col xs={6} lg={4}><Property label="Face types" value={solid.faceBreakdown ?? solid.faceType} multiline /></Col>
-        <Col xs={6} lg={5}><Property label="Face angles" value={solid.faceAngle} multiline /></Col>
+        <Col xs={6} lg={4}><Property label="Face angles" value={solid.faceAngle} multiline /></Col>
       </Row>
       <Row className="g-1 mt-1">
         <Col xs={3} lg={2}><Property label="At vertex" value={solid.vertexConfiguration} /></Col>
