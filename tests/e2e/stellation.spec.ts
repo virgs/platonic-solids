@@ -8,7 +8,7 @@ for (const [from,origin,name] of [
   ['icosahedron','Icosahedron','Great icosahedron'],
   ['great-dodecahedron','Great dodecahedron','Great stellated dodecahedron'],
 ] as const) {
-  test(`${origin} extends directly into ${name} and reverses`, async ({ page }) => {
+  test(`${origin} reshapes into ${name} on one surface and reverses`, async ({ page }) => {
     await page.goto(`./?solid=${from}`)
     await setTransformationTime(page,0.5)
     await page.getByRole('button', { name: 'Choose stellation destination' }).click()
@@ -20,9 +20,10 @@ for (const [from,origin,name] of [
     await progress.fill('0.5')
     await expect(page.getByRole('button', { name: 'Dual', exact: true })).toBeDisabled()
     await expect(page.locator('canvas')).toHaveAttribute('data-engine', /three.js/)
-    await page.screenshot({ path: test.info().outputPath('face-extension-midpoint.png'), animations: 'disabled' })
+    await page.screenshot({ path: test.info().outputPath('connected-stellation-midpoint.png'), animations: 'disabled' })
     await page.getByRole('button', { name: 'Explain this transformation' }).click()
-    await expect(page.getByRole('dialog', { name: 'How this transformation works' })).toContainText('one direct face-extension animation')
+    await expect(page.getByRole('dialog', { name: 'How this transformation works' })).toContainText('The exterior stays connected throughout')
+    if (name === 'Small stellated dodecahedron') await expect(page.getByRole('dialog')).toContainText('One pentagonal pyramid grows')
     await page.getByRole('button', { name: 'Close', exact: true }).click()
     await player.getByRole('button', { name: 'Go to transformation end' }).click()
     await page.getByRole('button', { name: 'Play transformation', exact: true }).click()
@@ -70,10 +71,11 @@ test('map arrows and line patterns distinguish reversible relationships without 
   await page.getByRole('button', { name: 'Map', exact: true }).click()
   const map = page.getByRole('dialog', { name: 'Transformation map' })
   const edges = map.locator('path[data-route-kind]')
-  await expect(edges).toHaveCount(10)
+  await expect(edges).toHaveCount(15)
   expect(await edges.evaluateAll((paths) => paths.every((path) => path.hasAttribute('marker-start') && path.hasAttribute('marker-end')))).toBe(true)
   await expect(map.locator('path[data-route-kind="dual"]')).toHaveCount(5)
   await expect(map.locator('path[data-route-kind="stellate"]')).toHaveCount(5)
+  await expect(map.locator('path[data-route-kind="rectify"]')).toHaveCount(5)
   await expect(map.locator('path[data-route-kind="staged"]')).toHaveCount(0)
   await expect(map.getByText(/Dotted|multi-step|staged/)).toHaveCount(0)
   expect((await map.locator('svg text').allTextContents()).filter((text) => /^\d+$/.test(text))).toEqual([])

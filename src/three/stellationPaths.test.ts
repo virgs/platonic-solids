@@ -1,9 +1,10 @@
 import { describe, expect, it } from 'vitest'
 import { getSolid, type SolidId } from '../data/solids'
-import { loadPolyhedron, renderPolyhedron, type Polyhedron } from './transformations'
+import { loadPolyhedron, type Polyhedron } from './transformations'
 import { createStellationPath } from './stellationPaths'
 import { routes } from '../data/routes'
 import { Line3, Quaternion, Vector3 } from 'three'
+import { exterior, renderSurface } from './exterior'
 
 function check(model: Polyhedron, id: SolidId) {
   const solid = getSolid(id)
@@ -21,7 +22,7 @@ function check(model: Polyhedron, id: SolidId) {
 }
 
 function surfaceArea(model: Polyhedron) {
-  const rendered = renderPolyhedron(model)
+  const rendered = renderSurface(model)
   const positions = rendered.geometry.getAttribute('position')
   let area = 0
   for (let i=0;i<positions.count;i+=3) {
@@ -35,10 +36,11 @@ function surfaceArea(model: Polyhedron) {
 }
 
 function edges(model: Polyhedron) {
-  const rendered = renderPolyhedron(model)
+  const rendered = renderSurface(model)
   const positions = rendered.edgeGeometry.getAttribute('position')
+  const colors = rendered.edgeGeometry.getAttribute('color')
   const result: Line3[] = []
-  for (let i=0;i<positions.count;i+=2) result.push(new Line3(new Vector3().fromBufferAttribute(positions,i),new Vector3().fromBufferAttribute(positions,i+1)))
+  for (let i=0;i<positions.count;i+=2) if (!colors || colors.getW(i)>0.01) result.push(new Line3(new Vector3().fromBufferAttribute(positions,i),new Vector3().fromBufferAttribute(positions,i+1)))
   rendered.geometry.dispose(); rendered.edgeGeometry.dispose()
   return result
 }
@@ -51,33 +53,25 @@ function checkEdgeContinuity(a: Polyhedron, b: Polyhedron) {
   }
 }
 
-describe('direct face extensions', () => {
-  it.each(routes.filter((route) => route.kind === 'stellate'))('$from grows directly into $to and reverses without rotating', ({ from,to }) => {
+describe('simple connected stellations', () => {
+  it.each(routes.filter((route) => route.kind === 'stellate'))('$from reshapes into $to and reverses without rotating', ({ from,to }) => {
     const source = loadPolyhedron(from)
     const rotation = new Quaternion().setFromAxisAngle(new Vector3(1,2,3).normalize(),0.73)
     source.vertices.forEach((v) => v.applyQuaternion(rotation))
     const path = createStellationPath(source,from,to)
     check(path.source,from)
     check(path.target,to)
-    const planes = source.faces.map((face) => {
-      const points = face.map((v) => source.vertices[v])
-      const normal = new Vector3().subVectors(points[1],points[0]).cross(new Vector3().subVectors(points[2],points[0])).normalize()
-      return { normal, distance: normal.dot(points[0]) }
-    })
     for (let i=0;i<=24;i++) {
       const model = path.at(i/24)
-      expect(model.faces).toHaveLength(source.faces.length)
       expect(Math.max(...model.vertices.map((v) => v.length()))).toBeCloseTo(1,5)
-      if (i > 0 && i < 24) {
-        const factors = model.faces.map((face,f) => {
-          const { normal,distance } = planes[f]
-          const offset = normal.dot(model.vertices[face[0]])
-          for (const v of face) expect(normal.dot(model.vertices[v])).toBeCloseTo(offset,6)
-          return offset/distance
-        })
-        expect(Math.max(...factors)-Math.min(...factors)).toBeLessThan(1e-6)
-      }
-      const rendered = renderPolyhedron(model)
+      const incidence = new Map<string,number>()
+      model.faces.forEach((face) => face.forEach((a,i) => {
+        const key = [a,face[(i+1)%face.length]].sort((x,y) => x-y).join(':')
+        incidence.set(key,(incidence.get(key) ?? 0)+1)
+      }))
+      expect([...incidence].filter(([,n]) => n!==2),`${from} → ${to} at ${i}/24 has an open edge`).toHaveLength(0)
+      expect(model.vertices.length-incidence.size+model.faces.length).toBe(2)
+      const rendered = renderSurface(model)
       const positions = rendered.geometry.getAttribute('position')
       expect(positions.count).toBeGreaterThan(0)
       expect([...positions.array].every(Number.isFinite)).toBe(true)
@@ -91,9 +85,23 @@ describe('direct face extensions', () => {
       for (const p of path.at(t).vertices) expect(Math.min(...backward.vertices.map((v) => v.distanceTo(p)))).toBeLessThan(1e-5)
     }
     // The rendered surface meets both endpoints continuously, with no reveal swap.
-    expect(surfaceArea(path.at(1e-7))).toBeCloseTo(surfaceArea(source),4)
-    expect(surfaceArea(path.at(1-1e-7))).toBeCloseTo(surfaceArea(path.target),4)
-    checkEdgeContinuity(path.at(1e-7),source)
-    checkEdgeContinuity(path.at(1-1e-7),path.target)
+    expect(surfaceArea(path.at(1e-7))).toBeCloseTo(surfaceArea(exterior(source)),4)
+    expect(surfaceArea(path.at(1-1e-7))).toBeCloseTo(surfaceArea(exterior(path.target)),4)
+    checkEdgeContinuity(path.at(1e-7),exterior(source))
+    checkEdgeContinuity(path.at(1-1e-7),exterior(path.target))
+  })
+  it('the small stellated dodecahedron grows one pyramid from each original pentagon', () => {
+    const source = loadPolyhedron('dodecahedron'), path = createStellationPath(source,'dodecahedron','small-stellated-dodecahedron')
+    expect(path.mode).toBe('pyramids')
+    for (const t of [0.25,0.5,0.75]) {
+      const surface = path.at(t), baseScale = surface.vertices[0].length()
+      expect(surface.vertices).toHaveLength(32)
+      expect(surface.faces).toHaveLength(60)
+      source.vertices.forEach((p,i) => expect(surface.vertices[i].clone().divideScalar(baseScale).distanceTo(p)).toBeLessThan(1e-5))
+      source.faces.forEach((face,i) => {
+        const normal = face.reduce((sum,v) => sum.add(source.vertices[v]),new Vector3()).normalize()
+        expect(surface.vertices[20+i].clone().normalize().distanceTo(normal)).toBeLessThan(1e-5)
+      })
+    }
   })
 })

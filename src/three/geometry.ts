@@ -71,7 +71,11 @@ function vectorKey(x: number, y: number, z: number): string {
 }
 
 export function extractPolyhedron(id: PlatonicId) {
-  const geometry = createSolidGeometry(id)
+  return extractGeometry(createSolidGeometry(id))
+}
+
+/** Recover mathematical polygon faces from an outward triangulated convex mesh. */
+export function extractGeometry(geometry: BufferGeometry) {
   const positions = geometry.getAttribute('position')
   const vertices: Array<[number, number, number]> = []
   const vertexByKey = new Map<string, number>()

@@ -5,9 +5,10 @@ export type PlatonicId =
   | 'dodecahedron'
   | 'icosahedron'
 
-export type SolidId = PlatonicId | import('../three/starPolyhedra').StarSolidId
+export type RectifiedId = 'cuboctahedron' | 'icosidodecahedron'
+export type SolidId = PlatonicId | RectifiedId | import('../three/starPolyhedra').StarSolidId
 
-export type SolidFamily = 'Platonic solid' | 'Kepler–Poinsot polyhedron'
+export type SolidFamily = 'Platonic solid' | 'Kepler–Poinsot polyhedron' | 'Archimedean solid'
 
 export interface SolidDefinition {
   id: SolidId
@@ -22,13 +23,15 @@ export interface SolidDefinition {
   vertexConfiguration: string
   faceAngle: string
   dihedralAngle: string
-  dualId: SolidId
+  dualId?: SolidId
+  dualName?: string
+  faceBreakdown?: string
   symmetry: string
   description: string
   wikipediaUrl: string
 }
 
-export const platonicSolids: readonly (SolidDefinition & { id: PlatonicId })[] = [
+export const platonicSolids: readonly (SolidDefinition & { id: PlatonicId; dualId: PlatonicId })[] = [
   {
     id: 'tetrahedron',
     name: 'Tetrahedron',
@@ -140,7 +143,26 @@ export const starSolids: readonly SolidDefinition[] = [
   wikipediaUrl: `https://en.wikipedia.org/wiki/${solid.name.replaceAll(' ', '_')}`,
 }))
 
-export const solids = [...platonicSolids, ...starSolids]
+export const rectifiedSolids: readonly SolidDefinition[] = [
+  {
+    id: 'cuboctahedron', name: 'Cuboctahedron', family: 'Archimedean solid', symbol: 'r{4,3}',
+    faces: 14, edges: 24, vertices: 12, faceType: 'Triangles / squares', faceBreakdown: '8 triangles · 6 squares',
+    faceAngle: 'Triangle 60° · square 90°', dihedralAngle: '125.26°', vertexConfiguration: '3.4.3.4',
+    dualName: 'Rhombic dodecahedron', symmetry: 'Oh',
+    description: 'The rectification of either a cube or an octahedron. Triangles and squares alternate around each vertex.',
+    wikipediaUrl: 'https://en.wikipedia.org/wiki/Cuboctahedron',
+  },
+  {
+    id: 'icosidodecahedron', name: 'Icosidodecahedron', family: 'Archimedean solid', symbol: 'r{5,3}',
+    faces: 32, edges: 60, vertices: 30, faceType: 'Triangles / pentagons', faceBreakdown: '20 triangles · 12 pentagons',
+    faceAngle: 'Triangle 60° · pentagon 108°', dihedralAngle: '142.62°', vertexConfiguration: '3.5.3.5',
+    dualName: 'Rhombic triacontahedron', symmetry: 'Ih',
+    description: 'The rectification of either a dodecahedron or an icosahedron. Triangles and pentagons alternate around each vertex.',
+    wikipediaUrl: 'https://en.wikipedia.org/wiki/Icosidodecahedron',
+  },
+]
+
+export const solids = [...platonicSolids, ...starSolids, ...rectifiedSolids]
 
 export function getSolid(id: string | null): SolidDefinition {
   return solids.find((solid) => solid.id === id) ?? solids[0]

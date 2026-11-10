@@ -9,6 +9,8 @@ import { getSolid } from '../data/solids'
 import { createCornerMorph } from '../three/cornerMorph'
 import { createStarDual, dualModel, loadPolyhedron, renderPolyhedron, type TransformationKind, type Polyhedron } from '../three/transformations'
 import { createStellationPath } from '../three/stellationPaths'
+import { createRectificationPath } from '../three/rectification'
+import { createExteriorProjection, renderSurface } from '../three/exterior'
 import { defaults, type CameraPosition } from '../settings'
 
 interface SolidSceneProps {
@@ -39,11 +41,16 @@ function TransformationMesh({ originId, progress, opacity, kind, transitionNonce
     const makePair = () => {
     if (kind === 'stellate') {
       const model = createStellationPath(source,originId,destinationId)
+      return { ...model, render: (t: number) => renderSurface(model.at(t)) }
+    }
+    if (kind === 'rectify') {
+      const model = createRectificationPath(source,originId,destinationId)
       return { ...model, render: (t: number) => renderPolyhedron(model.at(t)) }
     }
     if (getSolid(originId).family !== 'Platonic solid') {
       const model = createStarDual(source)
-      return { ...model, render: (t: number) => renderPolyhedron(model.at(t)) }
+      const surface = createExteriorProjection(source,model.target,model.at)
+      return { ...model, render: (t: number) => renderSurface(surface(t)) }
     }
     const rendered = renderPolyhedron(source)
     rendered.edgeGeometry.dispose()
@@ -76,6 +83,9 @@ function TransformationMesh({ originId, progress, opacity, kind, transitionNonce
     const path = pair.current
     if (!mesh.current || !path) return
     const { geometry, edgeGeometry } = path.render(progress)
+    if (!edgeGeometry.hasAttribute('color')) {
+      edgeGeometry.setAttribute('color',new Float32BufferAttribute(new Float32Array(edgeGeometry.getAttribute('position').count*4).fill(1),4))
+    }
     mesh.current.geometry.dispose()
     mesh.current.geometry = geometry
     if (depthMesh.current) depthMesh.current.geometry = geometry
@@ -113,10 +123,10 @@ function TransformationMesh({ originId, progress, opacity, kind, transitionNonce
           polygonOffset polygonOffsetFactor={1} polygonOffsetUnits={1} />
       </mesh>
       <lineSegments ref={hiddenLines} geometry={initialGeometry} renderOrder={2}>
-        <lineBasicMaterial color="#f8f9fa" transparent opacity={opacity*(1-opacity)} depthWrite={false} depthFunc={GreaterDepth} />
+        <lineBasicMaterial color="#f8f9fa" vertexColors transparent opacity={opacity*(1-opacity)} depthWrite={false} depthFunc={GreaterDepth} />
       </lineSegments>
       <lineSegments ref={lines} geometry={initialGeometry} renderOrder={3}>
-        <lineBasicMaterial color="#f8f9fa" transparent opacity={opacity} depthWrite={false} />
+        <lineBasicMaterial color="#f8f9fa" vertexColors transparent opacity={opacity} depthWrite={false} />
       </lineSegments>
     </group>
   )

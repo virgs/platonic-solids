@@ -8,6 +8,7 @@ import {
   RotateCcw,
   Rotate3D,
   Sparkles,
+  Scissors,
   ZoomIn,
   ZoomOut,
 } from 'lucide-react'
@@ -32,13 +33,15 @@ import { SolidScene } from './components/SolidScene'
 import { RelationshipMap } from './components/RelationshipMap'
 import { OpacityControl } from './components/OpacityControl'
 import { TransformationPlayer, TransformationExplanation } from './components/TransformationPlayer'
-import { routesFrom } from './data/routes'
+import { defaultRoute, routeLabel, routesFrom } from './data/routes'
+import { rectificationTargets } from './three/rectification'
 import { stellationTargets, type TransformationKind, type Polyhedron } from './three/transformations'
 import { readSettings, writeSettings, type CameraPosition, type Settings } from './settings'
 import {
   getSolid,
   platonicSolids,
   starSolids,
+  rectifiedSolids,
   type SolidDefinition,
   type SolidId,
 } from './data/solids'
@@ -74,8 +77,8 @@ export function App() {
   const [restoredModel, setRestoredModel] = useState<Polyhedron>()
   const [history, setHistory] = useState<{ entries: HistoryStop[]; index: number }>({ entries: [], index: -1 })
   const [target, setTarget] = useState(1)
-  const [kind, setKind] = useState<TransformationKind>('dual')
-  const [routeDestination, setRouteDestination] = useState<SolidId>()
+  const [kind, setKind] = useState<TransformationKind>(() => defaultRoute(initialSolid(saved).id).kind)
+  const [routeDestination, setRouteDestination] = useState<SolidId>(() => defaultRoute(initialSolid(saved).id).destination)
   const [transitionNonce, setTransitionNonce] = useState(0)
   const [opacity, setOpacity] = useState(saved.opacity)
   const [color, setColor] = useState(saved.color)
@@ -90,10 +93,12 @@ export function App() {
     direction: 'in' | 'out'
   }>({ nonce: 0, direction: 'in' })
   const solid = getSolid(solidId)
-  const origin = getSolid(originId)
-  const destinationId = kind === 'dual' ? origin.dualId : routeDestination ?? stellationTargets[originId] ?? originId
+  const destinationId = routeDestination
   const stellationDestination = stellationTargets[solidId]
   const unstellate = solid.faceType === 'Pentagram' || solidId === 'great-icosahedron'
+  const rectificationRoutes = routesFrom(solidId).filter((route) => route.kind === 'rectify')
+  const rectificationRoute = rectificationRoutes.find((route) => route.destination === rectificationTargets[solidId]) ?? rectificationRoutes[0]
+  const rectificationLabel = rectificationRoute ? routeLabel('rectify',solidId,rectificationRoute.destination) : 'Rectify'
   const latestSettings = useRef<Settings>(saved)
 
   const recordEndpoint = useCallback((id: SolidId, model: Polyhedron) => {
@@ -157,8 +162,8 @@ export function App() {
     if (dualTransition) return
     setSolidId(nextId)
     setOriginId(nextId)
-    setKind('dual')
-    setRouteDestination(undefined)
+    setKind(defaultRoute(nextId).kind)
+    setRouteDestination(defaultRoute(nextId).destination)
     setRestoredModel(undefined)
     setProgress(0)
     progressRef.current = 0
@@ -166,9 +171,10 @@ export function App() {
     setInitialCameraPosition(cameraPosition.current)
   }
 
-  function startDualTransition(nextKind: TransformationKind = 'dual', requestedDestination?: SolidId) {
+  function startTransition(nextKind: TransformationKind = 'dual', requestedDestination?: SolidId) {
+    const requested = requestedDestination ?? (nextKind === 'dual' ? solid.dualId : nextKind === 'stellate' ? stellationTargets[solidId] : rectificationRoute?.destination)
+    if (!requested || !routesFrom(solidId).some((route) => route.kind === nextKind && route.destination === requested)) return
     setAutoRotate(false)
-    const requested = requestedDestination ?? (nextKind === 'dual' ? solid.dualId : stellationTargets[solidId])
     const existingOtherEnd = progress === 1 ? originId : destinationId
     if (nextKind !== kind || requested !== existingOtherEnd) {
       setOriginId(solidId)
@@ -205,8 +211,8 @@ export function App() {
     setAutoRotate(false)
     setSolidId(entry.solidId)
     setOriginId(entry.solidId)
-    setKind('dual')
-    setRouteDestination(undefined)
+    setKind(defaultRoute(entry.solidId).kind)
+    setRouteDestination(defaultRoute(entry.solidId).destination)
     setProgress(0)
     progressRef.current = 0
     cameraPosition.current = [...entry.camera]
@@ -230,7 +236,7 @@ export function App() {
               alt=""
               aria-hidden="true"
             />
-            Platonic Solids Explorer
+            Polyhedra Explorer
           </Navbar.Brand>
           <Stack direction="horizontal" gap={2}>
             <Badge bg="dark">v{version}</Badge>
@@ -273,9 +279,11 @@ export function App() {
                 <Property label="Faces" value={solid.faces} />
                 <Property label="Edges" value={solid.edges} />
                 <Property label="Vertices" value={solid.vertices} />
-                <Property label="Face" value={solid.faceType} />
-                <Property label="Face angle" value={solid.faceAngle} />
+                <Property label={solid.faceBreakdown ? 'Face types' : 'Face'} value={solid.faceBreakdown ?? solid.faceType} />
+                <Property label={solid.faceBreakdown ? 'Face angles' : 'Face angle'} value={solid.faceAngle} />
                 <Property label="Dihedral" value={solid.dihedralAngle} />
+                {solid.faceBreakdown && <Property label="At each vertex" value={solid.vertexConfiguration} />}
+                {solid.dualName && <Property label="Dual" value={solid.dualName} />}
                 <a
                   className="link-info small"
                   href={solid.wikipediaUrl}
@@ -318,6 +326,13 @@ export function App() {
                     <Dropdown.Divider />
                     <Dropdown.Header>Kepler–Poinsot</Dropdown.Header>
                     {starSolids.map((option) => (
+                      <Dropdown.Item key={option.id} title={`View ${option.name}`} active={option.id === solidId} onClick={() => changeSolid(option.id)}>
+                        {option.name}
+                      </Dropdown.Item>
+                    ))}
+                    <Dropdown.Divider />
+                    <Dropdown.Header>Rectified solids</Dropdown.Header>
+                    {rectifiedSolids.map((option) => (
                       <Dropdown.Item key={option.id} title={`View ${option.name}`} active={option.id === solidId} onClick={() => changeSolid(option.id)}>
                         {option.name}
                       </Dropdown.Item>
@@ -376,23 +391,23 @@ export function App() {
               </Col>
             </Row>
             <div className="d-flex gap-2 justify-content-center flex-wrap mt-4" role="group" aria-label="Solid transformations">
-                  <button
+                  {solid.dualId && <button
                     type="button"
                     className="btn btn-warning btn-sm px-3 py-2 text-nowrap"
-                    onClick={() => startDualTransition('dual')}
+                    onClick={() => startTransition('dual')}
                     disabled={dualTransition}
                     aria-label="Dual"
                     title={`Show dual: ${getSolid(solid.dualId).name}`}
                   >
                     <RefreshCw size={16} aria-hidden="true" /> Dual → {getSolid(solid.dualId).name}
-                  </button>
-                <div className="d-flex">
+                  </button>}
+                {solid.family !== 'Archimedean solid' && <div className="d-flex">
                   <button
                     type="button"
                     className="btn btn-warning btn-sm px-3 py-2 text-nowrap"
                     aria-label={unstellate ? 'Unstellate' : 'Stellate'}
                     disabled={dualTransition || !stellationDestination}
-                    onClick={() => startDualTransition('stellate')}
+                    onClick={() => startTransition('stellate')}
                     title={stellationTargets[solidId] ? `Transform to ${getSolid(stellationTargets[solidId]!).name}` : 'No regular Kepler–Poinsot stellation for this solid'}
                   >
                     <Sparkles size={16} aria-hidden="true" /> {stellationDestination ? `${unstellate ? 'Unstellate' : 'Stellate'} → ${getSolid(stellationDestination).name}` : 'No regular stellation'}
@@ -402,13 +417,29 @@ export function App() {
                       disabled={dualTransition || !routesFrom(solidId).some((route) => route.kind === 'stellate')} />
                     <Dropdown.Menu>
                       {routesFrom(solidId).filter((route) => route.kind === 'stellate').map((route) => (
-                        <Dropdown.Item key={route.destination} title={`Transform to ${getSolid(route.destination).name}`} disabled={!route.implemented} onClick={() => startDualTransition('stellate',route.destination)}>
+                        <Dropdown.Item key={route.destination} title={`Transform to ${getSolid(route.destination).name}`} disabled={!route.implemented} onClick={() => startTransition('stellate',route.destination)}>
                           {getSolid(route.destination).name}
                         </Dropdown.Item>
                       ))}
                     </Dropdown.Menu>
                   </Dropdown>
-                </div>
+                </div>}
+                {rectificationRoute && <div className="d-flex">
+                  <button className="btn btn-warning btn-sm px-3 py-2 text-nowrap" aria-label={rectificationLabel}
+                    title={rectificationLabel === 'Rectify' ? 'Cut corners to edge midpoints' : 'Restore the parent solid'} disabled={dualTransition}
+                    onClick={() => startTransition('rectify',rectificationRoute.destination)}>
+                    <Scissors size={16} aria-hidden="true" /> {rectificationLabel} → {getSolid(rectificationRoute.destination).name}
+                  </button>
+                  <Dropdown>
+                    <Dropdown.Toggle variant="warning" size="sm" className="h-100" split aria-label="Choose rectification destination" title="Choose a rectification" disabled={dualTransition} />
+                    <Dropdown.Menu>
+                      {rectificationRoutes.map((route) => <Dropdown.Item key={route.destination} title={`${routeLabel('rectify',solidId,route.destination)} to ${getSolid(route.destination).name}`}
+                        onClick={() => startTransition('rectify',route.destination)}>
+                        {routeLabel('rectify',solidId,route.destination)} → {getSolid(route.destination).name}
+                      </Dropdown.Item>)}
+                    </Dropdown.Menu>
+                  </Dropdown>
+                </div>}
             </div>
             <Row className="align-items-center g-2 mt-1">
               <Col xs={12}>
@@ -418,7 +449,7 @@ export function App() {
                   onPlay={() => {
                       if (playing) setPlaying(false)
                       else if (progress > 0 && progress < 1) setPlaying(true)
-                      else startDualTransition(kind,progress === 1 ? originId : destinationId)
+                      else startTransition(kind,progress === 1 ? originId : destinationId)
                     }} />
               </Col>
             </Row>
@@ -448,10 +479,10 @@ export function App() {
         </Card>
       </Container>
       <RelationshipMap show={showMap} onHide={() => setShowMap(false)} current={solidId}
-        activeRoute={[originId,destinationId]} onInspect={changeSolid} onTransform={startDualTransition} />
+        activeRoute={[originId,destinationId]} onInspect={changeSolid} onTransform={startTransition} />
       <TransformationExplanation show={showExplanation} onHide={() => setShowExplanation(false)} originId={originId} destinationId={destinationId} progress={progress} kind={kind} />
       <Modal show={showHistory} onHide={() => setShowHistory(false)} centered scrollable aria-labelledby="history-title">
-        <Modal.Header><Modal.Title id="history-title">Route history</Modal.Title><CloseButton variant="white" title="Close history" onClick={() => setShowHistory(false)} /></Modal.Header>
+        <Modal.Header><Modal.Title id="history-title">Route history</Modal.Title><CloseButton title="Close history" onClick={() => setShowHistory(false)} /></Modal.Header>
         <Modal.Body>
           <div className="d-flex gap-2 mb-3">
             <button className="btn btn-primary btn-sm" title="Previous history entry" disabled={history.index <= 0} onClick={() => restoreStop(history.index-1)}><ArrowLeft size={16} /> Back</button>

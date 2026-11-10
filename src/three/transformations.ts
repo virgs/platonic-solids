@@ -3,9 +3,10 @@ import libtess from 'libtess'
 import { extractPolyhedron } from './geometry'
 import { starModels, type StarSolidId } from './starPolyhedra'
 import type { SolidId, PlatonicId } from '../data/solids'
+import { rectifyModel } from './rectification'
 
-export interface Polyhedron { vertices: Vector3[]; faces: number[][] }
-export type TransformationKind = 'dual' | 'stellate'
+export interface Polyhedron { vertices: Vector3[]; faces: number[][]; edgeOpacities?: number[]; rectifiedFrom?: { id: PlatonicId; model: Polyhedron } }
+export type TransformationKind = 'dual' | 'stellate' | 'rectify'
 export const stellationTargets: Partial<Record<SolidId, SolidId>> = {
   dodecahedron: 'small-stellated-dodecahedron',
   'small-stellated-dodecahedron': 'dodecahedron',
@@ -16,6 +17,8 @@ export const stellationTargets: Partial<Record<SolidId, SolidId>> = {
 }
 
 export function loadPolyhedron(id: SolidId): Polyhedron {
+  if (id === 'cuboctahedron') return rectifyModel(loadPolyhedron('cube'),'cube')
+  if (id === 'icosidodecahedron') return rectifyModel(loadPolyhedron('dodecahedron'),'dodecahedron')
   if (id in starModels) {
     const model = starModels[id as StarSolidId]
     return { vertices: model.vertices.map((v) => new Vector3(...v).normalize()), faces: model.faces.map((f) => [...f]) }

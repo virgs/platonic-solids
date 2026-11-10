@@ -13,10 +13,25 @@ export const routes: Route[] = [
   { from: 'great-dodecahedron', to: 'great-stellated-dodecahedron', kind: 'stellate', implemented: true },
   { from: 'dodecahedron', to: 'great-dodecahedron', kind: 'stellate', implemented: true },
   { from: 'dodecahedron', to: 'great-stellated-dodecahedron', kind: 'stellate', implemented: true },
+  { from: 'tetrahedron', to: 'octahedron', kind: 'rectify', implemented: true },
+  { from: 'cube', to: 'cuboctahedron', kind: 'rectify', implemented: true },
+  { from: 'octahedron', to: 'cuboctahedron', kind: 'rectify', implemented: true },
+  { from: 'dodecahedron', to: 'icosidodecahedron', kind: 'rectify', implemented: true },
+  { from: 'icosahedron', to: 'icosidodecahedron', kind: 'rectify', implemented: true },
 ]
 
 export function routesFrom(id: SolidId) {
   return routes.filter((route) => route.from === id || route.to === id).map((route) => ({
     ...route, destination: route.from === id ? route.to : route.from,
   }))
+}
+
+export function defaultRoute(id: SolidId) {
+  return routesFrom(id).find((route) => route.kind === 'dual') ?? routesFrom(id)[0]
+}
+
+export function routeLabel(kind: TransformationKind, from: SolidId, to: SolidId) {
+  if (kind === 'dual') return 'Dual'
+  if (kind === 'stellate') return 'Stellation'
+  return routes.some((route) => route.kind === kind && route.from === from && route.to === to) ? 'Rectify' : 'Unrectify'
 }

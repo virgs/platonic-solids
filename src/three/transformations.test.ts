@@ -3,8 +3,9 @@ import { getSolid } from '../data/solids'
 import { starModels, type StarSolidId } from './starPolyhedra'
 import { createStarDual, createStellation, createDestellation, loadPolyhedron, renderPolyhedron, type Polyhedron } from './transformations'
 
-function validate(model: Polyhedron, id: string) {
-  const expected = getSolid(id)
+function validate(model: Polyhedron, id: string | undefined) {
+  expect(id).toBeDefined()
+  const expected = getSolid(id ?? null)
   expect(model.vertices.length).toBe(expected.vertices)
   expect(model.faces.length).toBe(expected.faces)
   const edges = new Set<string>()

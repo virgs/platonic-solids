@@ -1,6 +1,9 @@
 import type { SolidId } from '../data/solids'
 import { createDestellation, createStarDual, createStellation, type Polyhedron } from './transformations'
-import { createFaceExtension } from './faceExtension'
+import { createExteriorMorph, createPyramidMorph } from './exterior'
+
+interface StoredPath { origin: SolidId; source: Polyhedron; mode: 'pyramids' | 'surface'; at: (t: number) => Polyhedron }
+const reversePaths = new WeakMap<Polyhedron,StoredPath>()
 
 function constructionStops(from: SolidId, to: SolidId): SolidId[] {
   const chain: SolidId[] = ['dodecahedron','small-stellated-dodecahedron','great-dodecahedron','great-stellated-dodecahedron']
@@ -9,8 +12,10 @@ function constructionStops(from: SolidId, to: SolidId): SolidId[] {
   return a <= b ? chain.slice(a,b+1) : chain.slice(b,a+1).reverse()
 }
 
-/** Endpoint construction uses existing exact geometry; only planar growth is animated. */
+/** Exact mathematical endpoints, with a simple connected exterior between them. */
 export function createStellationPath(source: Polyhedron, from: SolidId, to: SolidId) {
+  const previous = reversePaths.get(source)
+  if (previous?.origin === to) return { source, target: previous.source, mode: previous.mode, at: (t: number) => previous.at(1-Math.max(0,Math.min(1,t))) }
   const stops = constructionStops(from,to)
   let model = source
   for (let i=0;i<stops.length-1;i++) {
@@ -21,15 +26,15 @@ export function createStellationPath(source: Polyhedron, from: SolidId, to: Soli
     model = stage.target
   }
   if (stops.length < 2) throw new Error('A route needs distinct endpoints')
-  const reverse = from === 'small-stellated-dodecahedron' || from === 'great-stellated-dodecahedron' || from === 'great-icosahedron'
-    || (from === 'great-dodecahedron' && to === 'dodecahedron')
-  const extension = reverse ? createFaceExtension(model,source) : createFaceExtension(source,model)
-  return {
-    source, target: model,
+  const pyramid = (from === 'dodecahedron' && to === 'small-stellated-dodecahedron') || (to === 'dodecahedron' && from === 'small-stellated-dodecahedron')
+  const growPyramids = pyramid ? createPyramidMorph(from === 'dodecahedron' ? source : model,from === 'dodecahedron' ? model : source) : undefined
+  const surface = growPyramids ? (t: number) => growPyramids(from === 'dodecahedron' ? t : 1-t) : createExteriorMorph(source,model)
+  const path = {
+    source, target: model, mode: pyramid ? 'pyramids' as const : 'surface' as const,
     at(progress: number): Polyhedron {
-      if (progress <= 0) return source
-      if (progress >= 1) return model
-      return extension.at(reverse ? 1-progress : progress)
+      return surface(Math.max(0,Math.min(1,progress)))
     },
   }
+  reversePaths.set(model,{ origin: from, source, mode: path.mode, at: path.at })
+  return path
 }
