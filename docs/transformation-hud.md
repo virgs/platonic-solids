@@ -31,6 +31,9 @@ Solid properties support that task rather than dominating the interface.
    camera view. Back/forward and direct selection restore these snapshots;
    browser tests compare the rendered canvas before and after restoration.
 6. **Compact display settings:** Solid opacity controls faces and edges together.
+   Its slider moves in 1% steps. A separate depth mask distinguishes visible
+   edges from occluded edges; the latter use opacity × transparency so they
+   fade in gradually below 100%. The color picker uses the primary button background.
    It opens in a vertical popup from the half-filled circle beside the color picker, and that
    preference is persisted. Camera controls stay centered, with the color picker
    immediately after Reset view, as explicitly requested. Actions have a separate
@@ -42,6 +45,9 @@ Map links have arrowheads at both ends. Solid lines with diamonds identify duals
 dashed lines with stars identify stellation. All stellation links now represent
 direct face extension, so dotted links and multi-step labels are removed.
 Color is an additional cue only.
+
+All buttons, menu actions, modal close controls, and map nodes have short native
+tooltips. Accessible labels remain available for icon-only buttons.
 
 The user explicitly excluded the proposed before/after property comparison.
 No such panel is implemented.

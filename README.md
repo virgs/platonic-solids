@@ -58,7 +58,9 @@ stages. All routes listed in the map are playable in both directions.
 The centered transformation player supports play, pause, and direct progress
 scrubbing. Dragging progress pauses playback and preserves the intermediate
 surface. Solid opacity applies to both faces and edges, defaults to 85%, and can
-be adjusted from 20% to 100%. Separate vertex markers are not currently rendered.
+be adjusted from 20% to 100% in 1% steps. Rear edges fade in with transparency
+instead of appearing abruptly below 100%. Separate vertex markers are not
+currently rendered. All buttons and menu actions have short native tooltips.
 
 The Map dialog shows all nine solids with arrowheads at both ends of reversible
 links. Solid lines/diamonds identify duals, dashed lines/stars identify
