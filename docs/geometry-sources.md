@@ -34,3 +34,18 @@ stellated dodecahedron. The geometry at an endpoint is retained when a different
 operation starts, preserving its orientation across chained transformations.
 
 Construction reference: [Ghent University: the four regular non-convex polyhedra](https://cage.ugent.be/~hs/polyhedra/keplerpoinsot.html).
+
+## Icosahedron stellation
+
+Icosahedron ↔ great icosahedron extends the twenty triangular face regions into
+larger inverted triangles in the same planes, with a factor of φ⁴ in face-local
+coordinates. During animation, new tips open along the original triangle edges
+while the old corners move to the new edges' midpoints. At completion, collinear
+points are removed and coincident tips are welded into twelve vertices, thirty
+edges, and twenty equilateral triangles. The reverse uses the same construction.
+Circumradius normalization is applied at every step.
+
+The great icosahedron is the Kepler–Poinsot member among the regular
+icosahedron's stellations; adding spikes to an icosahedron does not uniquely
+identify this result. See [Paulo Freire's polyhedron constructions](https://www3.mpifr-bonn.mpg.de/staff/pfreire/polyhedra/polyhedra.htm)
+and [MathWorld's icosahedron stellations](https://mathworld.wolfram.com/IcosahedronStellations.html).

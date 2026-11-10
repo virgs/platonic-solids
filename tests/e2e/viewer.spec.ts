@@ -1,6 +1,48 @@
 import { expect, test } from '@playwright/test'
 import packageInfo from '../../package.json' with { type: 'json' }
 
+test('color, display preferences, selected solid and zoom survive reload', async ({ page }) => {
+  await page.goto('./?solid=cube')
+  await page.getByRole('slider', { name: /Transformation time/ }).fill('4')
+  await page.getByRole('slider', { name: /Face opacity/ }).fill('0.65')
+  await page.getByLabel('Color', { exact: true }).evaluate((input) => {
+    Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value')!.set!.call(input, '#ff6633')
+    input.dispatchEvent(new Event('input', { bubbles: true }))
+    input.dispatchEvent(new Event('change', { bubbles: true }))
+  })
+  await page.getByRole('button', { name: 'Zoom out', exact: true }).click()
+  const beforeSelection = await page.evaluate(() => Math.hypot(...JSON.parse(localStorage.getItem('platonic-solids.settings.v1')!).cameraPosition))
+  await page.locator('#solid-selector').click()
+  await page.getByRole('button', { name: 'Octahedron', exact: true }).click()
+  await expect(page.locator('canvas')).toHaveAttribute('data-engine', /three.js/)
+  await expect.poll(async () => page.evaluate(() => Math.hypot(...JSON.parse(localStorage.getItem('platonic-solids.settings.v1')!).cameraPosition))).toBeCloseTo(beforeSelection,3)
+  await page.locator('#solid-selector').click()
+  await page.getByRole('button', { name: 'Cube', exact: true }).click()
+  await page.getByRole('button', { name: 'Toggle automatic rotation' }).click()
+  await expect.poll(async () => page.evaluate(() => JSON.parse(localStorage.getItem('platonic-solids.settings.v1')!).color)).toBe('#ff6633')
+  const radius = await page.evaluate(() => Math.hypot(...JSON.parse(localStorage.getItem('platonic-solids.settings.v1')!).cameraPosition))
+  expect(radius).toBeGreaterThan(4.5)
+  await page.goto('./')
+  await expect(page.getByRole('heading', { name: 'Cube', exact: true })).toBeVisible()
+  await expect(page.getByLabel('Color', { exact: true })).toHaveValue('#ff6633')
+  await expect(page.getByRole('slider', { name: /Face opacity/ })).toHaveValue('0.65')
+  await expect(page.getByRole('slider', { name: /Transformation time/ })).toHaveValue('4')
+  await expect(page.getByRole('button', { name: 'Toggle automatic rotation' })).toHaveAttribute('aria-pressed','true')
+  await expect(page.locator('canvas')).toHaveAttribute('data-engine', /three.js/)
+  await expect.poll(async () => page.evaluate(() => Math.hypot(...JSON.parse(localStorage.getItem('platonic-solids.settings.v1')!).cameraPosition))).toBeCloseTo(radius, 3)
+  await page.goto('./?solid=icosahedron')
+  await expect(page.getByRole('heading', { name: 'Icosahedron', exact: true })).toBeVisible()
+})
+
+test('D20 stellates into a great icosahedron and back', async ({ page }) => {
+  await page.goto('./?solid=icosahedron')
+  await page.getByRole('slider', { name: /Transformation time/ }).fill('0.5')
+  await page.getByRole('button', { name: 'Stellate', exact: true }).click()
+  await expect(page.getByRole('heading', { name: 'Great icosahedron', exact: true })).toBeVisible()
+  await page.getByRole('button', { name: 'Unstellate', exact: true }).click()
+  await expect(page.getByRole('heading', { name: 'Icosahedron', exact: true })).toBeVisible()
+})
+
 test('release identity is visible and uses the shared favicon', async ({ page }) => {
   await page.goto('./')
 

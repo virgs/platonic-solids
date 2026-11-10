@@ -51,10 +51,18 @@ the same circumradius. Platonic dual transformations use progressive corner
 cuts, with a configurable duration of 0.5–6 seconds. Both Kepler–Poinsot dual
 pairs are animated. Pentagonal stellation is available for dodecahedron ↔ small
 stellated dodecahedron and great dodecahedron ↔ great stellated dodecahedron.
-Other stellation paths remain unavailable.
+Icosahedron ↔ great icosahedron is also available. Other stellation paths remain
+unavailable.
 
 The centered transformation player supports play, pause, and direct progress
 scrubbing. Dragging progress pauses playback and preserves the intermediate
 surface. Face opacity defaults to 85% and can be adjusted from 20% to 100%.
+
+The color picker changes face color. Color, opacity, transformation time,
+auto-rotation, the last completed solid, and the camera position (including zoom
+and orbit angle) are saved in local storage. An explicit solid in the URL takes
+precedence over the saved selection. Corrupt or unavailable storage falls back
+to defaults without interrupting the viewer. Reloading returns to the last
+completed solid rather than resuming an intermediate transformation.
 
 Star models use explicit face definitions; see [geometry sources](docs/geometry-sources.md).

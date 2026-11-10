@@ -11,6 +11,8 @@ export const stellationTargets: Partial<Record<SolidId, SolidId>> = {
   'small-stellated-dodecahedron': 'dodecahedron',
   'great-dodecahedron': 'great-stellated-dodecahedron',
   'great-stellated-dodecahedron': 'great-dodecahedron',
+  icosahedron: 'great-icosahedron',
+  'great-icosahedron': 'icosahedron',
 }
 
 export function loadPolyhedron(id: SolidId): Polyhedron {
@@ -129,20 +131,23 @@ export function createStarDual(source: Polyhedron) {
   }
 }
 
-/** Extend each pentagon edge into a tip, keeping its original central region. */
+/** Extend pentagons into pentagrams, or triangles into the great icosahedron. */
 export function createStellation(source: Polyhedron) {
   const starts: Vector3[] = []
   const ends: Vector3[] = []
   const faces = source.faces.map((face) => {
-    if (face.length !== 5) throw new Error('This stellation requires pentagonal faces')
+    if (face.length !== 5 && face.length !== 3) throw new Error('Unsupported stellation face')
+    const triangle = face.length === 3
+    const q = ((1+Math.sqrt(5))/2)**4
     const points = face.map((i) => source.vertices[i])
-    const center = points.reduce((sum,p) => sum.add(p),new Vector3()).divideScalar(5)
+    const center = points.reduce((sum,p) => sum.add(p),new Vector3()).divideScalar(points.length)
     const result: number[] = []
     points.forEach((point,i) => {
-      result.push(starts.length); starts.push(point); ends.push(point)
-      const midpoint = point.clone().add(points[(i+1)%5]).multiplyScalar(0.5)
+      result.push(starts.length); starts.push(point)
+      ends.push(triangle ? point.clone().sub(center).multiplyScalar(q/2).add(center) : point)
+      const midpoint = point.clone().add(points[(i+1)%points.length]).multiplyScalar(0.5)
       result.push(starts.length); starts.push(midpoint)
-      ends.push(midpoint.clone().sub(center).multiplyScalar(1+Math.sqrt(5)).add(center))
+      ends.push(midpoint.clone().sub(center).multiplyScalar(triangle ? 2*q : 1+Math.sqrt(5)).add(center))
     })
     return result
   })
@@ -151,6 +156,23 @@ export function createStellation(source: Polyhedron) {
 }
 
 export function createDestellation(source: Polyhedron) {
+  if (source.faces[0].length === 3) {
+    const vertices: Vector3[] = []
+    const q = ((1+Math.sqrt(5))/2)**4
+    const faces = source.faces.map((face) => {
+      const points = face.map((i) => source.vertices[i])
+      const center = points.reduce((sum,p) => sum.add(p),new Vector3()).divideScalar(3)
+      return points.map((point) => {
+        const core = point.clone().sub(center).multiplyScalar(-1/q).add(center)
+        let index = vertices.findIndex((p) => p.distanceTo(core) < 1e-5)
+        if (index < 0) { index = vertices.length; vertices.push(core) }
+        return index
+      })
+    })
+    const target = normalize({ vertices, faces })
+    const forward = createStellation(target)
+    return { source, target, at: (progress: number) => progress === 0 ? source : progress === 1 ? target : forward.at(1-progress) }
+  }
   const vertices: Vector3[] = []
   const faces = source.faces.map((face) => {
     const ring = [0,3,1,4,2].map((i) => source.vertices[face[i]])
@@ -177,5 +199,5 @@ function weld(model: Polyhedron): Polyhedron {
     return i
   }))
   // Tip order around the filled outline must become the pentagram edge order.
-  return { vertices, faces: faces.map((f) => [f[0],f[2],f[4],f[1],f[3]]) }
+  return { vertices, faces: faces.map((f) => f.length === 3 ? f : [f[0],f[2],f[4],f[1],f[3]]) }
 }

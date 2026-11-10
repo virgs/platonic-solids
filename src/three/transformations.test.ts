@@ -42,6 +42,7 @@ describe('star transformations', () => {
   it.each([
     ['dodecahedron','small-stellated-dodecahedron'],
     ['great-dodecahedron','great-stellated-dodecahedron'],
+    ['icosahedron','great-icosahedron'],
   ] as const)('%s stellates to %s and reverses continuously', (from,to) => {
     const source = loadPolyhedron(from)
     const forward = createStellation(source)
