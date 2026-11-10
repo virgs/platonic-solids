@@ -48,9 +48,10 @@ npm run build
 
 All five Platonic solids and four Kepler–Poinsot polyhedra can be inspected at
 the same circumradius. Platonic dual transformations use progressive corner
-cuts, with a configurable duration of 0.5–6 seconds. Star-polyhedron dual and
-stellation animations are planned; their controls remain disabled until those
-transformations are implemented.
+cuts, with a configurable duration of 0.5–6 seconds. Both Kepler–Poinsot dual
+pairs are animated. Pentagonal stellation is available for dodecahedron ↔ small
+stellated dodecahedron and great dodecahedron ↔ great stellated dodecahedron.
+Other stellation paths remain unavailable.
 
 The centered transformation player supports play, pause, and direct progress
 scrubbing. Dragging progress pauses playback and preserves the intermediate

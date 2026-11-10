@@ -112,12 +112,44 @@ test('all four Kepler–Poinsot models are selectable', async ({ page }) => {
     await page.locator('#solid-selector').click()
     await page.getByRole('button', { name, exact: true }).click()
     await expect(page.getByRole('heading', { name, exact: true })).toBeVisible()
-    await expect(page.getByRole('button', { name: 'Dual', exact: true })).toBeDisabled()
+    await expect(page.getByRole('button', { name: 'Dual', exact: true })).toBeEnabled()
   }
   expect(errors).toEqual([])
   await expect(page.locator('canvas')).toHaveAttribute('data-engine', /three.js/)
   await page.evaluate(() => new Promise<void>((resolve) => requestAnimationFrame(() => requestAnimationFrame(() => resolve()))))
   await page.screenshot({ path: test.info().outputPath('star-viewer.png') })
+})
+
+test('camera controls follow zoom, auto-rotate, reset order', async ({ page }) => {
+  await page.goto('./')
+  const controls = page.getByRole('group', { name: 'Camera controls' })
+  await expect(controls.getByRole('button')).toHaveCount(4)
+  expect(await controls.getByRole('button').evaluateAll((buttons) => buttons.map((button) => button.getAttribute('aria-label')))).toEqual([
+    'Zoom out', 'Zoom in', 'Toggle automatic rotation', 'Reset view',
+  ])
+})
+
+test('star duals, stellation, and unstellation share the player', async ({ page }) => {
+  const errors: string[] = []
+  page.on('pageerror', (error) => errors.push(error.message))
+  await page.goto('./?solid=dodecahedron')
+  await page.getByRole('slider', { name: /Transformation time/ }).fill('0.5')
+  for (const [action, destination] of [
+    ['Stellate','Small stellated dodecahedron'],
+    ['Dual','Great dodecahedron'],
+    ['Stellate','Great stellated dodecahedron'],
+    ['Dual','Great icosahedron'],
+    ['Dual','Great stellated dodecahedron'],
+    ['Unstellate','Great dodecahedron'],
+  ]) {
+    await page.getByRole('button', { name: action, exact: true }).click()
+    await expect(page.getByRole('heading', { name: destination, exact: true })).toBeVisible({ timeout: 3000 })
+    await expect(page.getByRole('button', { name: 'Dual', exact: true })).toBeEnabled()
+  }
+  expect(errors).toEqual([])
+  await expect(page.locator('canvas')).toHaveAttribute('data-engine', /three.js/)
+  await page.evaluate(() => new Promise<void>((resolve) => requestAnimationFrame(() => requestAnimationFrame(() => resolve()))))
+  await page.screenshot({ path: test.info().outputPath('star-transformations.png') })
 })
 
 test('transformation controls remain above the stage', async ({ page }) => {

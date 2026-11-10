@@ -20,6 +20,17 @@ creases, preserving edges through intersections. All faces are two-sided.
 The tests check counts, coplanarity, shared edges, and unit circumradius. Star
 dihedral angles remain explicitly unlisted pending a separate content review.
 
-Convex corner clipping is restricted to Platonic solids. The star models can be
-selected and inspected; their dual and stellation animations require their own
-construction and are not enabled yet.
+Convex corner clipping is restricted to Platonic solids. Star duals use polar
+reciprocation to construct their endpoints, then split each incident vertex-face
+pair into a moving corner. Original faces shrink, vertex faces open, and edge
+quadrilaterals keep the surface connected. The endpoints have the reviewed
+regular face and edge counts. Self-intersecting faces are tessellated with
+libtess using the nonzero winding rule, filling pentagram centers once.
+
+Pentagonal stellation extends each face's edges into a pentagram, retaining its
+central pentagon and opening five tips. The supported reversible paths are
+dodecahedron ↔ small stellated dodecahedron and great dodecahedron ↔ great
+stellated dodecahedron. The geometry at an endpoint is retained when a different
+operation starts, preserving its orientation across chained transformations.
+
+Construction reference: [Ghent University: the four regular non-convex polyhedra](https://cage.ugent.be/~hs/polyhedra/keplerpoinsot.html).
