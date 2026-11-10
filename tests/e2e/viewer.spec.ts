@@ -6,8 +6,8 @@ import { setTransformationTime } from './controls'
 test('color, display preferences, selected solid and zoom survive reload', async ({ page }) => {
   await page.goto('./?solid=cube')
   await setTransformationTime(page,4)
-  await page.getByRole('button', { name: 'Toggle face opacity', exact: true }).click()
-  const opacityControl = page.getByRole('slider', { name: 'Face opacity', exact: true })
+  await page.getByRole('button', { name: 'Toggle solid opacity', exact: true }).click()
+  const opacityControl = page.getByRole('slider', { name: 'Solid opacity', exact: true })
   await opacityControl.focus()
   await opacityControl.press('Home')
   for (let i=0;i<9;i++) await opacityControl.press('ArrowUp')
@@ -31,9 +31,9 @@ test('color, display preferences, selected solid and zoom survive reload', async
   await page.goto('./')
   await expect(page.getByRole('heading', { name: 'Cube', exact: true })).toBeVisible()
   await expect(page.getByLabel('Color', { exact: true })).toHaveValue('#ff6633')
-  await page.getByRole('button', { name: 'Toggle face opacity', exact: true }).click()
-  await expect(page.getByRole('slider', { name: 'Face opacity', exact: true })).toHaveAttribute('aria-valuenow','0.65')
-  await page.getByRole('button', { name: 'Toggle face opacity', exact: true }).click()
+  await page.getByRole('button', { name: 'Toggle solid opacity', exact: true }).click()
+  await expect(page.getByRole('slider', { name: 'Solid opacity', exact: true })).toHaveAttribute('aria-valuenow','0.65')
+  await page.getByRole('button', { name: 'Toggle solid opacity', exact: true }).click()
   await expect(page.getByRole('button', { name: 'Adjust transformation time' })).toContainText('4.0 s')
   await expect(page.getByRole('button', { name: 'Toggle automatic rotation' })).toHaveAttribute('aria-pressed','true')
   await expect(page.locator('canvas')).toHaveAttribute('data-engine', /three.js/)
@@ -166,23 +166,23 @@ test('the player can seek, hold an intermediate shape, and resume', async ({ pag
   await expect(page.locator('#solid-selector')).toBeEnabled()
 })
 
-test('face opacity defaults to 85 percent and is adjustable', async ({ page }) => {
+test('solid opacity defaults to 85 percent and is adjustable', async ({ page }) => {
   await page.goto('./')
-  await page.getByRole('button', { name: 'Toggle face opacity', exact: true }).click()
-  const opacity = page.getByRole('slider', { name: /Face opacity/ })
+  await page.getByRole('button', { name: 'Toggle solid opacity', exact: true }).click()
+  const opacity = page.getByRole('slider', { name: /Solid opacity/ })
   await expect(opacity).toHaveAttribute('aria-valuenow','0.85')
   await expect(opacity).toHaveAttribute('aria-orientation','vertical')
   const bounds = await opacity.boundingBox()
   expect(bounds!.height).toBeGreaterThan(bounds!.width)
   await opacity.focus()
   await opacity.press('End')
-  await expect(page.getByText('Face opacity: 100%', { exact: true })).toBeVisible()
+  await expect(page.getByText('Solid opacity: 100%', { exact: true })).toBeVisible()
   await page.screenshot({ path: test.info().outputPath('opacity-popup.png') })
   const point = { x: bounds!.x+bounds!.width/2, y: bounds!.y+bounds!.height*0.9 }
   if (test.info().project.name === 'mobile-chromium') await page.touchscreen.tap(point.x,point.y)
   else await page.mouse.click(point.x,point.y)
   await expect(opacity).toHaveAttribute('aria-valuenow','0.2')
-  await page.getByRole('button', { name: 'Toggle face opacity', exact: true }).click()
+  await page.getByRole('button', { name: 'Toggle solid opacity', exact: true }).click()
   await expect(opacity).not.toBeVisible()
 })
 
@@ -207,7 +207,7 @@ test('camera controls follow zoom, auto-rotate, reset order', async ({ page }) =
   const controls = page.getByRole('group', { name: 'Camera controls' })
   await expect(controls.getByRole('button')).toHaveCount(5)
   expect(await controls.getByRole('button').evaluateAll((buttons) => buttons.map((button) => button.getAttribute('aria-label')))).toEqual([
-    'Zoom out', 'Zoom in', 'Toggle automatic rotation', 'Reset view', 'Toggle face opacity',
+    'Zoom out', 'Zoom in', 'Toggle automatic rotation', 'Reset view', 'Toggle solid opacity',
   ])
 })
 

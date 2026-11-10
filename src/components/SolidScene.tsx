@@ -103,7 +103,7 @@ function TransformationMesh({ originId, progress, opacity, kind, transitionNonce
       </mesh>
       <lineSegments ref={lines}>
         <bufferGeometry />
-        <lineBasicMaterial color="#f8f9fa" transparent opacity={0.88} />
+        <lineBasicMaterial color="#f8f9fa" transparent opacity={opacity} depthWrite={opacity === 1} />
       </lineSegments>
     </group>
   )

@@ -29,7 +29,7 @@ test('long action labels stay on one line and color follows reset', async ({ pag
   const reset = await page.getByRole('button', { name: 'Reset view', exact: true }).boundingBox()
   const color = await page.getByLabel('Color', { exact: true }).boundingBox()
   expect(color!.x).toBeGreaterThanOrEqual(reset!.x+reset!.width)
-  const opacity = await page.getByRole('button', { name: 'Toggle face opacity' }).boundingBox()
+  const opacity = await page.getByRole('button', { name: 'Toggle solid opacity' }).boundingBox()
   expect(opacity!.x).toBeGreaterThanOrEqual(color!.x+color!.width)
   expect(Math.abs(opacity!.y-color!.y)).toBeLessThan(2)
   await expect(page.getByRole('button', { name: 'Dual', exact: true })).toHaveClass(/btn-warning/)
