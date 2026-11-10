@@ -18,7 +18,15 @@ Line segments use the original face boundaries rather than inferred mesh
 creases, preserving edges through intersections. All faces are two-sided.
 
 The tests check counts, coplanarity, shared edges, and unit circumradius. Star
-dihedral angles remain explicitly unlisted pending a separate content review.
+dihedral angles follow McCooey's definitions: small stellated dodecahedron
+116.565051177°, great dodecahedron and great stellated dodecahedron
+63.434948823°, and great icosahedron 41.810314896°. The HUD rounds to two
+decimal places. Source metric pages:
+
+- [Small stellated dodecahedron](https://dmccooey.com/polyhedra/SmallStellatedDodecahedron.html)
+- [Great dodecahedron](https://dmccooey.com/polyhedra/GreatDodecahedron.html)
+- [Great stellated dodecahedron](https://dmccooey.com/polyhedra/GreatStellatedDodecahedron.html)
+- [Great icosahedron](https://dmccooey.com/polyhedra/GreatIcosahedron.html)
 
 Convex corner clipping is restricted to Platonic solids. Star duals use polar
 reciprocation to construct their endpoints, then split each incident vertex-face

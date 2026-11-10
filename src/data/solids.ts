@@ -126,16 +126,15 @@ export const platonicSolids: readonly (SolidDefinition & { id: PlatonicId })[] =
 ] as const
 
 export const starSolids: readonly SolidDefinition[] = [
-  { id: 'small-stellated-dodecahedron', name: 'Small stellated dodecahedron', symbol: '{5/2,5}', faces: 12, edges: 30, vertices: 12, faceType: 'Pentagram', faceAngle: '36° (tip)', dualId: 'great-dodecahedron', vertexConfiguration: '(5/2)⁵' },
-  { id: 'great-dodecahedron', name: 'Great dodecahedron', symbol: '{5,5/2}', faces: 12, edges: 30, vertices: 12, faceType: 'Regular pentagon', faceAngle: '108°', dualId: 'small-stellated-dodecahedron', vertexConfiguration: '5^(5/2)' },
-  { id: 'great-stellated-dodecahedron', name: 'Great stellated dodecahedron', symbol: '{5/2,3}', faces: 12, edges: 30, vertices: 20, faceType: 'Pentagram', faceAngle: '36° (tip)', dualId: 'great-icosahedron', vertexConfiguration: '(5/2)³' },
-  { id: 'great-icosahedron', name: 'Great icosahedron', symbol: '{3,5/2}', faces: 20, edges: 30, vertices: 12, faceType: 'Equilateral triangle', faceAngle: '60°', dualId: 'great-stellated-dodecahedron', vertexConfiguration: '3^(5/2)' },
+  { id: 'small-stellated-dodecahedron', name: 'Small stellated dodecahedron', symbol: '{5/2,5}', faces: 12, edges: 30, vertices: 12, faceType: 'Pentagram', faceAngle: '36° (tip)', dihedralAngle: '116.57°', dualId: 'great-dodecahedron', vertexConfiguration: '(5/2)⁵' },
+  { id: 'great-dodecahedron', name: 'Great dodecahedron', symbol: '{5,5/2}', faces: 12, edges: 30, vertices: 12, faceType: 'Regular pentagon', faceAngle: '108°', dihedralAngle: '63.43°', dualId: 'small-stellated-dodecahedron', vertexConfiguration: '5^(5/2)' },
+  { id: 'great-stellated-dodecahedron', name: 'Great stellated dodecahedron', symbol: '{5/2,3}', faces: 12, edges: 30, vertices: 20, faceType: 'Pentagram', faceAngle: '36° (tip)', dihedralAngle: '63.43°', dualId: 'great-icosahedron', vertexConfiguration: '(5/2)³' },
+  { id: 'great-icosahedron', name: 'Great icosahedron', symbol: '{3,5/2}', faces: 20, edges: 30, vertices: 12, faceType: 'Equilateral triangle', faceAngle: '60°', dihedralAngle: '41.81°', dualId: 'great-stellated-dodecahedron', vertexConfiguration: '3^(5/2)' },
 ].map((solid) => ({
   ...solid,
   id: solid.id as SolidId,
   dualId: solid.dualId as SolidId,
   family: 'Kepler–Poinsot polyhedron',
-  dihedralAngle: 'Not listed yet',
   symmetry: 'Ih',
   description: 'A regular self-intersecting star polyhedron. Face and edge crossings are not counted as extra vertices.',
   wikipediaUrl: `https://en.wikipedia.org/wiki/${solid.name.replaceAll(' ', '_')}`,

@@ -1,7 +1,10 @@
 import { describe, expect, it } from 'vitest'
-import { getSolid, platonicSolids as solids } from './solids'
+import { getSolid, platonicSolids as solids, starSolids } from './solids'
 
 describe('solid catalog', () => {
+  it.each(starSolids)('$name has a reviewed dihedral angle', (solid) => {
+    expect(solid.dihedralAngle).toMatch(/^\d+\.\d{2}°$/)
+  })
   it('contains all five Platonic solids', () => {
     expect(solids).toHaveLength(5)
   })
