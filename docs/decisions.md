@@ -1,69 +1,51 @@
-# Decisions and open questions
+# Decisions and next scope
 
-## Accepted direction
+## Accepted product direction
 
-- The project is an educational, static GitHub Pages application.
-- The first release covers five Platonic solids and four Kepler–Poinsot
-  polyhedra.
-- React, TypeScript, and Vite form the application foundation.
-- React Three Fiber and Three.js provide 3D rendering.
-- React Bootstrap, one Bootswatch theme, and Lucide React provide the visual UI.
-- Bootswatch will be the sole stylesheet; the project will author no CSS in any
-  form.
-- Mathematical data and geometry are separated from UI components.
-- Duality and stellation are presented as mathematical relationships, not
-  arbitrary mesh effects.
-- Every solid is normalized to the same circumradius.
-- Zooming moves the camera rather than scaling solid geometry.
-- Camera panning is disabled; orbit, zoom, reset, and optional auto-rotation
-  keep the solid centered.
-- The HUD uses a grouped solid selector at the upper-left, camera actions at the
-  upper-right, relationship actions below the scene, and a property panel below
-  the stage at every breakpoint.
-- Relationship actions use contextual text labels such as **Show dual**,
-  **Stellate**, and **Return to convex form**.
+- Public name: Polyhedra Explorer.
+- Repository and GitHub Pages path remain `platonic-solids`.
+- Static educational application; no accounts, backend, or database.
+- Current collection: five Platonic, four Kepler–Poinsot, and two rectified solids.
+- Transformation-first experience: Dual, Stellate/Unstellate, Rectify/Unrectify,
+  a scrub-capable player, a relationship map, and geometry-preserving history.
+- Every displayed model and intermediate surface has the same circumradius.
+- Orbit and zoom move the camera; panning is disabled and rotation defaults off.
+- Mathematical counts are independent of surface-mesh subdivisions.
+- The two added solids are Archimedean, but the full family and its Catalan duals
+  are deferred for a separate scope discussion.
+- The Catalan dual names of the two rectified solids are shown in their properties;
+  unsupported dual actions are not offered.
 
-## Decisions needed before implementation
+## Technical direction
 
-1. **Public name:** Keep “Platonic Solids Explorer” or choose a more distinctive
-   title?
-2. **Repository name:** Use `platonic-solids`?
-3. **Visibility:** Public is assumed because the target is GitHub Pages.
-4. **Theme:** Choose the Bootswatch theme. `Darkly`, `Cyborg`, and `Solar` are
-   strong candidates for a 3D exhibit; a lighter theme may read more like an
-   educational reference.
-5. **Default solid:** Tetrahedron is the simplest introduction; dodecahedron is
-   more visually distinctive.
-6. **Visual treatment:** Solid faces plus edge lines, translucent faces, or an
-   optional toggle between treatments?
-7. **Stellation scope:** Which exact convex-to-star relationships should the
-   first release animate, and what geometric construction should the animation
-   teach?
-8. **Property depth:** Show advanced properties by default or place them in a
-   collapsible “More details” section?
-9. **Language:** English only for version 1, or design data for later
-   localization immediately?
-10. **Licensing:** Select a source-code license before accepting contributions.
+- React, TypeScript, Vite, React Three Fiber, Three.js, and Drei.
+- React Bootstrap, Bootswatch Darkly, and Lucide React.
+- Bootswatch is the sole stylesheet. No authored CSS/SCSS, CSS Modules,
+  CSS-in-JS, or inline DOM style overrides.
+- SVG drawing attributes and WebGL configuration are rendering data.
+- Geometry and mathematical definitions are separated from UI components.
+- Vitest checks geometry/data; Playwright checks desktop and mobile interaction.
+- GitHub Actions tests and publishes the site.
+- Default solid: tetrahedron. Default color: Darkly info blue. Default opacity: 85%.
+- User settings are persisted locally. Explicit solid URLs override saved selection.
 
-## Recommended defaults
+## Animation decisions
 
-Unless changed during review:
+The small stellated dodecahedron uses growing pentagonal pyramids. The other
+stellation pairs use a connected exterior reshape. This replaces literal plane
+extension, whose overlapping sheets were difficult to follow.
 
-- Repository: `platonic-solids`, public
-- Theme: Bootswatch Darkly
-- Default solid: tetrahedron
-- Rendering: opaque faces with a contrasting edge overlay
-- Properties: essential facts visible, advanced facts collapsed
-- Language: English with data structures that do not prevent later translation
-- URL state: `?solid=<slug>`
+The mathematical endpoints remain exact to numerical tolerance. The information
+dialog describes the chosen motion and separates visible patches from full
+mathematical faces. Forward and reverse controls preserve endpoint orientation.
 
-## Definition-phase exit criteria
+Rectification moves edge points to their midpoints. Both parents of each new
+rectified solid are explicit destinations.
 
-Implementation can begin when:
+## Future discussion
 
-- Product scope and terminology are approved
-- The Bootswatch theme and initial visual treatment are chosen
-- Mathematical conventions for star-polyhedron counts are documented
-- Initial stellation mappings are approved or explicitly deferred
-- Repository visibility and license are selected
-- Version 1 success criteria are accepted
+- Broader Archimedean and Catalan catalogs and additional operations.
+- Face/vertex tracking through transformations.
+- Shareable URLs containing route, progress, appearance, and camera state.
+- Export formats and further educational detail.
+- Source-code licensing before outside contributions.

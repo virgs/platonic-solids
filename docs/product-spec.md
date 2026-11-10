@@ -1,17 +1,17 @@
 # Product specification
 
-## Working title
+## Public name
 
-Platonic Solids Explorer
+Polyhedra Explorer
 
-The title is intentionally descriptive and can be replaced before the first
-release.
+The broader title covers the regular and rectified polyhedra in the collection.
 
 ## Product statement
 
-Platonic Solids Explorer is a static educational web application that lets a
+Polyhedra Explorer is a static educational web application that lets a
 visitor inspect, compare, and transform the five Platonic solids and four
-Kepler–Poinsot polyhedra in an interactive 3D scene.
+Kepler–Poinsot polyhedra, plus the cuboctahedron and icosidodecahedron, in an
+interactive 3D scene.
 
 It should make the relationships between these solids understandable without
 requiring prior geometry knowledge, while retaining enough mathematical detail
@@ -40,6 +40,26 @@ to be useful as a reference.
 2. Great dodecahedron
 3. Great stellated dodecahedron
 4. Great icosahedron
+
+### Rectified solids
+
+1. Cuboctahedron: rectification of the cube or octahedron
+2. Icosidodecahedron: rectification of the dodecahedron or icosahedron
+
+These two are Archimedean solids. Adding the broader family and its Catalan
+duals remains outside the current milestone. Their summaries list mixed face
+types and angles, vertex configuration, and the names of their external duals.
+
+### Rectification and simpler stellation
+
+Rectify cuts vertices back to edge midpoints; Unrectify reverses toward the
+chosen parent. Tetrahedron ↔ octahedron is also supported. All five paths are
+playable from the toolbar and map.
+
+Stellation animations use one connected exterior. Dodecahedron ↔ small stellated
+dodecahedron grows/retracts pentagonal pyramids. The other pairs use direct
+surface reshaping with planar patches and exact mathematical endpoints. Their
+intermediate frames are visual morphs, not literal fixed-plane stellations.
 
 ## Core experience
 
@@ -217,10 +237,11 @@ self-intersection status, and external references.
 
 ## Success criteria for version 1
 
-- All nine solids can be selected and rendered accurately
+- All eleven solids can be selected and rendered accurately
 - Each solid has reviewed property data and a reference link
 - Camera controls work with mouse, keyboard-supported controls, and touch
-- All dual relationships can be demonstrated
+- All dual relationships with both endpoints in the catalog can be demonstrated
+- Both rectified solids expose their two parent paths and mixed-face properties
 - Approved stellation relationships can be demonstrated without misleading
   labels
 - The page works at its GitHub Pages URL after a direct visit or refresh
