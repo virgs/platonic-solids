@@ -1,10 +1,11 @@
 import { expect, test } from '@playwright/test'
 import packageInfo from '../../package.json' with { type: 'json' }
 import { solids } from '../../src/data/solids'
+import { setTransformationTime } from './controls'
 
 test('color, display preferences, selected solid and zoom survive reload', async ({ page }) => {
   await page.goto('./?solid=cube')
-  await page.getByRole('slider', { name: /Transformation time/ }).fill('4')
+  await setTransformationTime(page,4)
   await page.getByRole('button', { name: 'Display', exact: true }).click()
   await page.getByRole('slider', { name: /Face opacity/ }).fill('0.65')
   await page.getByLabel('Color', { exact: true }).evaluate((input) => {
@@ -28,7 +29,7 @@ test('color, display preferences, selected solid and zoom survive reload', async
   await expect(page.getByRole('heading', { name: 'Cube', exact: true })).toBeVisible()
   await expect(page.getByLabel('Color', { exact: true })).toHaveValue('#ff6633')
   await expect(page.getByRole('slider', { name: /Face opacity/ })).toHaveValue('0.65')
-  await expect(page.getByRole('slider', { name: /Transformation time/ })).toHaveValue('4')
+  await expect(page.getByRole('button', { name: 'Adjust transformation time' })).toContainText('4.0 s')
   await expect(page.getByRole('button', { name: 'Toggle automatic rotation' })).toHaveAttribute('aria-pressed','true')
   await expect(page.locator('canvas')).toHaveAttribute('data-engine', /three.js/)
   await expect.poll(async () => page.evaluate(() => Math.hypot(...JSON.parse(localStorage.getItem('platonic-solids.settings.v1')!).cameraPosition))).toBeCloseTo(radius, 3)
@@ -38,7 +39,7 @@ test('color, display preferences, selected solid and zoom survive reload', async
 
 test('D20 stellates into a great icosahedron and back', async ({ page }) => {
   await page.goto('./?solid=icosahedron')
-  await page.getByRole('slider', { name: /Transformation time/ }).fill('0.5')
+  await setTransformationTime(page,0.5)
   await page.getByRole('button', { name: 'Stellate', exact: true }).click()
   await expect(page.getByRole('heading', { name: 'Great icosahedron', exact: true })).toBeVisible()
   await page.getByRole('button', { name: 'Unstellate', exact: true }).click()
@@ -79,7 +80,7 @@ test('completed endpoints unlock the correct actions for every solid', async ({ 
   const stellatable = new Set(['dodecahedron','icosahedron','small-stellated-dodecahedron','great-dodecahedron','great-stellated-dodecahedron','great-icosahedron'])
   for (const solid of solids) {
     await page.goto(`./?solid=${solid.id}`)
-    await page.getByRole('slider', { name: /Transformation time/ }).fill('0.5')
+    await setTransformationTime(page,0.5)
     await page.getByRole('button', { name: 'Dual', exact: true }).click()
     await expect(page.getByRole('slider', { name: /Transformation progress/ })).toHaveValue('1')
     const destination = solids.find((entry) => entry.id === solid.dualId)!
@@ -133,8 +134,8 @@ test('rotation defaults off and zoom out uses the expected icon', async ({ page 
 
 test('duration controls the dual animation and locks while running', async ({ page }) => {
   await page.goto('./?solid=cube')
-  const slider = page.getByRole('slider', { name: /Transformation time/ })
-  await slider.fill('0.5')
+  const slider = page.getByRole('button', { name: 'Adjust transformation time' })
+  await setTransformationTime(page,0.5)
   await page.getByRole('button', { name: 'Dual' }).click()
   await expect(slider).toBeDisabled()
   await expect(page.getByRole('heading', { name: 'Octahedron' })).toBeVisible({ timeout: 2000 })
@@ -196,7 +197,7 @@ test('star duals, stellation, and unstellation share the player', async ({ page 
   const errors: string[] = []
   page.on('pageerror', (error) => errors.push(error.message))
   await page.goto('./?solid=dodecahedron')
-  await page.getByRole('slider', { name: /Transformation time/ }).fill('0.5')
+  await setTransformationTime(page,0.5)
   for (const [action, destination] of [
     ['Stellate','Small stellated dodecahedron'],
     ['Dual','Great dodecahedron'],

@@ -3,6 +3,7 @@ import {
   Network,
   History,
   SlidersHorizontal,
+  Info,
   ArrowLeft,
   ArrowRight,
   RefreshCw,
@@ -31,7 +32,7 @@ import {
 } from 'react-bootstrap'
 import { SolidScene } from './components/SolidScene'
 import { RelationshipMap } from './components/RelationshipMap'
-import { TransformationPlayer } from './components/TransformationPlayer'
+import { TransformationPlayer, TransformationExplanation } from './components/TransformationPlayer'
 import { routesFrom } from './data/routes'
 import { stellationTargets, type TransformationKind, type Polyhedron } from './three/transformations'
 import { readSettings, writeSettings, type CameraPosition, type Settings } from './settings'
@@ -68,12 +69,14 @@ export function App() {
   const progressRef = useRef(0)
   const [playing, setPlaying] = useState(false)
   const [showMap, setShowMap] = useState(false)
+  const [showExplanation, setShowExplanation] = useState(false)
   const [showHistory, setShowHistory] = useState(false)
   const [showDisplay, setShowDisplay] = useState(saved.displayOpen)
   const [restoredModel, setRestoredModel] = useState<Polyhedron>()
   const [history, setHistory] = useState<{ entries: HistoryStop[]; index: number }>({ entries: [], index: -1 })
   const [target, setTarget] = useState(1)
   const [kind, setKind] = useState<TransformationKind>('dual')
+  const [routeDestination, setRouteDestination] = useState<SolidId>()
   const [transitionNonce, setTransitionNonce] = useState(0)
   const [opacity, setOpacity] = useState(saved.opacity)
   const [color, setColor] = useState(saved.color)
@@ -89,7 +92,7 @@ export function App() {
   }>({ nonce: 0, direction: 'in' })
   const solid = getSolid(solidId)
   const origin = getSolid(originId)
-  const destinationId = kind === 'dual' ? origin.dualId : stellationTargets[originId] ?? originId
+  const destinationId = kind === 'dual' ? origin.dualId : routeDestination ?? stellationTargets[originId] ?? originId
   const stellationDestination = stellationTargets[solidId]
   const unstellate = solid.faceType === 'Pentagram' || solidId === 'great-icosahedron'
   const latestSettings = useRef<Settings>(saved)
@@ -156,6 +159,7 @@ export function App() {
     setSolidId(nextId)
     setOriginId(nextId)
     setKind('dual')
+    setRouteDestination(undefined)
     setRestoredModel(undefined)
     setProgress(0)
     progressRef.current = 0
@@ -163,11 +167,14 @@ export function App() {
     setInitialCameraPosition(cameraPosition.current)
   }
 
-  function startDualTransition(nextKind: TransformationKind = 'dual') {
+  function startDualTransition(nextKind: TransformationKind = 'dual', requestedDestination?: SolidId) {
     setAutoRotate(false)
-    if (nextKind !== kind) {
+    const requested = requestedDestination ?? (nextKind === 'dual' ? solid.dualId : stellationTargets[solidId])
+    const existingOtherEnd = progress === 1 ? originId : destinationId
+    if (nextKind !== kind || requested !== existingOtherEnd) {
       setOriginId(solidId)
       setKind(nextKind)
+      setRouteDestination(requested)
       setTransitionNonce((n) => n+1)
       progressRef.current = 0
       setProgress(0)
@@ -179,7 +186,7 @@ export function App() {
   }
 
   function seek(value: number) {
-    value = Math.max(0,Math.min(1,Math.round(value*100)/100))
+    value = Math.max(0,Math.min(1,value))
     setPlaying(false)
     setAutoRotate(false)
     progressRef.current = value
@@ -200,6 +207,7 @@ export function App() {
     setSolidId(entry.solidId)
     setOriginId(entry.solidId)
     setKind('dual')
+    setRouteDestination(undefined)
     setProgress(0)
     progressRef.current = 0
     cameraPosition.current = [...entry.camera]
@@ -392,13 +400,16 @@ export function App() {
                       disabled={dualTransition || !routesFrom(solidId).some((route) => route.kind === 'stellate')} />
                     <Dropdown.Menu>
                       {routesFrom(solidId).filter((route) => route.kind === 'stellate').map((route) => (
-                        <Dropdown.Item key={route.destination} disabled={!route.implemented} onClick={() => startDualTransition('stellate')}>
-                          {getSolid(route.destination).name}{route.implemented ? '' : ' · Planned'}
+                        <Dropdown.Item key={route.destination} disabled={!route.implemented} onClick={() => startDualTransition('stellate',route.destination)}>
+                          {getSolid(route.destination).name}{route.stages ? ` · ${route.stages}-stage route` : ''}
                         </Dropdown.Item>
                       ))}
                     </Dropdown.Menu>
                   </Dropdown>
                 </div>
+                <button className="btn btn-outline-light btn-sm" aria-label="Explain this transformation" onClick={() => { setPlaying(false); setShowExplanation(true) }}>
+                  <Info size={16} /> How it works
+                </button>
             </div>
             <Collapse in={showDisplay}>
               <div id="display-settings">
@@ -407,21 +418,14 @@ export function App() {
               </div>
             </Collapse>
             <Row className="align-items-center g-2 mt-1">
-              <Col md={2} className="d-none d-md-block" />
-              <Col xs={12} md={8}>
+              <Col xs={12}>
                 <TransformationPlayer originId={originId} destinationId={destinationId} progress={progress} playing={playing} kind={kind} onSeek={seek}
+                  duration={duration} onDurationChange={setDuration}
                   onPlay={() => {
                       if (playing) setPlaying(false)
                       else if (progress > 0 && progress < 1) setPlaying(true)
-                      else startDualTransition(kind)
+                      else startDualTransition(kind,progress === 1 ? originId : destinationId)
                     }} />
-              </Col>
-              <Col xs={12} md={2}>
-                <Form.Label htmlFor="duration" className="small mb-0">
-                  Transformation time: {duration.toFixed(1)} s
-                </Form.Label>
-                <Form.Range id="duration" min={0.5} max={6} step={0.1} value={duration}
-                  disabled={playing} onChange={(event) => setDuration(Number(event.target.value))} />
               </Col>
             </Row>
           </Card.Header>
@@ -451,6 +455,7 @@ export function App() {
       </Container>
       <RelationshipMap show={showMap} onHide={() => setShowMap(false)} current={solidId}
         activeRoute={[originId,destinationId]} onInspect={changeSolid} onTransform={startDualTransition} />
+      <TransformationExplanation show={showExplanation} onHide={() => setShowExplanation(false)} originId={originId} destinationId={destinationId} progress={progress} kind={kind} />
       <Modal show={showHistory} onHide={() => setShowHistory(false)} centered scrollable aria-labelledby="history-title">
         <Modal.Header closeButton closeVariant="white"><Modal.Title id="history-title">Route history</Modal.Title></Modal.Header>
         <Modal.Body>

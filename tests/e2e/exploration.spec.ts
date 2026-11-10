@@ -1,15 +1,16 @@
 import { expect, test } from '@playwright/test'
+import { setTransformationTime } from './controls'
 
-test('the map supports inspection, route choice and planned destinations', async ({ page }) => {
+test('the map supports inspection and all implemented destinations', async ({ page }) => {
   await page.goto('./?solid=cube')
-  await page.getByRole('slider', { name: /Transformation time/ }).fill('0.5')
+  await setTransformationTime(page,0.5)
   await page.getByRole('button', { name: 'Map', exact: true }).click()
   const map = page.getByRole('dialog', { name: 'Transformation map' })
   await expect(map.getByRole('button', { name: /^Inspect / })).toHaveCount(9)
   await page.screenshot({ path: test.info().outputPath('relationship-map.png'), animations: 'disabled' })
   await map.getByRole('button', { name: 'Inspect Dodecahedron', exact: true }).click()
   await expect(map.getByRole('heading', { name: 'From Dodecahedron' })).toBeVisible()
-  await expect(map.getByRole('button', { name: 'Stellation → Great dodecahedron · Planned', exact: true })).toBeDisabled()
+  await expect(map.getByRole('button', { name: 'Stellation → Great dodecahedron · 2-stage route', exact: true })).toBeEnabled()
   await map.getByRole('button', { name: 'Stellation → Small stellated dodecahedron', exact: true }).click()
   await expect(page.getByRole('heading', { name: 'Small stellated dodecahedron', exact: true })).toBeVisible()
   await expect(map).not.toBeVisible()
@@ -60,7 +61,7 @@ test('player stepping and milestones hold intermediate geometry', async ({ page 
 
 test('history restores the reached geometry and its camera view', async ({ page }) => {
   await page.goto('./?solid=dodecahedron')
-  await page.getByRole('slider', { name: /Transformation time/ }).fill('0.5')
+  await setTransformationTime(page,0.5)
   await page.getByRole('button', { name: 'Stellate', exact: true }).click()
   await expect(page.getByRole('heading', { name: 'Small stellated dodecahedron', exact: true })).toBeVisible()
   await page.getByRole('button', { name: 'Zoom out', exact: true }).click()

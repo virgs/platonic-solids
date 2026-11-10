@@ -7,7 +7,8 @@ import type { OrbitControls as OrbitControlsImpl } from 'three-stdlib'
 import type { SolidId, PlatonicId } from '../data/solids'
 import { getSolid } from '../data/solids'
 import { createCornerMorph } from '../three/cornerMorph'
-import { createStarDual, createStellation, createDestellation, dualModel, loadPolyhedron, renderPolyhedron, type TransformationKind, type Polyhedron } from '../three/transformations'
+import { createStarDual, dualModel, loadPolyhedron, renderPolyhedron, type TransformationKind, type Polyhedron } from '../three/transformations'
+import { createStellationPath } from '../three/stellationPaths'
 import { defaults, type CameraPosition } from '../settings'
 
 interface SolidSceneProps {
@@ -37,8 +38,7 @@ function TransformationMesh({ originId, progress, opacity, kind, transitionNonce
     const source = current.current
     const makePair = () => {
     if (kind === 'stellate') {
-      const reverse = originId === 'small-stellated-dodecahedron' || originId === 'great-stellated-dodecahedron' || originId === 'great-icosahedron'
-      const model = reverse ? createDestellation(source) : createStellation(source)
+      const model = createStellationPath(source,originId,destinationId)
       return { ...model, render: (t: number) => renderPolyhedron(model.at(t)) }
     }
     if (getSolid(originId).family !== 'Platonic solid') {
@@ -54,7 +54,7 @@ function TransformationMesh({ originId, progress, opacity, kind, transitionNonce
     } }
     }
     pair.current = makePair()
-  }, [originId, kind, transitionNonce])
+  }, [originId, kind, transitionNonce, destinationId])
   const initialGeometry = useMemo(() => {
     const geometry = new BufferGeometry()
     geometry.setAttribute('position', new Float32BufferAttribute([], 3))
