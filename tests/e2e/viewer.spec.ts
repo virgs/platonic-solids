@@ -70,9 +70,11 @@ test('the canvas fills the available stage without a spacer gap', async ({
   expect(box!.width).toBeGreaterThan(200)
   expect(box!.height).toBeGreaterThan(100)
 
-  const canvasBox = await stage.locator('canvas').boundingBox()
-  expect(canvasBox).not.toBeNull()
-  expect(canvasBox!.height).toBeCloseTo(box!.height, 0)
+  await expect.poll(async () => {
+    const currentStage = await stage.boundingBox()
+    const canvasBox = await stage.locator('canvas').boundingBox()
+    return currentStage && canvasBox ? Math.abs(canvasBox.height-currentStage.height) : Infinity
+  }, { timeout: 5000 }).toBeLessThan(0.5)
 })
 
 test('completed endpoints unlock the correct actions for every solid', async ({ page }) => {
