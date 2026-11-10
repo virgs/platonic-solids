@@ -13,7 +13,7 @@ export interface Settings {
 }
 export const defaults: Settings = {
   solidId: 'tetrahedron', autoRotate: false, duration: 1.8,
-  opacity: 0.85, color: '#4cc9f0', cameraPosition: [2.4,1.7,2.4], displayOpen: false,
+  opacity: 0.85, color: '#3498db', cameraPosition: [2.4,1.7,2.4], displayOpen: false,
 }
 
 export function parseSettings(raw: string | null): Settings {

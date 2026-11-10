@@ -71,7 +71,9 @@ stores up to 30 endpoint geometry/view snapshots, so retracing a route preserves
 the reached orientation. The half-filled circle beside the color picker opens a vertical opacity slider; its open state
 is remembered. No before/after property-comparison panel is included.
 
-The color picker changes face color. Color, opacity, transformation time,
+The color picker changes face color; the default is Bootswatch Darkly's info blue
+(#3498db). Saved color choices are preserved. The opacity button always shows
+the current percentage, even when its popup is closed. Color, opacity, transformation time,
 auto-rotation, the last completed solid, and the camera position (including zoom
 and orbit angle) are saved in local storage. An explicit solid in the URL takes
 precedence over the saved selection. Corrupt or unavailable storage falls back
