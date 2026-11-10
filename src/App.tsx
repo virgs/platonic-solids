@@ -56,6 +56,7 @@ export function App() {
   const [progress, setProgress] = useState(0)
   const progressRef = useRef(0)
   const [playing, setPlaying] = useState(false)
+  const [hasTransformed, setHasTransformed] = useState(false)
   const [target, setTarget] = useState(1)
   const [kind, setKind] = useState<TransformationKind>('dual')
   const [transitionNonce, setTransitionNonce] = useState(0)
@@ -74,6 +75,11 @@ export function App() {
   const solid = getSolid(solidId)
   const origin = getSolid(originId)
   const destinationId = kind === 'dual' ? origin.dualId : stellationTargets[originId] ?? originId
+  const stellationDestination = stellationTargets[solidId]
+  const unstellate = solid.faceType === 'Pentagram' || solidId === 'great-icosahedron'
+  const operationName = kind === 'dual' ? 'Dual' : 'Stellation'
+  const phase = playing ? 'Playing' : dualTransition ? 'Paused' : hasTransformed ? 'Complete' : 'Ready'
+  const displayedPercent = playing ? Math.min(99, Math.floor(progress * 100)) : Math.round(progress * 100)
   const latestSettings = useRef<Settings>(saved)
 
   useEffect(() => {
@@ -120,6 +126,7 @@ export function App() {
     setSolidId(nextId)
     setOriginId(nextId)
     setKind('dual')
+    setHasTransformed(false)
     setProgress(0)
     progressRef.current = 0
     setSelectionKey((value) => value + 1)
@@ -127,6 +134,7 @@ export function App() {
   }
 
   function startDualTransition(nextKind: TransformationKind = 'dual') {
+    setHasTransformed(true)
     setAutoRotate(false)
     if (nextKind !== kind) {
       setOriginId(solidId)
@@ -142,6 +150,7 @@ export function App() {
   }
 
   function seek(value: number) {
+    setHasTransformed(true)
     setPlaying(false)
     setAutoRotate(false)
     progressRef.current = value
@@ -155,8 +164,8 @@ export function App() {
   }
 
   return (
-    <>
-      <Navbar bg="primary" data-bs-theme="dark" className="py-1">
+    <div className="vh-100 d-flex flex-column">
+      <Navbar bg="primary" data-bs-theme="dark" className="py-1 flex-shrink-0">
         <Container>
           <Navbar.Brand href="./" className="fw-semibold py-1">
             <img
@@ -183,8 +192,8 @@ export function App() {
         </Container>
       </Navbar>
 
-      <Container as="main" className="py-2">
-        <Card className="border-0 bg-body mb-2">
+      <Container as="main" className="py-2 d-flex flex-column flex-grow-1 overflow-hidden">
+        <Card className="border-0 bg-body mb-2 flex-shrink-0">
           <Card.Body className="px-2 py-1">
             <Stack
               direction="horizontal"
@@ -225,8 +234,8 @@ export function App() {
           </Card.Body>
         </Card>
 
-        <Card className="border-0 bg-body">
-          <Card.Header className="border-0 bg-body px-2 py-1">
+        <Card className="border-0 bg-body flex-grow-1 overflow-hidden">
+          <Card.Header className="border-0 bg-body px-2 py-1 flex-shrink-0">
             <Row className="align-items-center g-2">
               <Col xs={12} md={4}>
                 <Dropdown>
@@ -299,28 +308,37 @@ export function App() {
               </Col>
 
               <Col xs={12} md={4} className="text-md-end">
-                <ButtonGroup size="sm" aria-label="Solid transformations">
+                <div className="d-flex gap-2 justify-content-md-end" role="group" aria-label="Solid transformations">
                   <button
                     type="button"
-                    className="btn btn-primary"
+                    className="btn btn-primary btn-sm"
                     onClick={() => startDualTransition('dual')}
                     disabled={dualTransition}
+                    aria-label="Dual"
                     title={`Show dual: ${getSolid(solid.dualId).name}`}
                   >
-                    <RefreshCw size={16} aria-hidden="true" /> Dual
+                    <RefreshCw size={16} aria-hidden="true" /> {dualTransition ? 'Transformation in progress' : `Dual → ${getSolid(solid.dualId).name}`}
                   </button>
                   <button
                     type="button"
-                    className="btn btn-outline-info"
-                    disabled={dualTransition || !stellationTargets[solidId]}
+                    className="btn btn-info btn-sm"
+                    aria-label={unstellate ? 'Unstellate' : 'Stellate'}
+                    disabled={dualTransition || !stellationDestination}
                     onClick={() => startDualTransition('stellate')}
                     title={stellationTargets[solidId] ? `Transform to ${getSolid(stellationTargets[solidId]!).name}` : 'No regular Kepler–Poinsot stellation for this solid'}
                   >
-                    <Sparkles size={16} aria-hidden="true" /> {solid.faceType === 'Pentagram' || solidId === 'great-icosahedron' ? 'Unstellate' : 'Stellate'}
+                    <Sparkles size={16} aria-hidden="true" /> {stellationDestination ? `${unstellate ? 'Unstellate' : 'Stellate'} → ${getSolid(stellationDestination).name}` : 'No regular stellation'}
                   </button>
-                </ButtonGroup>
+                </div>
               </Col>
             </Row>
+            <div className="small text-center mt-1" data-testid="transformation-status" role="status" aria-live="polite">
+              <Badge bg={phase === 'Complete' ? 'success' : playing ? 'info' : 'secondary'} className="me-2">{phase}</Badge>
+              {hasTransformed
+                ? `${operationName}: ${target === 0 ? getSolid(destinationId).name : origin.name} → ${target === 0 ? origin.name : getSolid(destinationId).name}`
+                : `${solid.name} · choose a transformation`}
+              {dualTransition && <span className="text-body-secondary ms-2">New actions unlock when the player reaches an endpoint.</span>}
+            </div>
             <Row className="align-items-center g-2 mt-1">
               <Col xs={12} md={4}>
                 <div className="d-flex align-items-center justify-content-between gap-2">
@@ -336,7 +354,7 @@ export function App() {
               </Col>
               <Col xs={12} md={4} className="text-center">
                 <Form.Label htmlFor="progress" className="small mb-0">
-                  Transformation progress: {Math.round(progress * 100)}%
+                  Transformation progress: {displayedPercent}%
                 </Form.Label>
                 <div className="d-flex gap-2 align-items-center">
                   <button type="button" className="btn btn-primary btn-sm"
@@ -363,7 +381,7 @@ export function App() {
             </Row>
           </Card.Header>
 
-          <Card.Body className="p-0 bg-body">
+          <Card.Body className="p-0 bg-body position-relative flex-grow-1 overflow-hidden">
             <SolidScene
               key={selectionKey}
               solidId={solid.id}
@@ -383,6 +401,6 @@ export function App() {
           </Card.Body>
         </Card>
       </Container>
-    </>
+    </div>
   )
 }

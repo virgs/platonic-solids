@@ -1,5 +1,6 @@
 import { expect, test } from '@playwright/test'
 import packageInfo from '../../package.json' with { type: 'json' }
+import { solids } from '../../src/data/solids'
 
 test('color, display preferences, selected solid and zoom survive reload', async ({ page }) => {
   await page.goto('./?solid=cube')
@@ -54,7 +55,7 @@ test('release identity is visible and uses the shared favicon', async ({ page })
   )
 })
 
-test('the canvas occupies one responsive 21:9 stage without a spacer gap', async ({
+test('the canvas fills the available stage without a spacer gap', async ({
   page,
 }) => {
   await page.goto('./?solid=tetrahedron')
@@ -64,11 +65,29 @@ test('the canvas occupies one responsive 21:9 stage without a spacer gap', async
 
   const box = await stage.boundingBox()
   expect(box).not.toBeNull()
-  expect(box!.width / box!.height).toBeCloseTo(21 / 9, 1)
+  expect(box!.width).toBeGreaterThan(200)
+  expect(box!.height).toBeGreaterThan(100)
 
   const canvasBox = await stage.locator('canvas').boundingBox()
   expect(canvasBox).not.toBeNull()
   expect(canvasBox!.height).toBeCloseTo(box!.height, 0)
+})
+
+test('completed endpoints unlock the correct actions for every solid', async ({ page }) => {
+  test.setTimeout(60000)
+  const stellatable = new Set(['dodecahedron','icosahedron','small-stellated-dodecahedron','great-dodecahedron','great-stellated-dodecahedron','great-icosahedron'])
+  for (const solid of solids) {
+    await page.goto(`./?solid=${solid.id}`)
+    await page.getByRole('slider', { name: /Transformation time/ }).fill('0.5')
+    await page.getByRole('button', { name: 'Dual', exact: true }).click()
+    await expect(page.getByTestId('transformation-status')).toContainText('Complete')
+    const destination = solids.find((entry) => entry.id === solid.dualId)!
+    await expect(page.getByRole('heading', { name: destination.name, exact: true })).toBeVisible()
+    await expect(page.getByRole('button', { name: 'Dual', exact: true })).toBeEnabled()
+    const stellar = page.getByRole('button', { name: /^(Unstellate|Stellate)$/ })
+    if (stellatable.has(destination.id)) await expect(stellar).toBeEnabled()
+    else await expect(stellar).toBeDisabled()
+  }
 })
 
 test('solid selection updates the model, properties, and URL', async ({ page }) => {
