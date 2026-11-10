@@ -25,18 +25,18 @@ Solid properties support that task rather than dominating the interface.
    and three-stage D12 routes with named intermediate checkpoints.
 3. **Geometric explanation:** The info button in the player toolbar pauses playback
    and opens a short description of the current operation and progress region.
-4. **Player milestones:** named endpoints, start/end jumps, and 1% forward/back
-   steps support teaching. The cuboctahedron is marked at 50% on the cube-origin
-   path and 75% on the octahedron-origin path, matching the actual corner cuts.
+4. **Player checkpoints:** named endpoints, start/end jumps, and 1% forward/back
+   steps support teaching. Only named intermediate solids on multi-step routes
+   have checkpoint links; the generic midpoint link has been removed.
 5. **Route history:** up to 30 session stops retain the reached geometry and
    camera view. Back/forward and direct selection restore these snapshots;
    browser tests compare the rendered canvas before and after restoration.
-6. **Compact display settings:** opacity is collapsible under Display, and that
+6. **Compact display settings:** opacity is collapsible from its button beside the color picker, and that
    preference is persisted. Camera controls stay centered, with the color picker
    immediately after Reset view, as explicitly requested. Actions have a separate
    centered full-width row so destination names stay on one line.
 
-The clock button beside Play opens a vertical SVG timing slider. It supports
+The clock button beside Play opens a vertical SVG timing slider from 0.5 to 10 seconds. It supports
 mouse, touch, and keyboard interaction without a project-authored stylesheet.
 Map links have arrowheads at both ends. Solid lines with diamonds identify duals;
 dashed lines with stars identify stellation; dotted lines identify

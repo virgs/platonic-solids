@@ -30,7 +30,7 @@ export function RelationshipMap({ show, onHide, current, activeRoute, onInspect,
     <Modal.Body>
       <div className="d-flex gap-3 small flex-wrap mb-2">
         <span className="text-info">◇ Solid line: dual</span><span className="text-warning">★ Dashed: stellation</span>
-        <span>⋯ Dotted: staged route</span><span>Arrowheads at both ends: reversible</span>
+        <span>⋯ Dotted: multi-step transformation</span>
       </div>
       <Row className="g-3 align-items-center"><Col xs={12} md={8}>
       <svg viewBox="0 0 920 440" width="100%" role="group" aria-label="Relationships between all nine solids">

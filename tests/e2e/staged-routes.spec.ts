@@ -40,7 +40,8 @@ test('time and explanation controls belong to playback, with centered transforma
   const box = await slider.boundingBox()
   expect(box!.height).toBeGreaterThan(box!.width)
   await slider.focus(); await slider.press('End')
-  await expect(slider).toHaveAttribute('aria-valuenow','6')
+  await expect(slider).toHaveAttribute('aria-valuenow','10')
+  await expect.poll(() => page.evaluate(() => JSON.parse(localStorage.getItem('platonic-solids.settings.v1')!).duration)).toBe(10)
   await page.screenshot({ path: test.info().outputPath('timing-popup.png'), animations: 'disabled' })
   const point = { x: box!.x+box!.width/2, y: box!.y+box!.height*0.9 }
   if (test.info().project.name === 'mobile-chromium') await page.touchscreen.tap(point.x,point.y)

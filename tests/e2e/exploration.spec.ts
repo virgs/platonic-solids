@@ -29,6 +29,11 @@ test('long action labels stay on one line and color follows reset', async ({ pag
   const reset = await page.getByRole('button', { name: 'Reset view', exact: true }).boundingBox()
   const color = await page.getByLabel('Color', { exact: true }).boundingBox()
   expect(color!.x).toBeGreaterThanOrEqual(reset!.x+reset!.width)
+  const opacity = await page.getByRole('button', { name: 'Toggle face opacity' }).boundingBox()
+  expect(opacity!.x).toBeGreaterThanOrEqual(color!.x+color!.width)
+  expect(Math.abs(opacity!.y-color!.y)).toBeLessThan(2)
+  await expect(page.getByRole('button', { name: 'Dual', exact: true })).toHaveClass(/btn-info/)
+  await expect(page.getByRole('button', { name: 'Stellate', exact: true })).toHaveClass(/btn-warning/)
   await expect(page.getByText(/choose a transformation|New actions unlock/)).toHaveCount(0)
   await expect(page.locator('[data-testid="transformation-status"]')).toHaveCount(0)
   const stage = page.getByLabel('Interactive 3D model of a Great dodecahedron')
@@ -44,8 +49,10 @@ test('long action labels stay on one line and color follows reset', async ({ pag
 
 test('player stepping and milestones hold intermediate geometry', async ({ page }) => {
   await page.goto('./?solid=cube')
-  await page.getByRole('button', { name: 'Seek to transformation milestone' }).click()
+  await expect(page.getByRole('button', { name: 'Seek to transformation milestone' })).toHaveCount(0)
+  await expect(page.getByRole('button', { name: '50%', exact: true })).toHaveCount(0)
   const slider = page.getByRole('slider', { name: /Transformation progress/ })
+  await slider.fill('0.5')
   await expect(slider).toHaveValue('0.5')
   await page.getByRole('button', { name: 'Step transformation forward' }).click()
   await expect(slider).toHaveValue('0.51')

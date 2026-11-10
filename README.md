@@ -48,7 +48,7 @@ npm run build
 
 All five Platonic solids and four Kepler–Poinsot polyhedra can be inspected at
 the same circumradius. Platonic dual transformations use progressive corner
-cuts, with a configurable duration of 0.5–6 seconds. Both Kepler–Poinsot dual
+cuts, with a configurable duration of 0.5–10 seconds. Both Kepler–Poinsot dual
 pairs are animated. Pentagonal stellation is available for dodecahedron ↔ small
 stellated dodecahedron and great dodecahedron ↔ great stellated dodecahedron.
 Icosahedron ↔ great icosahedron is also available. The additional D12 destinations
@@ -63,12 +63,12 @@ surface. Face opacity defaults to 85% and can be adjusted from 20% to 100%.
 
 The Map dialog shows all nine solids with arrowheads at both ends of reversible
 links. Solid lines/diamonds identify duals, dashed lines/stars identify
-stellations, and dotted lines identify staged routes. Select a node to
+stellations, and dotted lines identify completed multi-step transformations. Select a node to
 inspect it, then choose a route. The player has named endpoints, 1% steps, and
 geometry checkpoints; its clock button opens a vertical timing slider. “How it
 works”, in the player toolbar, opens an explanation. Session history
 stores up to 30 endpoint geometry/view snapshots, so retracing a route preserves
-the reached orientation. Display collapses the opacity settings; its open state
+the reached orientation. The opacity button beside the color picker collapses the opacity settings; its open state
 is remembered. No before/after property-comparison panel is included.
 
 The color picker changes face color. Color, opacity, transformation time,

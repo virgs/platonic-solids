@@ -11,7 +11,7 @@ describe('saved preferences', () => {
   })
 
   it('restores valid settings including camera distance and color', () => {
-    const saved = { ...defaults, solidId: 'great-icosahedron', color: '#ff6633', duration: 4, autoRotate: true, opacity: 1, cameraPosition: [0,0,5] }
+    const saved = { ...defaults, solidId: 'great-icosahedron', color: '#ff6633', duration: 10, autoRotate: true, opacity: 1, cameraPosition: [0,0,5] }
     expect(parseSettings(JSON.stringify(saved))).toEqual(saved)
   })
 

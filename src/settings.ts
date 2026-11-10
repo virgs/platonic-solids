@@ -27,7 +27,7 @@ export function parseSettings(raw: string | null): Settings {
     return {
       solidId: solids.some((solid) => solid.id === value.solidId) ? value.solidId : defaults.solidId,
       autoRotate: typeof value.autoRotate === 'boolean' ? value.autoRotate : defaults.autoRotate,
-      duration: inRange(value.duration,0.5,6,defaults.duration),
+      duration: inRange(value.duration,0.5,10,defaults.duration),
       opacity: inRange(value.opacity,0.2,1,defaults.opacity),
       color: typeof value.color === 'string' && /^#[\da-f]{6}$/i.test(value.color) ? value.color : defaults.color,
       cameraPosition: validPosition ? [position[0],position[1],position[2]] : [...defaults.cameraPosition],

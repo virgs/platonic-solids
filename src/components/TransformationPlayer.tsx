@@ -39,7 +39,7 @@ export function TransformationPlayer(props: RouteView & {
     <datalist id="player-milestones"><option value="0" label="Start" />{milestones.map((point) => <option key={point.value} value={point.value} label={point.label || 'Midpoint'} />)}<option value="1" label="End" /></datalist>
     <div className="d-flex justify-content-between small text-body-secondary gap-2 flex-wrap">
       <span>{getSolid(originId).name}</span>
-      {milestones.map((point) => <button key={point.value} className="btn btn-link btn-sm p-0"
+      {milestones.filter((point) => point.staged).map((point) => <button key={point.value} className="btn btn-link btn-sm p-0"
         aria-label={point.staged ? `Seek to ${point.label} checkpoint` : 'Seek to transformation milestone'}
         onClick={() => onSeek(point.value)}>{point.label ? `${point.label} · ` : ''}{Math.round(point.value*100)}%</button>)}
       <span className="text-end">{getSolid(destinationId).name}</span>

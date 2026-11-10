@@ -2,7 +2,7 @@ import {
   Github,
   Network,
   History,
-  SlidersHorizontal,
+  Blend,
   ArrowLeft,
   ArrowRight,
   RefreshCw,
@@ -291,7 +291,7 @@ export function App() {
         <Card className="border-0 bg-body flex-grow-1 overflow-hidden">
           <Card.Header className="border-0 bg-body px-2 py-1 flex-shrink-0">
             <Row className="align-items-center g-2">
-              <Col xs={12} md={4}>
+              <Col xs={12} md={3}>
                 <Dropdown>
                   <Dropdown.Toggle
                     variant="primary"
@@ -323,7 +323,7 @@ export function App() {
                 </Dropdown>
               </Col>
 
-              <Col xs={12} md={4} className="text-center">
+              <Col xs={12} md={6} className="text-center">
                 <ButtonGroup size="sm" aria-label="Camera controls">
                   <button
                     type="button"
@@ -361,21 +361,21 @@ export function App() {
                   <Form.Label htmlFor="solid-color" className="visually-hidden">Color</Form.Label>
                   <Form.Control type="color" id="solid-color" size="sm" className="ms-2" value={color}
                     title="Solid color" onChange={(event) => setColor(event.target.value)} />
+                  <button className="btn btn-primary btn-sm ms-2" aria-label="Toggle face opacity" title="Face opacity" aria-expanded={showDisplay} aria-controls="display-settings" onClick={() => setShowDisplay((value) => !value)}><Blend size={16} /></button>
                 </ButtonGroup>
               </Col>
 
-              <Col xs={12} md={4} className="text-md-end">
+              <Col xs={12} md={3} className="text-md-end">
                 <div className="d-flex gap-2 justify-content-md-end flex-wrap">
                   <button className="btn btn-primary btn-sm" disabled={dualTransition} onClick={() => setShowMap(true)}><Network size={16} /> Map</button>
                   <button className="btn btn-primary btn-sm" disabled={dualTransition} onClick={() => setShowHistory(true)}><History size={16} /> History</button>
-                  <button className="btn btn-primary btn-sm" aria-expanded={showDisplay} aria-controls="display-settings" onClick={() => setShowDisplay((value) => !value)}><SlidersHorizontal size={16} /> Display</button>
                 </div>
               </Col>
             </Row>
             <div className="d-flex gap-2 justify-content-center flex-wrap mt-2" role="group" aria-label="Solid transformations">
                   <button
                     type="button"
-                    className="btn btn-primary btn-sm px-3 py-2 text-nowrap"
+                    className="btn btn-info btn-sm px-3 py-2 text-nowrap"
                     onClick={() => startDualTransition('dual')}
                     disabled={dualTransition}
                     aria-label="Dual"
@@ -386,7 +386,7 @@ export function App() {
                 <div className="d-flex">
                   <button
                     type="button"
-                    className="btn btn-info btn-sm px-3 py-2 text-nowrap"
+                    className="btn btn-warning btn-sm px-3 py-2 text-nowrap"
                     aria-label={unstellate ? 'Unstellate' : 'Stellate'}
                     disabled={dualTransition || !stellationDestination}
                     onClick={() => startDualTransition('stellate')}
@@ -395,7 +395,7 @@ export function App() {
                     <Sparkles size={16} aria-hidden="true" /> {stellationDestination ? `${unstellate ? 'Unstellate' : 'Stellate'} → ${getSolid(stellationDestination).name}` : 'No regular stellation'}
                   </button>
                   <Dropdown>
-                    <Dropdown.Toggle variant="info" size="sm" className="h-100" split aria-label="Choose stellation destination"
+                    <Dropdown.Toggle variant="warning" size="sm" className="h-100" split aria-label="Choose stellation destination"
                       disabled={dualTransition || !routesFrom(solidId).some((route) => route.kind === 'stellate')} />
                     <Dropdown.Menu>
                       {routesFrom(solidId).filter((route) => route.kind === 'stellate').map((route) => (

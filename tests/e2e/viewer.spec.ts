@@ -6,7 +6,7 @@ import { setTransformationTime } from './controls'
 test('color, display preferences, selected solid and zoom survive reload', async ({ page }) => {
   await page.goto('./?solid=cube')
   await setTransformationTime(page,4)
-  await page.getByRole('button', { name: 'Display', exact: true }).click()
+  await page.getByRole('button', { name: 'Toggle face opacity', exact: true }).click()
   await page.getByRole('slider', { name: /Face opacity/ }).fill('0.65')
   await page.getByLabel('Color', { exact: true }).evaluate((input) => {
     Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value')!.set!.call(input, '#ff6633')
@@ -163,7 +163,7 @@ test('the player can seek, hold an intermediate shape, and resume', async ({ pag
 
 test('face opacity defaults to 85 percent and is adjustable', async ({ page }) => {
   await page.goto('./')
-  await page.getByRole('button', { name: 'Display', exact: true }).click()
+  await page.getByRole('button', { name: 'Toggle face opacity', exact: true }).click()
   const opacity = page.getByRole('slider', { name: /Face opacity/ })
   await expect(opacity).toHaveValue('0.85')
   await opacity.fill('1')
@@ -189,9 +189,9 @@ test('all four Kepler–Poinsot models are selectable', async ({ page }) => {
 test('camera controls follow zoom, auto-rotate, reset order', async ({ page }) => {
   await page.goto('./')
   const controls = page.getByRole('group', { name: 'Camera controls' })
-  await expect(controls.getByRole('button')).toHaveCount(4)
+  await expect(controls.getByRole('button')).toHaveCount(5)
   expect(await controls.getByRole('button').evaluateAll((buttons) => buttons.map((button) => button.getAttribute('aria-label')))).toEqual([
-    'Zoom out', 'Zoom in', 'Toggle automatic rotation', 'Reset view',
+    'Zoom out', 'Zoom in', 'Toggle automatic rotation', 'Reset view', 'Toggle face opacity',
   ])
 })
 
