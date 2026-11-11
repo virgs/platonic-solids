@@ -29,6 +29,7 @@ import {
   Row,
   Stack,
 } from 'react-bootstrap'
+import type { Highlight } from './three/highlights'
 import { SolidScene } from './components/SolidScene'
 import { RelationshipMap } from './components/RelationshipMap'
 import { OpacityControl } from './components/OpacityControl'
@@ -58,6 +59,7 @@ interface HistoryStop { solidId: SolidId; model: Polyhedron; camera: CameraPosit
 export function App() {
   const [saved] = useState(readSettings)
   const [solidId, setSolidId] = useState<SolidId>(() => initialSolid(saved).id)
+  const [highlight, setHighlight] = useState<Highlight>(null)
   const [autoRotate, setAutoRotate] = useState(saved.autoRotate)
   const [originId, setOriginId] = useState<SolidId>(() => initialSolid(saved).id)
   const [progress, setProgress] = useState(0)
@@ -180,10 +182,12 @@ export function App() {
     } else {
       setTarget(progress === 1 ? 0 : 1)
     }
+    setHighlight(null)
     setPlaying(true)
   }
 
   function seek(value: number) {
+    setHighlight(null)
     value = Math.max(0,Math.min(1,value))
     setPlaying(false)
     setAutoRotate(false)
@@ -250,7 +254,7 @@ export function App() {
       <Container as="main" className="py-2 d-flex flex-column flex-grow-1 overflow-hidden">
         <Card className="border-0 bg-body mb-2 flex-shrink-0">
           <Card.Body className="px-2 py-1">
-            <SolidSummary solid={solid} />
+            <SolidSummary solid={solid} highlight={highlight} onHighlight={setHighlight} disabled={dualTransition} />
           </Card.Body>
         </Card>
 
@@ -418,6 +422,7 @@ export function App() {
               key={selectionKey}
               solidId={solid.id}
               solidName={solid.name}
+              highlight={dualTransition ? null : highlight}
               autoRotate={autoRotate}
               resetNonce={resetNonce}
               zoom={zoom}

@@ -1,4 +1,4 @@
-import { BufferGeometry, Float32BufferAttribute, Vector3 } from 'three'
+import { BufferGeometry, Color, Float32BufferAttribute, Vector3 } from 'three'
 import libtess from 'libtess'
 import { extractPolyhedron } from './geometry'
 import { starModels, type StarSolidId } from './starPolyhedra'
@@ -41,13 +41,15 @@ function faceNormal(points: Vector3[]) {
 }
 
 /** Nonzero winding fills a pentagram's center once, even as its edges intersect. */
-export function renderPolyhedron(model: Polyhedron) {
+export function renderPolyhedron(model: Polyhedron, faceColors?: Color[]) {
+  const colors: number[] = []
   const triangles: number[] = []
   const edges: number[] = []
   const seen = new Set<string>()
-  for (const face of model.faces) {
+  for (const [faceIndex,face] of model.faces.entries()) {
     const points = face.map((i) => model.vertices[i])
     if (faceNormal(points).lengthSq() < 0.5) continue
+    const before = triangles.length
     const tess = new libtess.GluTesselator()
     tess.gluTessProperty(libtess.gluEnum.GLU_TESS_WINDING_RULE, libtess.windingRule.GLU_TESS_WINDING_NONZERO)
     tess.gluTessCallback(libtess.gluEnum.GLU_TESS_VERTEX, (point: number[]) => triangles.push(...point))
@@ -59,6 +61,7 @@ export function renderPolyhedron(model: Polyhedron) {
     points.forEach((point) => tess.gluTessVertex(point.toArray(), point.toArray()))
     tess.gluTessEndContour()
     tess.gluTessEndPolygon()
+    if (faceColors) for (let i=before; i<triangles.length; i+=3) colors.push(...faceColors[faceIndex].toArray())
     points.forEach((point, i) => {
       const next = points[(i+1)%points.length]
       if (point.distanceTo(next) < 1e-6) return
@@ -69,6 +72,7 @@ export function renderPolyhedron(model: Polyhedron) {
   }
   const geometry = new BufferGeometry()
   geometry.setAttribute('position', new Float32BufferAttribute(triangles,3))
+  if (faceColors) geometry.setAttribute('color', new Float32BufferAttribute(colors,3))
   geometry.computeVertexNormals()
   geometry.computeBoundingSphere()
   const edgeGeometry = new BufferGeometry()

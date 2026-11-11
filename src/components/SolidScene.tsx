@@ -1,3 +1,4 @@
+import { highlightGeometry, type Highlight } from '../three/highlights'
 import { OrbitControls } from '@react-three/drei'
 import { Canvas, useThree } from '@react-three/fiber'
 import { useEffect, useMemo, useRef, useState } from 'react'
@@ -16,6 +17,7 @@ import { defaults, type CameraPosition } from '../settings'
 interface SolidSceneProps {
   solidId: SolidId
   solidName: string
+  highlight: Highlight
   autoRotate: boolean
   resetNonce: number
   zoom: { nonce: number; direction: 'in' | 'out' }
@@ -32,9 +34,10 @@ interface SolidSceneProps {
   onEndpoint: (id: SolidId, model: Polyhedron) => void
 }
 
-function TransformationMesh({ originId, progress, opacity, kind, transitionNonce, color, destinationId, restoredModel, onEndpoint }: Pick<SolidSceneProps, 'originId' | 'progress' | 'opacity' | 'kind' | 'transitionNonce' | 'color' | 'destinationId' | 'restoredModel' | 'onEndpoint'>) {
+function TransformationMesh({ highlight, originId, progress, opacity, kind, transitionNonce, color, destinationId, restoredModel, onEndpoint }: Pick<SolidSceneProps, 'highlight' | 'originId' | 'progress' | 'opacity' | 'kind' | 'transitionNonce' | 'color' | 'destinationId' | 'restoredModel' | 'onEndpoint'>) {
   const [initialModel] = useState(() => restoredModel ?? loadPolyhedron(originId))
   const current = useRef(initialModel)
+  const [endpointModel, setEndpointModel] = useState(initialModel)
   const pair = useRef<{ source: Polyhedron; target: Polyhedron; render: (t: number) => ReturnType<typeof renderPolyhedron> } | null>(null)
   useEffect(() => {
     const source = current.current
@@ -97,24 +100,25 @@ function TransformationMesh({ originId, progress, opacity, kind, transitionNonce
       previous.dispose()
     }
 
-    if (progress === 0) { current.current = path.source; onEndpoint(originId,path.source) }
-    if (progress === 1) { current.current = path.target; onEndpoint(destinationId,path.target) }
+    if (progress === 0) { current.current = path.source; setEndpointModel(path.source); onEndpoint(originId,path.source) }
+    if (progress === 1) { current.current = path.target; setEndpointModel(path.target); onEndpoint(destinationId,path.target) }
   }, [originId, kind, transitionNonce, progress, destinationId, onEndpoint])
 
   return (
     <group rotation={[0.35, 0.45, 0]}>
-      <mesh ref={mesh} geometry={initialGeometry} renderOrder={0}>
+      <mesh ref={mesh} geometry={initialGeometry} renderOrder={0} visible={highlight !== 'faces'}>
         <meshStandardMaterial
           color={color}
           depthWrite={opacity === 1}
           flatShading
           metalness={0.08}
-          opacity={opacity}
+          opacity={highlight === 'edges' || highlight === 'vertices' ? opacity*0.35 : opacity}
           roughness={0.38}
           side={DoubleSide}
           transparent
         />
       </mesh>
+      <ElementHighlight model={endpointModel} highlight={highlight} opacity={opacity} />
       {/* Keep edge visibility independent of the faces' transparency mode.
           Clear the faces' depth first so the same offset mask is written at
           100% as at 99%, avoiding flickering on visible edges as well. */}
@@ -130,6 +134,22 @@ function TransformationMesh({ originId, progress, opacity, kind, transitionNonce
       </lineSegments>
     </group>
   )
+}
+
+function ElementHighlight({ model, highlight, opacity }: { model: Polyhedron; highlight: Highlight; opacity: number }) {
+  const rendered = useMemo(() => highlight ? highlightGeometry(model,highlight) : undefined, [model,highlight])
+  useEffect(() => () => {
+    rendered?.geometry.dispose()
+    if (rendered && 'edgeGeometry' in rendered) rendered.edgeGeometry?.dispose()
+  }, [rendered])
+  if (!rendered) return null
+  if (highlight === 'faces') return <mesh geometry={rendered.geometry} renderOrder={0}>
+    <meshStandardMaterial color="#ffffff" vertexColors flatShading side={DoubleSide} transparent opacity={opacity} depthWrite={opacity === 1} />
+  </mesh>
+  return <group>
+    <mesh geometry={rendered.geometry} renderOrder={2}><meshBasicMaterial color="#f39c12" transparent opacity={opacity*(1-opacity)} depthWrite={false} depthFunc={GreaterDepth} /></mesh>
+    <mesh geometry={rendered.geometry} renderOrder={3}><meshBasicMaterial color="#f39c12" transparent opacity={opacity} depthWrite={false} /></mesh>
+  </group>
 }
 
 function CameraControls({
@@ -199,6 +219,7 @@ function CameraControls({
 export function SolidScene(props: SolidSceneProps) {
   return (
     <Canvas
+      data-highlight={props.highlight ?? 'none'}
       aria-label={`Interactive 3D model of a ${props.solidName}`}
       camera={{ position: props.initialCameraPosition, fov: 42 }}
       className="position-absolute top-0 start-0 w-100 h-100"
@@ -214,7 +235,7 @@ export function SolidScene(props: SolidSceneProps) {
       <ambientLight intensity={1.2} />
       <directionalLight position={[3, 4, 5]} intensity={2.4} />
       <directionalLight position={[-4, -2, -3]} intensity={0.8} />
-      <TransformationMesh originId={props.originId} progress={props.progress} opacity={props.opacity} kind={props.kind} transitionNonce={props.transitionNonce} color={props.color}
+      <TransformationMesh highlight={props.highlight} originId={props.originId} progress={props.progress} opacity={props.opacity} kind={props.kind} transitionNonce={props.transitionNonce} color={props.color}
         destinationId={props.destinationId} restoredModel={props.restoredModel} onEndpoint={props.onEndpoint} />
       <CameraControls
         autoRotate={props.autoRotate}
