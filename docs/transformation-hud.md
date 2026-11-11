@@ -41,6 +41,19 @@ explains the distinction between mathematical faces and visible patches.
 - All buttons, menu actions, modal close controls, and map nodes have tooltips.
 - Layout uses only Bootswatch/Bootstrap components and utilities.
 
+## Mobile layout
+
+Below the large-screen breakpoint, the summary shows Faces, Edges, and Vertices.
+A chevron button reveals or collapses the remaining properties; the reserved
+line slots remain consistent while switching solids in either mode. The solid
+picker, map, history, camera actions, and GitHub link use icons with accessible
+names and tooltips. Opacity and duration continue showing their current values.
+Camera controls occupy a centered row beneath the picker/map/history row.
+Transformation buttons show only the operation icon and name; destination
+choices and player endpoint labels retain the solid names. Desktop controls
+retain their text labels and full property summary. The GitHub link uses a
+filled success color at every size.
+
 ## Transformation map
 
 All eleven nodes and fifteen links are shown. Selecting a node inspects its

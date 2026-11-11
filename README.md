@@ -75,6 +75,11 @@ that setting; rear edges fade in with transparency. The default is 85% opacity
 and Bootswatch Darkly's info blue (`#3498db`). Saved colors are preserved.
 There are no separate vertex markers.
 
+On mobile, the summary starts with Faces, Edges, and Vertices; a chevron
+reveals the remaining properties. Icon-only controls and short transformation
+labels leave more room for the canvas. Opacity and duration keep their values
+visible, and every control retains an accessible name and tooltip.
+
 The map shows all eleven solids and fifteen reversible relationships.
 Solid lines/diamonds identify duals, dashed lines/stars identify stellation,
 and dash-dot lines/scissors identify rectification. All links have arrowheads
