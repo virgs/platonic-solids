@@ -102,7 +102,7 @@ test('completed endpoints unlock the correct actions for every solid', async ({ 
 
 test('solid selection updates the model, properties, and URL', async ({ page }) => {
   await page.goto('./')
-  await page.getByRole('button', { name: 'Tetrahedron', exact: true }).click()
+  await page.getByRole('button', { name: 'Choose a solid', exact: true }).click()
   await page.getByRole('button', { name: 'Cube', exact: true }).click()
 
   await expect(page.getByRole('heading', { name: 'Cube' })).toBeVisible()
