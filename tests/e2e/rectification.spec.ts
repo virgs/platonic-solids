@@ -42,6 +42,8 @@ for (const [id,name,faces,edges,vertices,breakdown,angles,pattern,dual,parents] 
     for (const [label,value] of [['Faces',faces],['Edges',edges],['Vertices',vertices]] as const) {
       await expect(page.getByText(label,{ exact: true }).locator('..')).toContainText(String(value))
     }
+    const more = page.getByRole('button', { name: 'Show all properties' })
+    if (await more.isVisible()) await more.click()
     for (const value of [breakdown,angles,pattern,dual]) await expect(page.getByText(value,{ exact: true })).toBeVisible()
     await expect(page.getByRole('button', { name: 'Dual', exact: true })).toHaveCount(0)
     await expect(page.getByRole('button', { name: 'Unrectify', exact: true })).toBeEnabled()

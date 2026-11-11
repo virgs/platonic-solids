@@ -1,4 +1,5 @@
-import type { ReactNode } from 'react'
+import { useState, type ReactNode } from 'react'
+import { ChevronDown, ChevronUp } from 'lucide-react'
 import { Badge, Col, Row } from 'react-bootstrap'
 import { getSolid, type SolidDefinition } from '../data/solids'
 
@@ -14,6 +15,8 @@ function Property({ label,value,multiline = false }: { label: string; value: Rea
 }
 
 export function SolidSummary({ solid }: { solid: SolidDefinition }) {
+  const [expanded, setExpanded] = useState(false)
+  const detailsClass = expanded ? '' : 'd-none d-lg-block'
   const dual = solid.dualName ?? (solid.dualId ? getSolid(solid.dualId).name : '—')
   return <section className="small" aria-label="Solid properties" data-testid="solid-summary">
     <div className="d-flex align-items-center gap-2">
@@ -33,13 +36,14 @@ export function SolidSummary({ solid }: { solid: SolidDefinition }) {
             <Property label="Faces" value={solid.faces} />
             <Property label="Edges" value={solid.edges} />
             <Property label="Vertices" value={solid.vertices} />
-            <Property label="Dihedral" value={solid.dihedralAngle} />
+            <div className={detailsClass}><Property label="Dihedral" value={solid.dihedralAngle} /></div>
+            <button type="button" className="btn btn-primary btn-sm d-lg-none align-self-center" aria-label={expanded ? 'Show fewer properties' : 'Show all properties'} title={expanded ? 'Show fewer properties' : 'Show all properties'} aria-expanded={expanded} onClick={() => setExpanded(value => !value)}>{expanded ? <ChevronUp size={16} aria-hidden="true" /> : <ChevronDown size={16} aria-hidden="true" />}</button>
           </div>
         </Col>
-        <Col xs={6} lg={4}><Property label="Face types" value={solid.faceBreakdown ?? solid.faceType} multiline /></Col>
-        <Col xs={6} lg={4}><Property label="Face angles" value={solid.faceAngle} multiline /></Col>
+        <Col xs={6} lg={4} className={detailsClass}><Property label="Face types" value={solid.faceBreakdown ?? solid.faceType} multiline /></Col>
+        <Col xs={6} lg={4} className={detailsClass}><Property label="Face angles" value={solid.faceAngle} multiline /></Col>
       </Row>
-      <Row className="g-1 mt-1">
+      <Row className={`g-1 mt-1 ${expanded ? '' : 'd-none d-lg-flex'}`}>
         <Col xs={3} lg={2}><Property label="At vertex" value={solid.vertexConfiguration} /></Col>
         <Col xs={6} lg={8}><Property label="Dual" value={dual} multiline /></Col>
         <Col xs={3} lg={2}><Property label="Reference" value={<a className="link-info" href={solid.wikipediaUrl} target="_blank" rel="noreferrer" title="Read about this solid">Wikipedia</a>} /></Col>

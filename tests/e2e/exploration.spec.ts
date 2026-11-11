@@ -36,7 +36,7 @@ test('long action labels stay on one line and color follows reset', async ({ pag
   await expect(page.getByRole('button', { name: 'Stellate', exact: true })).toHaveClass(/btn-warning/)
   const camera = await page.getByRole('group', { name: 'Camera controls' }).boundingBox()
   const actions = await page.getByRole('group', { name: 'Solid transformations' }).boundingBox()
-  expect(actions!.y-(camera!.y+camera!.height)).toBeGreaterThanOrEqual(24)
+  expect(actions!.y-(camera!.y+camera!.height)).toBeGreaterThanOrEqual(page.viewportSize()!.width >= 992 ? 24 : 8)
   await expect(page.getByText(/choose a transformation|New actions unlock/)).toHaveCount(0)
   await expect(page.locator('[data-testid="transformation-status"]')).toHaveCount(0)
   const stage = page.getByLabel('Interactive 3D model of a Great dodecahedron')

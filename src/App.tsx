@@ -11,6 +11,7 @@ import {
   Scissors,
   ZoomIn,
   ZoomOut,
+  Shapes,
 } from 'lucide-react'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { version } from '../package.json'
@@ -233,13 +234,14 @@ export function App() {
           <Stack direction="horizontal" gap={2}>
             <Badge bg="dark">v{version}</Badge>
             <a
-              className="btn btn-outline-light btn-sm"
+              className="btn btn-success btn-sm"
               title="View source on GitHub"
+              aria-label="GitHub"
               href="https://github.com/virgs/platonic-solids"
               target="_blank"
               rel="noreferrer"
             >
-              <Github size={16} aria-hidden="true" /> GitHub
+              <Github size={16} aria-hidden="true" /><span className="d-none d-lg-inline"> GitHub</span>
             </a>
           </Stack>
         </Container>
@@ -254,17 +256,18 @@ export function App() {
 
         <Card className="border-0 bg-body flex-grow-1 overflow-hidden">
           <Card.Header className="border-0 bg-body px-2 py-1 flex-shrink-0">
-            <Row className="align-items-center g-2">
-              <Col xs={12} md={3}>
+            <Row className="align-items-center justify-content-between g-2">
+              <Col xs="auto" lg={3}>
                 <Dropdown>
                   <Dropdown.Toggle
                     variant="primary"
                     size="sm"
                     id="solid-selector"
                     title="Choose a solid"
+                    aria-label="Choose a solid"
                     disabled={dualTransition}
                   >
-                    {solid.name}
+                    <Shapes size={16} className="d-lg-none" aria-hidden="true" /><span className="d-none d-lg-inline">{solid.name}</span>
                   </Dropdown.Toggle>
                   <Dropdown.Menu>
                     <Dropdown.Header>Platonic solids</Dropdown.Header>
@@ -296,7 +299,7 @@ export function App() {
                 </Dropdown>
               </Col>
 
-              <Col xs={12} md={6} className="text-center">
+              <Col xs={12} lg={6} className="text-center order-2 order-lg-0">
                 <ButtonGroup size="sm" aria-label="Camera controls">
                   <button
                     type="button"
@@ -318,18 +321,18 @@ export function App() {
                   </button>
                   <button
                     type="button"
-                    className={`btn ms-3 ${autoRotate ? 'btn-info' : 'btn-primary'}`}
+                    className={`btn ms-2 ms-lg-3 ${autoRotate ? 'btn-info' : 'btn-primary'}`}
                     onClick={() => setAutoRotate((value) => !value)}
                     aria-label="Toggle automatic rotation"
                     aria-pressed={autoRotate}
                     title="Toggle automatic rotation"
                   >
-                    <Rotate3D size={16} aria-hidden="true" /> Auto-rotate
+                    <Rotate3D size={16} aria-hidden="true" /><span className="d-none d-lg-inline"> Auto-rotate</span>
                   </button>
                   <button type="button" className="btn btn-primary"
                     onClick={() => setResetNonce((value) => value + 1)}
                     aria-label="Reset view" title="Reset view">
-                    <RotateCcw size={16} aria-hidden="true" /> Reset view
+                    <RotateCcw size={16} aria-hidden="true" /><span className="d-none d-lg-inline"> Reset view</span>
                   </button>
                   <Form.Label htmlFor="solid-color" className="visually-hidden">Color</Form.Label>
                   <Form.Control type="color" id="solid-color" size="sm" className="ms-2 bg-primary border-primary" value={color}
@@ -338,14 +341,14 @@ export function App() {
                 </ButtonGroup>
               </Col>
 
-              <Col xs={12} md={3} className="text-md-end">
+              <Col xs="auto" lg={3} className="text-lg-end">
                 <div className="d-flex gap-2 justify-content-md-end flex-wrap">
-                  <button className="btn btn-primary btn-sm" title="Explore transformations" disabled={dualTransition} onClick={() => setShowMap(true)}><Network size={16} /> Map</button>
-                  <button className="btn btn-primary btn-sm" title="Revisit previous solids" disabled={dualTransition} onClick={() => setShowHistory(true)}><History size={16} /> History</button>
+                  <button className="btn btn-primary btn-sm" aria-label="Map" title="Explore transformations" disabled={dualTransition} onClick={() => setShowMap(true)}><Network size={16} aria-hidden="true" /><span className="d-none d-lg-inline"> Map</span></button>
+                  <button className="btn btn-primary btn-sm" aria-label="History" title="Revisit previous solids" disabled={dualTransition} onClick={() => setShowHistory(true)}><History size={16} aria-hidden="true" /><span className="d-none d-lg-inline"> History</span></button>
                 </div>
               </Col>
             </Row>
-            <div className="d-flex gap-2 justify-content-center flex-wrap mt-4" role="group" aria-label="Solid transformations">
+            <div className="d-flex gap-2 justify-content-center flex-wrap mt-2 mt-lg-4" role="group" aria-label="Solid transformations">
                   {solid.dualId && <button
                     type="button"
                     className="btn btn-warning btn-sm px-3 py-2 text-nowrap"
@@ -354,7 +357,7 @@ export function App() {
                     aria-label="Dual"
                     title={`Show dual: ${getSolid(solid.dualId).name}`}
                   >
-                    <RefreshCw size={16} aria-hidden="true" /> Dual → {getSolid(solid.dualId).name}
+                    <RefreshCw size={16} aria-hidden="true" /> Dual
                   </button>}
                 {solid.family !== 'Archimedean solid' && <div className="d-flex">
                   <button
@@ -365,7 +368,7 @@ export function App() {
                     onClick={() => startTransition('stellate')}
                     title={stellationTargets[solidId] ? `Transform to ${getSolid(stellationTargets[solidId]!).name}` : 'No regular Kepler–Poinsot stellation for this solid'}
                   >
-                    <Sparkles size={16} aria-hidden="true" /> {stellationDestination ? `${unstellate ? 'Unstellate' : 'Stellate'} → ${getSolid(stellationDestination).name}` : 'No regular stellation'}
+                    <Sparkles size={16} aria-hidden="true" /> {unstellate ? 'Unstellate' : 'Stellate'}
                   </button>
                   <Dropdown>
                     <Dropdown.Toggle variant="warning" size="sm" className="h-100" split aria-label="Choose stellation destination" title="Choose a stellation"
@@ -383,7 +386,7 @@ export function App() {
                   <button className="btn btn-warning btn-sm px-3 py-2 text-nowrap" aria-label={rectificationLabel}
                     title={rectificationLabel === 'Rectify' ? 'Cut corners to edge midpoints' : 'Restore the parent solid'} disabled={dualTransition}
                     onClick={() => startTransition('rectify',rectificationRoute.destination)}>
-                    <Scissors size={16} aria-hidden="true" /> {rectificationLabel} → {getSolid(rectificationRoute.destination).name}
+                    <Scissors size={16} aria-hidden="true" /> {rectificationLabel}
                   </button>
                   <Dropdown>
                     <Dropdown.Toggle variant="warning" size="sm" className="h-100" split aria-label="Choose rectification destination" title="Choose a rectification" disabled={dualTransition} />
@@ -440,8 +443,8 @@ export function App() {
         <Modal.Header><Modal.Title id="history-title">Route history</Modal.Title><DialogCloseButton title="Close history" onClick={() => setShowHistory(false)} /></Modal.Header>
         <Modal.Body>
           <div className="d-flex gap-2 mb-3">
-            <button className="btn btn-primary btn-sm" title="Previous history entry" disabled={history.index <= 0} onClick={() => restoreStop(history.index-1)}><ArrowLeft size={16} /> Back</button>
-            <button className="btn btn-primary btn-sm" title="Next history entry" disabled={history.index >= history.entries.length-1} onClick={() => restoreStop(history.index+1)}>Forward <ArrowRight size={16} /></button>
+            <button className="btn btn-primary btn-sm" aria-label="Back" title="Previous history entry" disabled={history.index <= 0} onClick={() => restoreStop(history.index-1)}><ArrowLeft size={16} aria-hidden="true" /><span className="d-none d-lg-inline"> Back</span></button>
+            <button className="btn btn-primary btn-sm" aria-label="Forward" title="Next history entry" disabled={history.index >= history.entries.length-1} onClick={() => restoreStop(history.index+1)}><span className="d-none d-lg-inline">Forward </span><ArrowRight size={16} aria-hidden="true" /></button>
           </div>
           <ListGroup>{history.entries.map((entry,index) => (
             <ListGroup.Item key={`${entry.signature}:${index}`} title={`Restore ${getSolid(entry.solidId).name} view`} action active={index === history.index}
