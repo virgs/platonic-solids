@@ -84,6 +84,19 @@ Faces have distinct colors across shared edges, edges are emphasized, and
 vertices receive markers. Star crossings do not create extra elements.
 Highlighting is available at endpoints and clears on playback or scrubbing.
 
+## Compact viewer layout
+
+The current solid heading doubles as the only solid picker. Its dropdown has a
+bounded native list grouped into the four families. The navbar's far-right
+hamburger opens Map, History, and GitHub with the release version.
+
+One toolbar places view tools at the far left and transformations at the far
+right, with equal button height. Phone buttons use icons; opacity and duration
+keep their current values. Auto-rotate and Reset view move into the navbar menu
+on phones. Destination arrows are offered only for multiple choices. The
+canvas takes the remaining screen height and keeps the default model visible
+in portrait projection without changing the saved camera distance.
+
 ## Core experience
 
 The page opens with one solid centered in a 3D stage. A visitor can:

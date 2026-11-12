@@ -6,7 +6,7 @@ The public title is Polyhedra Explorer; the repository and Pages path remain
 
 ## Current collection and actions
 
-The grouped selector contains five Platonic solids, four Kepler–Poinsot
+The title picker contains five Platonic solids, four Kepler–Poinsot
 polyhedra, and seven Archimedean solids (two rectified and five truncated), plus their seven
 Catalan duals. The summary follows the completed endpoint.
 Property rows and the title reserve consistent line slots across all solids,
@@ -47,9 +47,13 @@ all solids reserve two dihedral value lines to prevent layout shifts.
 
 ## Player and view controls
 
-- Camera actions remain centered: zoom out, zoom in, gap, auto-rotate, reset view,
-  color picker, and Solid opacity.
-- The color picker uses the primary button background.
+- View controls occupy the far left of one toolbar; transformations occupy
+  the far right. Both groups share the same small-button height.
+- Desktop view controls retain zoom out, zoom in, auto-rotate, reset view, color,
+  and Solid opacity. On smaller screens, Auto-rotate and Reset view move into
+  the navbar menu; zoom, color, and opacity remain directly available.
+- The color picker is a palette button with the primary background and the
+  native color input, including keyboard activation.
 - The half-filled-circle button always displays the opacity percentage.
   Its vertical popup adjusts faces and edges from 20% to 100% in 1% steps.
 - Rear edges use a separate depth mask and opacity × transparency, avoiding
@@ -63,16 +67,30 @@ all solids reserve two dihedral value lines to prevent layout shifts.
 
 ## Mobile layout
 
-Below the large-screen breakpoint, the summary shows Faces, Edges, and Vertices.
-A chevron button reveals or collapses the remaining properties; the reserved
-line slots remain consistent while switching solids in either mode. The solid
-picker, map, history, camera actions, and GitHub link use icons with accessible
-names and tooltips. Opacity and duration continue showing their current values.
-Camera controls occupy a centered row beneath the picker/map/history row.
-Transformation buttons show only the operation icon and name; destination
-choices and player endpoint labels retain the solid names. Desktop controls
-retain their text labels and full property summary. The GitHub link uses a
-filled success color at every size.
+The current title doubles as the solid picker, with a chevron and a native,
+family-grouped listbox in its dropdown. The list has nine visible rows and its
+own scrolling, keeping all 23 entries reachable without growing the HUD.
+The title retains heading semantics, and Escape/selection restores focus.
+The family caption and symbol share the line above it. Reserved title slots
+and property slots keep the summary height stable across selections.
+
+The far-right navbar hamburger opens Map, History, and a filled green GitHub
+link with the current version badge. On phones it also contains Auto-rotate
+and Reset view. Navigation closes before opening a dialog and restores focus
+to the menu trigger afterward.
+
+Below 992px the toolbar buttons show icons only, with accessible names and
+tooltips. Opacity and duration retain their values. View tools and all four
+available transformations fit a single row even at 320px and 100% opacity.
+Destination arrows appear only when there is more than one choice. Desktop
+retains the operation text and full property summary. Popups use fixed
+positioning so the compact header does not clip their contents.
+
+The canvas takes the remaining height. Its projection keeps the base field of
+view on the shorter dimension, preventing a tall portrait canvas from cropping
+the default unit-radius solid. Zoom continues to change camera distance, and
+resizing does not overwrite the saved camera position. All layout uses only
+Bootswatch/Bootstrap components and utilities.
 
 ## Transformation map
 

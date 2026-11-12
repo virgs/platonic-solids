@@ -31,6 +31,18 @@
 - Default solid: tetrahedron. Default color: Darkly info blue. Default opacity: 85%.
 - User settings are persisted locally. Explicit solid URLs override saved selection.
 
+## Layout decisions
+
+- The solid title is the sole picker, with a bounded, native grouped listbox.
+- Navbar hamburger: Map, History, GitHub, and release version. Auto-rotate and
+  Reset view also live there below 992px.
+- View controls align left and transformations align right on one row.
+- All toolbar buttons share the small height; phone transformation text is
+  hidden while opacity/duration values stay visible.
+- Only operations with multiple destinations get a destination arrow.
+- Portrait projection fits the shorter canvas dimension without changing
+  the saved camera position or the solids' common circumradius.
+
 ## Animation decisions
 
 The small stellated dodecahedron uses growing pentagonal pyramids. The other

@@ -94,10 +94,17 @@ vertices gain markers. Markers and highlighted edges follow solid opacity.
 Tap the active count to clear; starting or scrubbing a transformation clears
 highlighting. Star crossings are never counted or marked as extra vertices.
 
-On mobile, the summary starts with Faces, Edges, and Vertices; a chevron
-reveals the remaining properties. Icon-only controls and short transformation
-labels leave more room for the canvas. Opacity and duration keep their values
-visible, and every control retains an accessible name and tooltip.
+The current solid title is also its picker: click it to open the grouped
+catalog. The navbar hamburger contains Map, History, and GitHub with the
+release version. On mobile, Auto-rotate and Reset view are there too.
+
+View tools sit left and transformations sit right on a single row, using the
+same button height. Smaller screens show icons, with opacity and duration
+values retained. Destination arrows appear only when there are alternatives.
+The summary starts with Faces, Edges, and Vertices; its chevron reveals the
+rest. Every control retains an accessible name and tooltip. The canvas uses
+the remaining height and keeps the default model uncropped on portrait screens;
+zoom and the saved camera distance remain under user control.
 
 The map shows all twenty-three solids and thirty-two reversible relationships.
 Solid lines/diamonds identify duals, dashed lines/stars identify stellation,
