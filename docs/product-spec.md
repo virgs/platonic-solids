@@ -87,7 +87,7 @@ Highlighting is available at endpoints and clears on playback or scrubbing.
 ## Compact viewer layout
 
 The current solid heading doubles as the only solid picker. Its dropdown has a
-bounded native list grouped into the four families. The navbar's far-right
+bounded React Bootstrap menu with headers for the four families. The navbar's far-right
 hamburger opens Map, History, and GitHub with the release version.
 
 One toolbar places view tools at the far left and transformations at the far

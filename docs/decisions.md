@@ -33,7 +33,7 @@
 
 ## Layout decisions
 
-- The solid title is the sole picker, with a bounded, native grouped listbox.
+- The solid title is the sole picker, with a bounded React Bootstrap menu grouped by family.
 - Navbar hamburger: Map, History, GitHub, and release version. Auto-rotate and
   Reset view live there at every screen size.
 - View controls align left and transformations align right on one row.

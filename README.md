@@ -95,7 +95,7 @@ Tap the active count to clear; starting or scrubbing a transformation clears
 highlighting. Star crossings are never counted or marked as extra vertices.
 
 The current solid title is also its picker: click it to open the grouped
-catalog. The navbar hamburger contains Map, History, and GitHub with the
+catalog, using themed React Bootstrap menu items and family headers. The navbar hamburger contains Map, History, and GitHub with the
 release version, plus Auto-rotate and Reset view at every screen size.
 
 View tools sit left and transformations sit right on a single row, using the

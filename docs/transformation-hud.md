@@ -70,9 +70,10 @@ Summary count buttons use Bootstrap padding in both their active and inactive
 states, preserving layout while highlighting. The compact summary uses an info
 icon to reveal extra properties and a close icon to collapse them.
 
-The current title doubles as the solid picker, with a chevron and a native,
-family-grouped listbox in its dropdown. The list has nine visible rows and its
-own scrolling, keeping all 23 entries reachable without growing the HUD.
+The current title doubles as the solid picker, with a chevron and a React
+Bootstrap menu. Standard headers group its items by family, and the active item
+identifies the selected solid. Internal scrolling in a menu half the viewport
+height keeps all 23 entries reachable without growing the HUD.
 The title retains heading semantics, and Escape/selection restores focus.
 The family caption and symbol share the line above it. Reserved title slots
 and property slots keep the summary height stable across selections.

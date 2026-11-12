@@ -1,7 +1,7 @@
 # Technical design
 
 This document records the original architectural design. For the implemented
-v0.16.2 geometry and controls, see [geometry sources](geometry-sources.md) and
+v0.16.3 geometry and controls, see [geometry sources](geometry-sources.md) and
 [the transformation HUD](transformation-hud.md). The public name is now
 Polyhedra Explorer, with twenty-three catalog solids, reversible rectification
 and truncation, Archimedean/Catalan polar duals, and count-based element
@@ -195,10 +195,11 @@ The summary owns `SolidPicker`; the navbar owns `NavigationMenu`; `ViewerToolbar
 keeps the camera and transformation groups on one line. Bootstrap responsive
 utilities select compact labels. Auto-rotate and Reset view always live in
 the navbar menu.
-The picker uses a native grouped listbox with nine visible rows. Fixed Popper
-positioning keeps dropdowns outside the header's clipping containers. The
-title picker menu is portaled to the document body so its native listbox
-cannot cover the trigger through an ancestor clipping boundary.
+The picker uses React Bootstrap `Dropdown.Header` and `Dropdown.Item` components,
+with a checked/active state for the current solid. Fixed Popper positioning and
+a body portal keep the menu outside the header's clipping containers. Bootstrap
+`h-50` and overflow utilities bound it to half the viewport height with internal
+scrolling. The library handles arrow navigation, Escape, and focus restoration.
 
 The perspective field of view adapts to the shorter canvas dimension. Camera
 position, orbit target, zoom limits, and normalized geometry remain independent
