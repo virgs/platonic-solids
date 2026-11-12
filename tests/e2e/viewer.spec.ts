@@ -213,11 +213,14 @@ test('all four Kepler–Poinsot models are selectable', async ({ page }) => {
   await page.screenshot({ path: test.info().outputPath('star-viewer.png') })
 })
 
-test('camera controls keep their order with compact mobile view actions in the menu', async ({ page }) => {
+test('camera controls keep their order with rotation and reset in the navbar menu at every size', async ({ page }) => {
   await page.goto('./')
   const controls=page.getByRole('group',{name:'Camera controls'})
   const names=await controls.getByRole('button').evaluateAll(buttons=>buttons.filter(button=>button.getClientRects().length).map(button=>button.getAttribute('aria-label')))
-  expect(names).toEqual(page.viewportSize()!.width>=992 ? ['Zoom out','Zoom in','Toggle automatic rotation','Reset view','Choose solid color','Toggle solid opacity'] : ['Zoom out','Zoom in','Choose solid color','Toggle solid opacity'])
+  expect(names).toEqual(['Zoom out','Zoom in','Choose solid color','Toggle solid opacity'])
+  await openNavigation(page)
+  await expect(page.getByRole('button',{name:'Toggle automatic rotation',exact:true})).toBeVisible()
+  await expect(page.getByRole('button',{name:'Reset view',exact:true})).toBeVisible()
 })
 
 test('star duals, stellation, and unstellation share the player', async ({ page }) => {

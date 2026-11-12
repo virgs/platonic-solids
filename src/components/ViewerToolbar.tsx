@@ -1,5 +1,5 @@
 import { useRef } from 'react'
-import { Palette, RefreshCw, Rotate3D, RotateCcw, Scissors, Slice, Sparkles, ZoomIn, ZoomOut } from 'lucide-react'
+import { Palette, RefreshCw, Scissors, Slice, Sparkles, ZoomIn, ZoomOut } from 'lucide-react'
 import { ButtonGroup, Dropdown, Form } from 'react-bootstrap'
 import { getSolid, type SolidDefinition, type SolidId } from '../data/solids'
 import { routeLabel, routesFrom } from '../data/routes'
@@ -7,8 +7,8 @@ import { rectificationTargets } from '../three/rectification'
 import { stellationTargets, type TransformationKind } from '../three/transformations'
 import { OpacityControl } from './OpacityControl'
 
-export function ViewerToolbar({ solid, disabled, autoRotate, onRotate, onReset, onZoom, color, onColor, opacity, onOpacity, showOpacity, onToggleOpacity, onTransform }: {
-  solid: SolidDefinition; disabled: boolean; autoRotate: boolean; onRotate: () => void; onReset: () => void; onZoom: (direction: 'in'|'out') => void
+export function ViewerToolbar({ solid, disabled, onZoom, color, onColor, opacity, onOpacity, showOpacity, onToggleOpacity, onTransform }: {
+  solid: SolidDefinition; disabled: boolean; onZoom: (direction: 'in'|'out') => void
   color: string; onColor: (value: string) => void; opacity: number; onOpacity: (value: number) => void
   showOpacity: boolean; onToggleOpacity: (show: boolean) => void; onTransform: (kind: TransformationKind, destination?: SolidId) => void
 }) {
@@ -23,8 +23,6 @@ export function ViewerToolbar({ solid, disabled, autoRotate, onRotate, onReset, 
     <ButtonGroup size="sm" aria-label="Camera controls" className="flex-shrink-0">
       <button type="button" className="btn btn-primary px-1 px-lg-2" aria-label="Zoom out" title="Zoom out" onClick={()=>onZoom('out')}><ZoomOut size={16} aria-hidden="true" /></button>
       <button type="button" className="btn btn-primary px-1 px-lg-2" aria-label="Zoom in" title="Zoom in" onClick={()=>onZoom('in')}><ZoomIn size={16} aria-hidden="true" /></button>
-      <button type="button" className={`btn d-none d-lg-inline-block ms-1 ${autoRotate ? 'btn-info' : 'btn-primary'}`} aria-label="Toggle automatic rotation" aria-pressed={autoRotate} title="Toggle automatic rotation" onClick={onRotate}><Rotate3D size={16} aria-hidden="true" /> Auto-rotate</button>
-      <button type="button" className="btn btn-primary d-none d-lg-inline-block" aria-label="Reset view" title="Reset view" onClick={onReset}><RotateCcw size={16} aria-hidden="true" /> Reset view</button>
       <Form.Label htmlFor="solid-color" role="button" tabIndex={0} aria-label="Choose solid color" title="Solid color" data-testid="solid-color-button" className="btn btn-primary btn-sm px-1 px-lg-2 position-relative mb-0 focus-ring"
         onKeyDown={event=>{if(event.key==='Enter' || event.key===' '){event.preventDefault();colorInput.current?.click()}}}>
         <Palette size={16} fill={color} aria-hidden="true" />

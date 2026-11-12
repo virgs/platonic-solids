@@ -49,9 +49,8 @@ all solids reserve two dihedral value lines to prevent layout shifts.
 
 - View controls occupy the far left of one toolbar; transformations occupy
   the far right. Both groups share the same small-button height.
-- Desktop view controls retain zoom out, zoom in, auto-rotate, reset view, color,
-  and Solid opacity. On smaller screens, Auto-rotate and Reset view move into
-  the navbar menu; zoom, color, and opacity remain directly available.
+- View controls retain zoom out, zoom in, color, and Solid opacity at every
+  screen size. Auto-rotate and Reset view always live in the navbar menu.
 - The color picker is a palette button with the primary background and the
   native color input, including keyboard activation.
 - The half-filled-circle button always displays the opacity percentage.
@@ -75,8 +74,8 @@ The family caption and symbol share the line above it. Reserved title slots
 and property slots keep the summary height stable across selections.
 
 The far-right navbar hamburger opens Map, History, and a filled green GitHub
-link with the current version badge. On phones it also contains Auto-rotate
-and Reset view. Navigation closes before opening a dialog and restores focus
+link with the current version badge. It also contains Auto-rotate and Reset
+view at every screen size. Navigation closes before opening a dialog and restores focus
 to the menu trigger afterward.
 
 Below 992px the toolbar buttons show icons only, with accessible names and

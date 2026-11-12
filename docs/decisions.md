@@ -35,7 +35,7 @@
 
 - The solid title is the sole picker, with a bounded, native grouped listbox.
 - Navbar hamburger: Map, History, GitHub, and release version. Auto-rotate and
-  Reset view also live there below 992px.
+  Reset view live there at every screen size.
 - View controls align left and transformations align right on one row.
 - All toolbar buttons share the small height; phone transformation text is
   hidden while opacity/duration values stay visible.

@@ -96,7 +96,7 @@ highlighting. Star crossings are never counted or marked as extra vertices.
 
 The current solid title is also its picker: click it to open the grouped
 catalog. The navbar hamburger contains Map, History, and GitHub with the
-release version. On mobile, Auto-rotate and Reset view are there too.
+release version, plus Auto-rotate and Reset view at every screen size.
 
 View tools sit left and transformations sit right on a single row, using the
 same button height. Smaller screens show icons, with opacity and duration

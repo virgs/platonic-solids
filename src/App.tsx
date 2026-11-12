@@ -222,7 +222,7 @@ export function App() {
 
         <Card className="border-0 bg-body flex-grow-1 overflow-hidden">
           <Card.Header className="border-0 bg-body px-2 py-1 flex-shrink-0">
-            <ViewerToolbar solid={solid} disabled={dualTransition} autoRotate={autoRotate} onRotate={()=>setAutoRotate(value=>!value)} onReset={()=>setResetNonce(value=>value+1)} onZoom={changeZoom}
+            <ViewerToolbar solid={solid} disabled={dualTransition} onZoom={changeZoom}
               color={color} onColor={setColor} opacity={opacity} onOpacity={setOpacity} showOpacity={showDisplay} onToggleOpacity={setShowDisplay} onTransform={startTransition} />
             <div className="mt-1">
                 <TransformationPlayer originId={originId} destinationId={destinationId} progress={progress} playing={playing} kind={kind} onSeek={seek}

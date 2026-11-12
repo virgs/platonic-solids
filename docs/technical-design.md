@@ -1,7 +1,7 @@
 # Technical design
 
 This document records the original architectural design. For the implemented
-v0.16.0 geometry and controls, see [geometry sources](geometry-sources.md) and
+v0.16.1 geometry and controls, see [geometry sources](geometry-sources.md) and
 [the transformation HUD](transformation-hud.md). The public name is now
 Polyhedra Explorer, with twenty-three catalog solids, reversible rectification
 and truncation, Archimedean/Catalan polar duals, and count-based element
@@ -193,7 +193,8 @@ These milestones begin only after the definition phase is approved.
 
 The summary owns `SolidPicker`; the navbar owns `NavigationMenu`; `ViewerToolbar`
 keeps the camera and transformation groups on one line. Bootstrap responsive
-utilities select compact labels and place phone-only view actions in the menu.
+utilities select compact labels. Auto-rotate and Reset view always live in
+the navbar menu.
 The picker uses a native grouped listbox with nine visible rows. Fixed Popper
 positioning keeps dropdowns outside the header's clipping containers. The
 title picker menu is portaled to the document body so its native listbox

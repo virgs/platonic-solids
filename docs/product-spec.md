@@ -92,8 +92,8 @@ hamburger opens Map, History, and GitHub with the release version.
 
 One toolbar places view tools at the far left and transformations at the far
 right, with equal button height. Phone buttons use icons; opacity and duration
-keep their current values. Auto-rotate and Reset view move into the navbar menu
-on phones. Destination arrows are offered only for multiple choices. The
+keep their current values. Auto-rotate and Reset view live in the navbar menu
+at every screen size. Destination arrows are offered only for multiple choices. The
 canvas takes the remaining screen height and keeps the default model visible
 in portrait projection without changing the saved camera distance.
 
