@@ -3,6 +3,9 @@ import type { TransformationKind } from '../three/transformations'
 
 export interface Route { from: SolidId; to: SolidId; kind: TransformationKind; implemented: boolean }
 export const routes: Route[] = [
+  { from: 'tetrahedron', to: 'truncated-tetrahedron', kind: 'truncate', implemented: true },
+  { from: 'cube', to: 'truncated-cube', kind: 'truncate', implemented: true },
+  { from: 'octahedron', to: 'truncated-octahedron', kind: 'truncate', implemented: true },
   { from: 'tetrahedron', to: 'tetrahedron', kind: 'dual', implemented: true },
   { from: 'cube', to: 'octahedron', kind: 'dual', implemented: true },
   { from: 'dodecahedron', to: 'icosahedron', kind: 'dual', implemented: true },
@@ -33,5 +36,7 @@ export function defaultRoute(id: SolidId) {
 export function routeLabel(kind: TransformationKind, from: SolidId, to: SolidId) {
   if (kind === 'dual') return 'Dual'
   if (kind === 'stellate') return 'Stellation'
-  return routes.some((route) => route.kind === kind && route.from === from && route.to === to) ? 'Rectify' : 'Unrectify'
+  const forward = routes.some((route) => route.kind === kind && route.from === from && route.to === to)
+  if (kind === 'truncate') return forward ? 'Truncate' : 'Untruncate'
+  return forward ? 'Rectify' : 'Unrectify'
 }

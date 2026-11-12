@@ -12,6 +12,7 @@ import {
   ZoomIn,
   ZoomOut,
   Shapes,
+  Slice,
 } from 'lucide-react'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { version } from '../package.json'
@@ -37,6 +38,7 @@ import { SolidSummary } from './components/SolidSummary'
 import { DialogCloseButton } from './components/DialogCloseButton'
 import { TransformationPlayer, TransformationExplanation } from './components/TransformationPlayer'
 import { defaultRoute, routeLabel, routesFrom } from './data/routes'
+import { truncationTargets } from './three/truncation'
 import { rectificationTargets } from './three/rectification'
 import { stellationTargets, type TransformationKind, type Polyhedron } from './three/transformations'
 import { readSettings, writeSettings, type CameraPosition, type Settings } from './settings'
@@ -44,7 +46,7 @@ import {
   getSolid,
   platonicSolids,
   starSolids,
-  rectifiedSolids,
+  archimedeanSolids,
   type SolidDefinition,
   type SolidId,
 } from './data/solids'
@@ -94,6 +96,8 @@ export function App() {
   const rectificationRoutes = routesFrom(solidId).filter((route) => route.kind === 'rectify')
   const rectificationRoute = rectificationRoutes.find((route) => route.destination === rectificationTargets[solidId]) ?? rectificationRoutes[0]
   const rectificationLabel = rectificationRoute ? routeLabel('rectify',solidId,rectificationRoute.destination) : 'Rectify'
+  const truncationRoute = routesFrom(solidId).find(route => route.kind === 'truncate')
+  const truncationLabel = truncationRoute ? routeLabel('truncate',solidId,truncationRoute.destination) : 'Truncate'
   const latestSettings = useRef<Settings>(saved)
 
   const recordEndpoint = useCallback((id: SolidId, model: Polyhedron) => {
@@ -167,7 +171,7 @@ export function App() {
   }
 
   function startTransition(nextKind: TransformationKind = 'dual', requestedDestination?: SolidId) {
-    const requested = requestedDestination ?? (nextKind === 'dual' ? solid.dualId : nextKind === 'stellate' ? stellationTargets[solidId] : rectificationRoute?.destination)
+    const requested = requestedDestination ?? (nextKind === 'dual' ? solid.dualId : nextKind === 'stellate' ? stellationTargets[solidId] : nextKind === 'truncate' ? truncationRoute?.destination : rectificationRoute?.destination)
     if (!requested || !routesFrom(solidId).some((route) => route.kind === nextKind && route.destination === requested)) return
     setAutoRotate(false)
     const existingOtherEnd = progress === 1 ? originId : destinationId
@@ -293,8 +297,8 @@ export function App() {
                       </Dropdown.Item>
                     ))}
                     <Dropdown.Divider />
-                    <Dropdown.Header>Rectified solids</Dropdown.Header>
-                    {rectifiedSolids.map((option) => (
+                    <Dropdown.Header>Archimedean solids</Dropdown.Header>
+                    {archimedeanSolids.map((option) => (
                       <Dropdown.Item key={option.id} title={`View ${option.name}`} active={option.id === solidId} onClick={() => changeSolid(option.id)}>
                         {option.name}
                       </Dropdown.Item>
@@ -363,7 +367,7 @@ export function App() {
                   >
                     <RefreshCw size={16} aria-hidden="true" /> Dual
                   </button>}
-                {solid.family !== 'Archimedean solid' && <div className="d-flex">
+                {routesFrom(solidId).some(route => route.kind === 'stellate') && <div className="d-flex">
                   <button
                     type="button"
                     className="btn btn-warning btn-sm px-3 py-2 text-nowrap"
@@ -402,6 +406,9 @@ export function App() {
                     </Dropdown.Menu>
                   </Dropdown>
                 </div>}
+                {truncationRoute && <button type="button" className="btn btn-warning btn-sm px-3 py-2 text-nowrap" aria-label={truncationLabel} title={`${truncationLabel}: ${getSolid(truncationRoute.destination).name}`} disabled={dualTransition} onClick={() => startTransition('truncate',truncationTargets[solidId] ?? truncationRoute.destination)}>
+                  <Slice size={16} aria-hidden="true" /> {truncationLabel}
+                </button>}
             </div>
             <Row className="align-items-center g-2 mt-1">
               <Col xs={12}>

@@ -3,6 +3,7 @@ import { solids, getSolid, rectifiedSolids } from './solids'
 import { routes, routesFrom } from './routes'
 import { loadPolyhedron } from '../three/transformations'
 import { createStellationPath } from '../three/stellationPaths'
+import { createTruncationPath } from '../three/truncation'
 import { createRectificationPath } from '../three/rectification'
 
 describe('relationship map', () => {
@@ -23,7 +24,7 @@ describe('relationship map', () => {
       if (route.kind === 'dual') expect(getSolid(route.from).dualId).toBe(route.to)
       else {
         const source = loadPolyhedron(route.from)
-        const path = route.kind === 'rectify' ? createRectificationPath(source,route.from,route.to) : createStellationPath(source,route.from,route.to)
+        const path = route.kind === 'truncate' ? createTruncationPath(source,route.from,route.to) : route.kind === 'rectify' ? createRectificationPath(source,route.from,route.to) : createStellationPath(source,route.from,route.to)
         expect(path.target.faces).toHaveLength(getSolid(route.to).faces)
       }
     }

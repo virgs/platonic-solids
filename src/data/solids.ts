@@ -6,7 +6,8 @@ export type PlatonicId =
   | 'icosahedron'
 
 export type RectifiedId = 'cuboctahedron' | 'icosidodecahedron'
-export type SolidId = PlatonicId | RectifiedId | import('../three/starPolyhedra').StarSolidId
+export type TruncatedId = 'truncated-tetrahedron' | 'truncated-cube' | 'truncated-octahedron'
+export type SolidId = PlatonicId | RectifiedId | TruncatedId | import('../three/starPolyhedra').StarSolidId
 
 export type SolidFamily = 'Platonic solid' | 'Kepler–Poinsot polyhedron' | 'Archimedean solid'
 
@@ -23,6 +24,7 @@ export interface SolidDefinition {
   vertexConfiguration: string
   faceAngle: string
   dihedralAngle: string
+  dihedralDetail?: string
   dualId?: SolidId
   dualName?: string
   faceBreakdown?: string
@@ -162,7 +164,39 @@ export const rectifiedSolids: readonly SolidDefinition[] = [
   },
 ]
 
-export const solids = [...platonicSolids, ...starSolids, ...rectifiedSolids]
+export const truncatedSolids: readonly SolidDefinition[] = [
+  {
+    id: 'truncated-tetrahedron', name: 'Truncated tetrahedron', family: 'Archimedean solid', symbol: 't{3,3}',
+    faces: 8, edges: 18, vertices: 12, faceType: 'Triangles / hexagons', faceBreakdown: '4 triangles · 4 hexagons',
+    faceAngle: 'Triangle 60° · hexagon 120°', dihedralAngle: '70.53° / 109.47°',
+    dihedralDetail: 'Hexagon–hexagon: 70.53°; triangle–hexagon: 109.47°', vertexConfiguration: '3.6.6',
+    dualName: 'Triakis tetrahedron', symmetry: 'Td',
+    description: 'Cutting each tetrahedron corner one third of the way along its edges leaves regular hexagons and opens equilateral triangles.',
+    wikipediaUrl: 'https://en.wikipedia.org/wiki/Truncated_tetrahedron',
+  },
+  {
+    id: 'truncated-cube', name: 'Truncated cube', family: 'Archimedean solid', symbol: 't{4,3}',
+    faces: 14, edges: 36, vertices: 24, faceType: 'Triangles / octagons', faceBreakdown: '8 triangles · 6 octagons',
+    faceAngle: 'Triangle 60° · octagon 135°', dihedralAngle: '90° / 125.26°',
+    dihedralDetail: 'Octagon–octagon: 90°; triangle–octagon: 125.26°', vertexConfiguration: '3.8.8',
+    dualName: 'Triakis octahedron', symmetry: 'Oh',
+    description: 'Cutting every cube corner at 1 / (2 + √2) of each edge creates regular octagons and equilateral triangles with the same edge length.',
+    wikipediaUrl: 'https://en.wikipedia.org/wiki/Truncated_cube',
+  },
+  {
+    id: 'truncated-octahedron', name: 'Truncated octahedron', family: 'Archimedean solid', symbol: 't{3,4}',
+    faces: 14, edges: 36, vertices: 24, faceType: 'Squares / hexagons', faceBreakdown: '6 squares · 8 hexagons',
+    faceAngle: 'Square 90° · hexagon 120°', dihedralAngle: '109.47° / 125.26°',
+    dihedralDetail: 'Hexagon–hexagon: 109.47°; square–hexagon: 125.26°', vertexConfiguration: '4.6.6',
+    dualName: 'Tetrakis hexahedron', symmetry: 'Oh',
+    description: 'Cutting each octahedron corner one third of the way along its edges creates squares and regular hexagons.',
+    wikipediaUrl: 'https://en.wikipedia.org/wiki/Truncated_octahedron',
+  },
+]
+
+export const archimedeanSolids = [...rectifiedSolids, ...truncatedSolids]
+
+export const solids = [...platonicSolids, ...starSolids, ...archimedeanSolids]
 
 export function getSolid(id: string | null): SolidDefinition {
   return solids.find((solid) => solid.id === id) ?? solids[0]

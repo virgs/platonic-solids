@@ -96,7 +96,7 @@ test('completed endpoints unlock the correct actions for every solid', async ({ 
     await expect(page.getByRole('button', { name: 'Dual', exact: true })).toBeEnabled()
     const stellar = page.getByRole('button', { name: /^(Unstellate|Stellate)$/ })
     if (stellatable.has(destination.id)) await expect(stellar).toBeEnabled()
-    else await expect(stellar).toBeDisabled()
+    else await expect(stellar).toHaveCount(0)
   }
 })
 

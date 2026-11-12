@@ -26,8 +26,8 @@ test('all solids keep the same property area and every value fits its reserved l
 test('map links do not intersect and use drawn icons', async ({ page }) => {
   await page.goto('./')
   await page.getByRole('button', { name: 'Map', exact: true }).click()
-  const map = page.getByRole('group', { name: 'Relationships between all 11 solids' })
-  await expect(map.locator('svg.lucide')).toHaveCount(15)
+  const map = page.getByRole('group', { name: 'Relationships between all 14 solids' })
+  await expect(map.locator('svg.lucide')).toHaveCount(18)
   const crossings = await map.evaluate((svg) => {
     const paths = [...svg.querySelectorAll<SVGPathElement>('path[data-route-kind]')]
     const points = paths.map(path => Array.from({ length: 101 }, (_, i) => path.getPointAtLength(path.getTotalLength() * i / 100)))

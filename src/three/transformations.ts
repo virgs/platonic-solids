@@ -3,10 +3,11 @@ import libtess from 'libtess'
 import { extractPolyhedron } from './geometry'
 import { starModels, type StarSolidId } from './starPolyhedra'
 import type { SolidId, PlatonicId } from '../data/solids'
+import { truncateModel, truncationParents } from './truncation'
 import { rectifyModel } from './rectification'
 
-export interface Polyhedron { vertices: Vector3[]; faces: number[][]; edgeOpacities?: number[]; rectifiedFrom?: { id: PlatonicId; model: Polyhedron } }
-export type TransformationKind = 'dual' | 'stellate' | 'rectify'
+export interface Polyhedron { vertices: Vector3[]; faces: number[][]; edgeOpacities?: number[]; rectifiedFrom?: { id: PlatonicId; model: Polyhedron }; truncatedFrom?: { id: PlatonicId; model: Polyhedron } }
+export type TransformationKind = 'dual' | 'stellate' | 'rectify' | 'truncate'
 export const stellationTargets: Partial<Record<SolidId, SolidId>> = {
   dodecahedron: 'small-stellated-dodecahedron',
   'small-stellated-dodecahedron': 'dodecahedron',
@@ -17,6 +18,8 @@ export const stellationTargets: Partial<Record<SolidId, SolidId>> = {
 }
 
 export function loadPolyhedron(id: SolidId): Polyhedron {
+  const parent = truncationParents[id]
+  if (parent) return truncateModel(loadPolyhedron(parent),parent)
   if (id === 'cuboctahedron') return rectifyModel(loadPolyhedron('cube'),'cube')
   if (id === 'icosidodecahedron') return rectifyModel(loadPolyhedron('dodecahedron'),'dodecahedron')
   if (id in starModels) {

@@ -10,6 +10,7 @@ import { getSolid } from '../data/solids'
 import { createCornerMorph } from '../three/cornerMorph'
 import { createStarDual, dualModel, loadPolyhedron, renderPolyhedron, type TransformationKind, type Polyhedron } from '../three/transformations'
 import { createStellationPath } from '../three/stellationPaths'
+import { createTruncationPath } from '../three/truncation'
 import { createRectificationPath } from '../three/rectification'
 import { createExteriorProjection, renderSurface } from '../three/exterior'
 import { defaults, type CameraPosition } from '../settings'
@@ -45,6 +46,10 @@ function TransformationMesh({ highlight, originId, progress, opacity, kind, tran
     if (kind === 'stellate') {
       const model = createStellationPath(source,originId,destinationId)
       return { ...model, render: (t: number) => renderSurface(model.at(t)) }
+    }
+    if (kind === 'truncate') {
+      const model = createTruncationPath(source,originId,destinationId)
+      return { ...model, render: (t: number) => renderPolyhedron(model.at(t)) }
     }
     if (kind === 'rectify') {
       const model = createRectificationPath(source,originId,destinationId)

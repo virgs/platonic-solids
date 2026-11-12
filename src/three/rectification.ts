@@ -9,7 +9,7 @@ export const rectificationTargets: Partial<Record<SolidId,SolidId>> = {
   dodecahedron: 'icosidodecahedron', icosahedron: 'icosidodecahedron',
 }
 
-function cutCorners(source: Polyhedron, fraction: number): Polyhedron {
+export function cutCorners(source: Polyhedron, fraction: number): Polyhedron {
   const vertices: Vector3[] = []
   const indices = new Map<string,number>()
   const add = (point: Vector3) => {

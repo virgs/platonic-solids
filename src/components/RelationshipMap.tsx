@@ -3,15 +3,17 @@ import { getSolid, solids, type SolidId } from '../data/solids'
 import { routeLabel, routes, routesFrom, type Route } from '../data/routes'
 import type { TransformationKind } from '../three/transformations'
 import { DialogCloseButton } from './DialogCloseButton'
-import { Diamond, Scissors, Star } from 'lucide-react'
+import { Diamond, Scissors, Slice, Star } from 'lucide-react'
 
 const positions: Record<SolidId, [number, number]> = {
+  'truncated-tetrahedron': [480,630], 'truncated-cube': [480,80], 'truncated-octahedron': [480,445],
   tetrahedron: [150,590], cube: [150,100], octahedron: [150,410], cuboctahedron: [420,255],
-  dodecahedron: [800,210], icosahedron: [1110,210], icosidodecahedron: [955,70],
-  'small-stellated-dodecahedron': [620,430], 'great-dodecahedron': [800,620],
-  'great-stellated-dodecahedron': [1110,620], 'great-icosahedron': [1160,430],
+  dodecahedron: [920,210], icosahedron: [1230,210], icosidodecahedron: [1075,70],
+  'small-stellated-dodecahedron': [740,430], 'great-dodecahedron': [920,620],
+  'great-stellated-dodecahedron': [1230,620], 'great-icosahedron': [1280,430],
 }
 const styles = {
+  truncate: { color: '#adb5bd', dash: '3 5', icon: Slice },
   dual: { color: '#3498db', dash: undefined, icon: Diamond },
   stellate: { color: '#f39c12', dash: '10 5', icon: Star },
   rectify: { color: '#00bc8c', dash: '12 4 2 4', icon: Scissors },
@@ -37,9 +39,10 @@ export function RelationshipMap({ show, onHide, current, activeRoute, onInspect,
         <span className="text-info"><Diamond size={16} aria-hidden="true" /> Solid line: dual</span>
         <span className="text-warning"><Star size={16} aria-hidden="true" /> Dashed: stellation</span>
         <span className="text-success"><Scissors size={16} aria-hidden="true" /> Dash-dot: rectification</span>
+        <span><Slice size={16} aria-hidden="true" /> Short dash: truncation</span>
       </div>
       <Row className="g-3 align-items-center"><Col xs={12} lg={9}>
-      <svg viewBox="0 0 1320 700" width="100%" role="group" aria-label={`Relationships between all ${solids.length} solids`}>
+      <svg viewBox="0 0 1440 700" width="100%" role="group" aria-label={`Relationships between all ${solids.length} solids`}>
         <defs>
           {Object.entries(styles).map(([id,{ color }]) => (
             <marker key={id} id={`map-arrow-${id}`} viewBox="0 0 10 10" refX="8" refY="5" markerWidth="12" markerHeight="12" markerUnits="userSpaceOnUse" orient="auto-start-reverse">

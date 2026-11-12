@@ -57,7 +57,7 @@ for (const [id,name,faces,edges,vertices,breakdown,angles,pattern,dual,parents] 
     await setTransformationTime(page,0.5)
     await page.getByRole('button', { name: 'Map', exact: true }).click()
     const map = page.getByRole('dialog', { name: 'Transformation map' })
-    await expect(map.getByRole('button', { name: /^Inspect / })).toHaveCount(11)
+    await expect(map.getByRole('button', { name: /^Inspect / })).toHaveCount(14)
     for (const parent of parents) await expect(map.getByRole('button', { name: `Unrectify → ${parent}`, exact: true })).toBeEnabled()
     await map.getByRole('button', { name: `Unrectify → ${parents[1]}`, exact: true }).click()
     await expect(page.getByRole('heading', { name: parents[1], exact: true })).toBeVisible()

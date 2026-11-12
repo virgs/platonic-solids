@@ -48,7 +48,8 @@ export function TransformationExplanation({ show,onHide,...props }: RouteView & 
   const milestone = checkpoints(props)[0]
   const pyramid = [originId,destinationId].includes('dodecahedron') && [originId,destinationId].includes('small-stellated-dodecahedron')
   const rectifying = rectificationTargets[originId] === destinationId
-  const caption = kind === 'rectify' ? rectifying ? 'The corners are cut back toward the original edge midpoints.' : 'The cut corners grow back toward the parent solid.'
+  const truncating = kind === 'truncate' && !originId.startsWith('truncated-')
+  const caption = kind === 'truncate' ? truncating ? 'Each corner is cut back until all remaining edges have the same length.' : 'The cut corners grow back to restore the parent solid.' : kind === 'rectify' ? rectifying ? 'The corners are cut back toward the original edge midpoints.' : 'The cut corners grow back toward the parent solid.'
     : kind === 'stellate' ? pyramid ? 'The pentagonal face centers rise into pyramid tips, or retract during reverse playback.' : 'The connected exterior reshapes as old peaks retract and target peaks emerge.'
     : progress < milestone.value ? 'Corners separate and new face regions open along the original edges.' : 'The original face regions shrink toward the target vertices.'
   return <Modal show={show} onHide={onHide} centered aria-labelledby="explanation-title">
@@ -56,7 +57,9 @@ export function TransformationExplanation({ show,onHide,...props }: RouteView & 
     <Modal.Body>
       <p>{getSolid(originId).name} → {getSolid(destinationId).name}</p>
       <p>At {Math.round(progress*100)}%: {caption}</p>
-      <p>{kind === 'rectify'
+      <p>{kind === 'truncate'
+        ? 'Truncation cuts each corner, opening one new face per original vertex. It stops before the edge midpoints, when every edge has equal length. Tetrahedron and octahedron cuts reach one third of each original edge; cube cuts reach 1 / (2 + √2). Untruncate reverses the same path without changing orientation.'
+        : kind === 'rectify'
         ? 'Rectification cuts every corner back to the midpoint of each incident edge. The original faces remain, and a new face opens at each original vertex. Unrectify restores the chosen parent along the same path.'
         : kind === 'stellate' ? pyramid
           ? 'One pentagonal pyramid grows from each of the dodecahedron’s twelve faces. The face center becomes its tip, and the sides remain attached to the original boundary. Reverse playback lowers the tips back into their faces.'

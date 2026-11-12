@@ -6,7 +6,7 @@ test('the map supports inspection and all implemented destinations', async ({ pa
   await setTransformationTime(page,0.5)
   await page.getByRole('button', { name: 'Map', exact: true }).click()
   const map = page.getByRole('dialog', { name: 'Transformation map' })
-  await expect(map.getByRole('button', { name: /^Inspect / })).toHaveCount(11)
+  await expect(map.getByRole('button', { name: /^Inspect / })).toHaveCount(14)
   await page.screenshot({ path: test.info().outputPath('relationship-map.png'), animations: 'disabled' })
   await map.getByRole('button', { name: 'Inspect Dodecahedron', exact: true }).click()
   await expect(map.getByRole('heading', { name: 'From Dodecahedron' })).toBeVisible()

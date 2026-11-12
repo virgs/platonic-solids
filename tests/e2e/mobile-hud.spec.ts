@@ -15,7 +15,7 @@ test('mobile HUD prioritizes the canvas and expands the remaining properties on 
     expect((await button.innerText()).trim(), name).toBe('')
     await expect(button).toHaveAttribute('title', /.+/)
   }
-  for (const name of ['Dual','Stellate','Rectify']) {
+  for (const name of ['Dual','Rectify','Truncate']) {
     await expect(page.getByRole('button', { name, exact: true })).toHaveText(name)
   }
   await expect(page.getByRole('button', { name: 'Toggle solid opacity' })).toContainText('85%')
