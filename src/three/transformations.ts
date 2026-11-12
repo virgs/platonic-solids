@@ -125,6 +125,9 @@ export function createConvexDual(source: Polyhedron) {
   return { source, target, at: (progress: number) => progress <= 0 ? source : progress >= 1 ? target : path.at(progress) }
 }
 
+/** Mathematical flag construction. Nonconvex playback uses createStarDualPath;
+ * projecting this moving self-intersecting surface causes spurious folds.
+ */
 export function createStarDual(source: Polyhedron) {
   const target = dualModel(source)
   const flags: Array<[number, number]> = []

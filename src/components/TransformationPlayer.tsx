@@ -48,9 +48,10 @@ export function TransformationExplanation({ show,onHide,...props }: RouteView & 
   const milestone = checkpoints(props)[0]
   const pyramid = [originId,destinationId].includes('dodecahedron') && [originId,destinationId].includes('small-stellated-dodecahedron')
   const rectifying = rectificationTargets[originId] === destinationId
+  const starDual = kind === 'dual' && getSolid(originId).family === 'Kepler–Poinsot polyhedron'
   const continuation = kind === 'rectify' && (originId.startsWith('truncated-') || destinationId.startsWith('truncated-'))
   const truncating = kind === 'truncate' && !originId.startsWith('truncated-')
-  const caption = continuation ? 'The existing corner cuts continue toward the edge midpoints, or retract to the uniform truncated endpoint.' : kind === 'truncate' ? truncating ? 'Each corner is cut back until all remaining edges have the same length.' : 'The cut corners grow back to restore the parent solid.' : kind === 'rectify' ? rectifying ? 'The corners are cut back toward the original edge midpoints.' : 'The cut corners grow back toward the parent solid.'
+  const caption = starDual ? 'Existing peaks retract while the dual’s peaks emerge on one connected surface, with stable planar regions.' : continuation ? 'The existing corner cuts continue toward the edge midpoints, or retract to the uniform truncated endpoint.' : kind === 'truncate' ? truncating ? 'Each corner is cut back until all remaining edges have the same length.' : 'The cut corners grow back to restore the parent solid.' : kind === 'rectify' ? rectifying ? 'The corners are cut back toward the original edge midpoints.' : 'The cut corners grow back toward the parent solid.'
     : kind === 'stellate' ? pyramid ? 'The pentagonal face centers rise into pyramid tips, or retract during reverse playback.' : 'The connected exterior reshapes as old peaks retract and target peaks emerge.'
     : progress < milestone.value ? 'Corners separate and new face regions open along the original edges.' : 'The original face regions shrink toward the target vertices.'
   return <Modal show={show} onHide={onHide} centered aria-labelledby="explanation-title">
@@ -58,7 +59,7 @@ export function TransformationExplanation({ show,onHide,...props }: RouteView & 
     <Modal.Body>
       <p>{getSolid(originId).name} → {getSolid(destinationId).name}</p>
       <p>At {Math.round(progress*100)}%: {caption}</p>
-      <p>{continuation ? 'This is the same corner-cut construction as Truncate. Starting from the uniform truncated solid, the cuts continue to the original edge midpoints. Neighboring cut points meet there to form the rectified solid. The reverse stops at the uniform truncated shape, preserving the same orientation.' : kind === 'truncate'
+      <p>{starDual ? 'Polar reciprocity determines the exact dual endpoint. The animation reshapes the two exteriors directly: planar regions move continuously, without repeatedly revealing different intersecting sheets inside the solid. Reverse playback follows the identical surface path back to the original solid.' : continuation ? 'This is the same corner-cut construction as Truncate. Starting from the uniform truncated solid, the cuts continue to the original edge midpoints. Neighboring cut points meet there to form the rectified solid. The reverse stops at the uniform truncated shape, preserving the same orientation.' : kind === 'truncate'
         ? 'Truncation cuts each corner, opening one new face per original vertex. It stops before the edge midpoints, when every edge has equal length. Triangular-face parents use one third of each original edge; cube and dodecahedron cuts use 1 / (2 + 2 cos(π/p)), with p = 4 or 5. Untruncate reverses the same path without changing orientation.'
         : kind === 'rectify'
         ? 'Rectification cuts every corner back to the midpoint of each incident edge. The original faces remain, and a new face opens at each original vertex. Unrectify restores the chosen parent along the same path.'

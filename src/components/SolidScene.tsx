@@ -8,11 +8,12 @@ import type { OrbitControls as OrbitControlsImpl } from 'three-stdlib'
 import type { SolidId, PlatonicId } from '../data/solids'
 import { getSolid } from '../data/solids'
 import { createCornerMorph } from '../three/cornerMorph'
-import { createConvexDual, createStarDual, dualModel, loadPolyhedron, renderPolyhedron, type TransformationKind, type Polyhedron } from '../three/transformations'
+import { createConvexDual, dualModel, loadPolyhedron, renderPolyhedron, type TransformationKind, type Polyhedron } from '../three/transformations'
 import { createStellationPath } from '../three/stellationPaths'
 import { createTruncationPath } from '../three/truncation'
 import { createRectificationPath } from '../three/rectification'
-import { createExteriorProjection, renderSurface } from '../three/exterior'
+import { createStarDualPath } from '../three/starDualPaths'
+import { renderSurface } from '../three/exterior'
 import { defaults, type CameraPosition } from '../settings'
 
 interface SolidSceneProps {
@@ -60,9 +61,8 @@ function TransformationMesh({ highlight, originId, progress, opacity, kind, tran
       return { ...model, render: (t: number) => renderPolyhedron(model.at(t)) }
     }
     if (getSolid(originId).family === 'Kepler–Poinsot polyhedron') {
-      const model = createStarDual(source)
-      const surface = createExteriorProjection(source,model.target,model.at)
-      return { ...model, render: (t: number) => renderSurface(surface(t)) }
+      const model = createStarDualPath(source)
+      return { ...model, render: (t: number) => renderSurface(model.at(t)) }
     }
     const rendered = renderPolyhedron(source)
     rendered.edgeGeometry.dispose()

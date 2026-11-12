@@ -1,7 +1,8 @@
 import { describe, expect, it } from 'vitest'
 import { Vector3 } from 'three'
-import { exterior, createExteriorProjection, renderSurface } from './exterior'
-import { createStarDual, loadPolyhedron, type Polyhedron } from './transformations'
+import { exterior, renderSurface } from './exterior'
+import { loadPolyhedron, type Polyhedron } from './transformations'
+import { createStarDualPath } from './starDualPaths'
 import { starModels, type StarSolidId } from './starPolyhedra'
 
 function checkClosed(model: Polyhedron) {
@@ -35,11 +36,10 @@ describe('connected exteriors', () => {
     expect([...rendered.geometry.getAttribute('position').array].every(Number.isFinite)).toBe(true)
     rendered.geometry.dispose(); rendered.edgeGeometry.dispose()
   })
-  it.each(['small-stellated-dodecahedron','great-stellated-dodecahedron'] as const)('%s retains the star dual movement on a connected exterior', (id) => {
-    const source = loadPolyhedron(id), dual = createStarDual(source)
-    const project = createExteriorProjection(source,dual.target,dual.at)
+  it.each(['small-stellated-dodecahedron','great-stellated-dodecahedron'] as const)('%s reshapes to its dual on a connected exterior', (id) => {
+    const path = createStarDualPath(loadPolyhedron(id))
     for (const t of [0,0.25,0.5,0.75,1]) {
-      const surface = project(t); checkClosed(surface)
+      const surface = path.at(t); checkClosed(surface)
       expect(surface.vertices.every((p) => p.toArray().every(Number.isFinite))).toBe(true)
     }
   })

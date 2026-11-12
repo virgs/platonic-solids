@@ -76,8 +76,12 @@ export function angularMesh(models: Polyhedron[]): AngularMesh {
     return result
   }
   for (const cell of cells) {
-    const center = index(cell.reduce((sum,p) => sum.add(p),new Vector3()).divideScalar(cell.length))
-    const ring = cell.map(index)
+    const ring = [...new Set(cell.map(index))]
+    if (ring.length<3) continue
+    // Weld shared boundary vertices, never a cell's interior triangulation point.
+    // Welding a thin cell's center onto its rim can delete faces and leave cracks.
+    const center = directions.length
+    directions.push(ring.reduce((sum,v)=>sum.add(directions[v]),new Vector3()).normalize())
     ring.forEach((a,i) => {
       const b = ring[(i+1)%ring.length]
       if (a!==b && a!==center && b!==center) faces.push([center,a,b])
@@ -155,16 +159,6 @@ export function createExteriorMorph(source: Polyhedron, target: Polyhedron) {
     // Interpolate reciprocal radius: cells sharing endpoint planes then share
     // one moving plane, rather than acquiring a faceted or curved surface.
     return { ...projected(mesh,a.map((radius,i) => 1/((1-progress)/radius+progress/b[i]))), edgeOpacities: aa.map((weight,i) => weight*(1-progress)+bb[i]*progress) }
-  }
-}
-
-/** Retain the existing star-dual construction, viewing its connected exterior. */
-export function createExteriorProjection(source: Polyhedron, target: Polyhedron, at: (t: number) => Polyhedron) {
-  const mesh = angularMesh([source,target])
-  const aa = creaseWeights(projected(mesh,surfaceRadii(source,mesh.directions))).map((weight) => weight>0.5 ? 1 : 0)
-  const bb = creaseWeights(projected(mesh,surfaceRadii(target,mesh.directions))).map((weight) => weight>0.5 ? 1 : 0)
-  return (progress: number) => progress<=0 ? exterior(source) : progress>=1 ? exterior(target) : {
-    ...projected(mesh,surfaceRadii(at(progress),mesh.directions)), edgeOpacities: aa.map((weight,i) => weight*(1-progress)+bb[i]*progress),
   }
 }
 
