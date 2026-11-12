@@ -42,8 +42,9 @@ Every solid and intermediate surface has unit circumradius. Zooming moves the
 camera; mouse, touch, wheel, and pinch gestures orbit and zoom the centered model.
 
 - **Dual:** progressive corner cuts connect Platonic pairs. Polar reciprocity
-  determines the Kepler–Poinsot dual endpoints; their connected exterior follows
-  the corner-splitting construction. Archimedean ↔ Catalan pairs use polar
+  determines the Kepler–Poinsot dual endpoints; their connected exteriors
+  reshape directly through stable planar regions, without switching between
+  moving self-intersecting sheets. Archimedean ↔ Catalan pairs use polar
   dual endpoints and a closed convex corner/face/edge construction, with exact
   reverse playback and no internal sheets.
 - **Stellate / Unstellate:** dodecahedron ↔ each of its three regular stellations,

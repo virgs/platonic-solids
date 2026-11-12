@@ -136,10 +136,11 @@ useful.
 
 ### Dual transformation
 
-The control label should be **Show dual** rather than simply **Dual**. The
-animation should explain the relationship: face centers of the current solid
-become vertices of the target solid, with the original and target briefly
-visible together when practical.
+The control label is **Dual**. One evolving solid remains visible throughout.
+Platonic duals use progressive corner clipping; Archimedean/Catalan duals use
+a closed convex construction. Kepler–Poinsot duals reshape the endpoint
+exteriors directly through stable planar regions, avoiding changing internal
+sheets and spurious folds. Mathematical endpoints and orientation remain exact.
 
 Platonic dual pairs are:
 

@@ -136,15 +136,32 @@ Completed star solids consistently display the same cached exterior when
 another operation starts or history restores them. Their full mathematical
 definitions remain separate for catalog properties and subsequent operations.
 The reverse constructor retains the original surface path when available.
+Shared boundary vertices are welded, while each cell keeps its own interior
+triangulation point. This prevents thin cells from losing faces when their
+centers nearly coincide with boundary vertices.
 
 ## Duality
 
 Platonic duals retain their progressive corner-clipping animation. Star duals
-use polar reciprocity to obtain exact endpoints, then split incident
-vertex/face corners while connecting edge quadrilaterals keep the construction
-joined. The renderer samples that construction's exterior on a shared angular
-mesh. Intermediate sampling is a visualization; completed mathematical
-endpoints and their orientation are retained.
+use polar reciprocity for exact mathematical endpoints, then interpolate the
+endpoint exteriors directly through stable planar regions. This uses the same
+reciprocal-radius construction as the simple surface stellations. Every ray
+has a fixed endpoint correspondence, and reverse playback reuses the identical
+path and original endpoint geometry.
+
+The previous star-dual animation projected a moving self-intersecting flag
+construction onto an angular mesh. Changing outermost sheets introduced sharp
+folds along thousands of subdivision edges that should have stayed planar,
+producing a boiling appearance. Both star-dual pairs and both directions now
+use the direct exterior path. The mathematical duals, endpoint orientation,
+and common circumradius are unchanged.
+
+The transformation audit covers all 32 relationships by construction family:
+Platonic corner clipping, Archimedean/Catalan convex flag duality, truncation
+and rectification cuts, explicit pyramids, and direct star-surface morphs. Only
+the two star-dual pairs used the moving-sheet projection. The same audit found
+thin-cell cracks in dodecahedron → great dodecahedron and dodecahedron → great
+stellated dodecahedron; retaining separate cell centers repairs them.
 
 libtess applies the nonzero winding rule when computing full mathematical
 face regions, so pentagram centers are filled once. Exterior surface patches
@@ -156,6 +173,10 @@ Tests check mathematical endpoint counts, equal endpoint edge lengths,
 unit circumradius, closed exterior topology, Euler characteristic, outward
 faces, finite tessellation, endpoint plane membership, continuity of visible
 area and ridges, rotated starting geometry, and exact reverse samples.
+Every star-dual and stellation route is checked in both directions: hidden
+subdivision edges remain planar throughout, radial ratios have no repeated
+reversals after cancelling uniform normalization, and every sampled surface
+is closed with Euler characteristic two.
 
 Browser coverage includes all five rectification sources, both reverse parents
 of directly selected rectified solids, all five stellation pairs, route-map

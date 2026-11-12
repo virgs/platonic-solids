@@ -23,9 +23,11 @@ Rectify cuts corners to edge midpoints. Its menu also exposes reverse choices,
 including both parents for each newly added solid. Tetrahedron ↔ octahedron is
 included. Every operation is disabled while playing or held between endpoints.
 
-Dual and Stellate/Unstellate retain their destination labels. The simple
-stellation constructions use a connected exterior; the information dialog
-explains the distinction between mathematical faces and visible patches.
+Dual and Stellate/Unstellate use short operation labels; menus and the player
+name their destinations. Star duals now reshape one connected exterior through
+stable planar regions, without the old moving-sheet projection. The information
+dialog explains this visual motion separately from the exact polar endpoint.
+Stellation retains its direct surfaces or explicit pentagonal pyramids.
 
 The Faces, Edges, and Vertices counts toggle one highlight mode at a time.
 Adjacent mathematical faces use distinct colors; edges thicken and vertex

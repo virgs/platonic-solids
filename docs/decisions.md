@@ -37,6 +37,12 @@ The small stellated dodecahedron uses growing pentagonal pyramids. The other
 stellation pairs use a connected exterior reshape. This replaces literal plane
 extension, whose overlapping sheets were difficult to follow.
 
+Both star-dual pairs use the same direct planar exterior morph as the simple
+stellations. Reprojecting a moving self-intersecting construction is excluded:
+its changing outer sheets caused spurious folds and a boiling appearance.
+The shared angular mesh welds boundary vertices while keeping interior cell
+centers distinct, preventing tiny cracks in thin cells.
+
 The mathematical endpoints remain exact to numerical tolerance. The information
 dialog describes the chosen motion and separates visible patches from full
 mathematical faces. Forward and reverse controls preserve endpoint orientation.
