@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test'
 import { catalanSolids, getSolid } from '../../src/data/solids'
-import { setTransformationTime } from './controls'
+import { setTransformationTime, clickControl } from './controls'
 
 for (const solid of catalanSolids) {
   test(`${solid.name} has a selectable model, full properties, and a reversible dual`, async ({ page })=>{
@@ -19,7 +19,7 @@ for (const solid of catalanSolids) {
     await page.screenshot({path:test.info().outputPath('catalan-solid.png')})
     await page.reload()
     await expect(page.getByRole('heading',{name:solid.name,exact:true})).toBeVisible()
-    await page.getByRole('button',{name:'Map',exact:true}).click()
+    await clickControl(page, 'Map')
     const map=page.getByRole('dialog',{name:'Transformation map'})
     await expect(map.getByRole('button',{name:`Inspect ${solid.name}`,exact:true})).toHaveAccessibleDescription('Catalan')
     await expect(map.getByRole('button',{name:`Inspect ${solid.name}`,exact:true}).locator('[data-family-label]')).toHaveText('Catalan')

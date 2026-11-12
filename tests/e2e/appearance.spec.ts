@@ -58,10 +58,11 @@ test('buttons and menu actions have short tooltips and the color picker matches 
     .map((button) => button.getAttribute('aria-label') || button.textContent))
   expect(await missingTooltips()).toEqual([])
   const background = await page.getByRole('button', { name: 'Zoom out' }).evaluate((element) => getComputedStyle(element).backgroundColor)
-  await expect.poll(() => page.getByLabel('Color', { exact: true }).evaluate((element) => getComputedStyle(element).backgroundColor)).toBe(background)
+  await expect.poll(() => page.getByTestId('solid-color-button').evaluate((element) => getComputedStyle(element).backgroundColor)).toBe(background)
   for (const name of ['Dodecahedron','Choose stellation destination','Map','History','Explain this transformation']) {
     const toggle = name === 'Dodecahedron' ? page.locator('#solid-selector') : page.getByRole('button', { name, exact: true })
-    await toggle.click()
+    if (name === 'Map' || name === 'History') await clickControl(page,name)
+    else await toggle.click()
     expect(await missingTooltips()).toEqual([])
     if (['Map','History','Explain this transformation'].includes(name)) await page.getByRole('button', { name: 'Close', exact: true }).click()
     else await toggle.click()

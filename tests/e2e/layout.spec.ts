@@ -1,4 +1,5 @@
 import { expect, test } from '@playwright/test'
+import { clickControl, chooseSolid } from './controls'
 import { solids } from '../../src/data/solids'
 
 for (const expanded of [false,true]) test(`all solids keep the same property area and every value fits its reserved lines (${expanded ? 'expanded' : 'default'})`, async ({ page, isMobile }) => {
@@ -7,8 +8,7 @@ for (const expanded of [false,true]) test(`all solids keep the same property are
   if (expanded) await page.getByRole('button', { name: 'Show all properties' }).click()
   let height: number | undefined
   for (const solid of solids) {
-    await page.locator('#solid-selector').click()
-    await page.locator('.dropdown-menu').getByRole('button', { name: solid.name, exact: true }).click()
+    await chooseSolid(page, solid.id)
     await expect(page.getByRole('heading', { name: solid.name, exact: true })).toBeVisible()
     const summary = page.getByTestId('solid-summary')
     const bounds = await summary.boundingBox()
@@ -32,7 +32,7 @@ for (const expanded of [false,true]) test(`all solids keep the same property are
 
 test('map links do not intersect and use drawn icons', async ({ page }) => {
   await page.goto('./')
-  await page.getByRole('button', { name: 'Map', exact: true }).click()
+  await clickControl(page, 'Map')
   const map = page.getByRole('group', { name: 'Relationships between all 23 solids' })
   await expect(map.locator('svg.lucide')).toHaveCount(32)
   for (const [family,count] of [['Platonic solid',5],['Archimedean solid',7],['Catalan solid',7],['Kepler–Poinsot polyhedron',4]] as const) await expect(map.locator(`[data-family-label="${family}"]`)).toHaveCount(count)

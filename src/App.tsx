@@ -1,53 +1,26 @@
-import {
-  Github,
-  Network,
-  History,
-  ArrowLeft,
-  ArrowRight,
-  RefreshCw,
-  RotateCcw,
-  Rotate3D,
-  Sparkles,
-  Scissors,
-  ZoomIn,
-  ZoomOut,
-  Shapes,
-  Slice,
-} from 'lucide-react'
+import { ArrowLeft, ArrowRight } from 'lucide-react'
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { version } from '../package.json'
 import {
-  Badge,
-  ButtonGroup,
   Card,
-  Col,
   Container,
-  Dropdown,
-  Form,
   Navbar,
   Modal,
   ListGroup,
-  Row,
-  Stack,
 } from 'react-bootstrap'
 import type { Highlight } from './three/highlights'
 import { SolidScene } from './components/SolidScene'
 import { RelationshipMap } from './components/RelationshipMap'
-import { OpacityControl } from './components/OpacityControl'
+import { ViewerToolbar } from './components/ViewerToolbar'
+import { NavigationMenu } from './components/NavigationMenu'
 import { SolidSummary } from './components/SolidSummary'
 import { DialogCloseButton } from './components/DialogCloseButton'
 import { TransformationPlayer, TransformationExplanation } from './components/TransformationPlayer'
-import { defaultRoute, routeLabel, routesFrom } from './data/routes'
-import { truncationTargets } from './three/truncation'
+import { defaultRoute, routesFrom } from './data/routes'
 import { rectificationTargets } from './three/rectification'
 import { stellationTargets, type TransformationKind, type Polyhedron } from './three/transformations'
 import { readSettings, writeSettings, type CameraPosition, type Settings } from './settings'
 import {
   getSolid,
-  platonicSolids,
-  starSolids,
-  archimedeanSolids,
-  catalanSolids,
   type SolidDefinition,
   type SolidId,
 } from './data/solids'
@@ -92,13 +65,9 @@ export function App() {
   }>({ nonce: 0, direction: 'in' })
   const solid = getSolid(solidId)
   const destinationId = routeDestination
-  const stellationDestination = stellationTargets[solidId]
-  const unstellate = solid.faceType === 'Pentagram' || solidId === 'great-icosahedron'
   const rectificationRoutes = routesFrom(solidId).filter((route) => route.kind === 'rectify')
   const rectificationRoute = rectificationRoutes.find((route) => route.destination === rectificationTargets[solidId]) ?? rectificationRoutes[0]
-  const rectificationLabel = rectificationRoute ? routeLabel('rectify',solidId,rectificationRoute.destination) : 'Rectify'
   const truncationRoute = routesFrom(solidId).find(route => route.kind === 'truncate')
-  const truncationLabel = truncationRoute ? routeLabel('truncate',solidId,truncationRoute.destination) : 'Truncate'
   const latestSettings = useRef<Settings>(saved)
 
   const recordEndpoint = useCallback((id: SolidId, model: Polyhedron) => {
@@ -229,7 +198,7 @@ export function App() {
     <div className="vh-100 d-flex flex-column">
       <Navbar bg="primary" data-bs-theme="dark" className="py-1 flex-shrink-0">
         <Container>
-          <Navbar.Brand href="./" className="fw-semibold py-1">
+          <Navbar.Brand href="./" className="fw-semibold py-1 me-0">
             <img
               src={`${import.meta.env.BASE_URL}favicon.svg`}
               width="28"
@@ -240,182 +209,22 @@ export function App() {
             />
             Polyhedra Explorer
           </Navbar.Brand>
-          <Stack direction="horizontal" gap={2}>
-            <Badge bg="dark">v{version}</Badge>
-            <a
-              className="btn btn-success btn-sm"
-              title="View source on GitHub"
-              aria-label="GitHub"
-              href="https://github.com/virgs/platonic-solids"
-              target="_blank"
-              rel="noreferrer"
-            >
-              <Github size={16} aria-hidden="true" /><span className="d-none d-lg-inline"> GitHub</span>
-            </a>
-          </Stack>
+          <NavigationMenu disabled={dualTransition} autoRotate={autoRotate} onRotate={()=>setAutoRotate(value=>!value)} onReset={()=>setResetNonce(value=>value+1)} onMap={()=>setShowMap(true)} onHistory={()=>setShowHistory(true)} />
         </Container>
       </Navbar>
 
       <Container as="main" className="py-2 d-flex flex-column flex-grow-1 overflow-hidden">
         <Card className="border-0 bg-body mb-2 flex-shrink-0">
           <Card.Body className="px-2 py-1">
-            <SolidSummary solid={solid} highlight={highlight} onHighlight={setHighlight} disabled={dualTransition} />
+            <SolidSummary solid={solid} highlight={highlight} onHighlight={setHighlight} disabled={dualTransition} onSelect={changeSolid} />
           </Card.Body>
         </Card>
 
         <Card className="border-0 bg-body flex-grow-1 overflow-hidden">
           <Card.Header className="border-0 bg-body px-2 py-1 flex-shrink-0">
-            <Row className="align-items-center justify-content-between g-2">
-              <Col xs="auto" lg={3}>
-                <Dropdown>
-                  <Dropdown.Toggle
-                    variant="primary"
-                    size="sm"
-                    id="solid-selector"
-                    title="Choose a solid"
-                    aria-label="Choose a solid"
-                    disabled={dualTransition}
-                  >
-                    <Shapes size={16} className="d-lg-none" aria-hidden="true" /><span className="d-none d-lg-inline">{solid.name}</span>
-                  </Dropdown.Toggle>
-                  <Dropdown.Menu>
-                    <Dropdown.Header>Platonic solids</Dropdown.Header>
-                    {platonicSolids.map((option) => (
-                      <Dropdown.Item
-                        key={option.id}
-                        active={option.id === solidId}
-                        title={`View ${option.name}`}
-                        onClick={() => changeSolid(option.id)}
-                      >
-                        {option.name}
-                      </Dropdown.Item>
-                    ))}
-                    <Dropdown.Divider />
-                    <Dropdown.Header>Kepler–Poinsot</Dropdown.Header>
-                    {starSolids.map((option) => (
-                      <Dropdown.Item key={option.id} title={`View ${option.name}`} active={option.id === solidId} onClick={() => changeSolid(option.id)}>
-                        {option.name}
-                      </Dropdown.Item>
-                    ))}
-                    <Dropdown.Divider />
-                    <Dropdown.Header>Archimedean solids</Dropdown.Header>
-                    {archimedeanSolids.map((option) => (
-                      <Dropdown.Item key={option.id} title={`View ${option.name}`} active={option.id === solidId} onClick={() => changeSolid(option.id)}>
-                        {option.name}
-                      </Dropdown.Item>
-                    ))}
-                    <Dropdown.Divider />
-                    <Dropdown.Header>Catalan solids</Dropdown.Header>
-                    {catalanSolids.map(option => <Dropdown.Item key={option.id} title={`View ${option.name}`} active={option.id === solidId} onClick={() => changeSolid(option.id)}>{option.name}</Dropdown.Item>)}
-                  </Dropdown.Menu>
-                </Dropdown>
-              </Col>
-
-              <Col xs={12} lg={6} className="text-center order-2 order-lg-0">
-                <ButtonGroup size="sm" aria-label="Camera controls">
-                  <button
-                    type="button"
-                    className="btn btn-primary"
-                    onClick={() => changeZoom('out')}
-                    aria-label="Zoom out"
-                    title="Zoom out"
-                  >
-                    <ZoomOut size={16} aria-hidden="true" />
-                  </button>
-                  <button
-                    type="button"
-                    className="btn btn-primary"
-                    onClick={() => changeZoom('in')}
-                    aria-label="Zoom in"
-                    title="Zoom in"
-                  >
-                    <ZoomIn size={16} aria-hidden="true" />
-                  </button>
-                  <button
-                    type="button"
-                    className={`btn ms-2 ms-lg-3 ${autoRotate ? 'btn-info' : 'btn-primary'}`}
-                    onClick={() => setAutoRotate((value) => !value)}
-                    aria-label="Toggle automatic rotation"
-                    aria-pressed={autoRotate}
-                    title="Toggle automatic rotation"
-                  >
-                    <Rotate3D size={16} aria-hidden="true" /><span className="d-none d-lg-inline"> Auto-rotate</span>
-                  </button>
-                  <button type="button" className="btn btn-primary"
-                    onClick={() => setResetNonce((value) => value + 1)}
-                    aria-label="Reset view" title="Reset view">
-                    <RotateCcw size={16} aria-hidden="true" /><span className="d-none d-lg-inline"> Reset view</span>
-                  </button>
-                  <Form.Label htmlFor="solid-color" className="visually-hidden">Color</Form.Label>
-                  <Form.Control type="color" id="solid-color" size="sm" className="ms-2 bg-primary border-primary" value={color}
-                    title="Solid color" onChange={(event) => setColor(event.target.value)} />
-                  <OpacityControl value={opacity} onChange={setOpacity} show={showDisplay} onToggle={setShowDisplay} />
-                </ButtonGroup>
-              </Col>
-
-              <Col xs="auto" lg={3} className="text-lg-end">
-                <div className="d-flex gap-2 justify-content-md-end flex-wrap">
-                  <button className="btn btn-primary btn-sm" aria-label="Map" title="Explore transformations" disabled={dualTransition} onClick={() => setShowMap(true)}><Network size={16} aria-hidden="true" /><span className="d-none d-lg-inline"> Map</span></button>
-                  <button className="btn btn-primary btn-sm" aria-label="History" title="Revisit previous solids" disabled={dualTransition} onClick={() => setShowHistory(true)}><History size={16} aria-hidden="true" /><span className="d-none d-lg-inline"> History</span></button>
-                </div>
-              </Col>
-            </Row>
-            <div className="d-flex gap-2 justify-content-center flex-wrap mt-2 mt-lg-4" role="group" aria-label="Solid transformations">
-                  {solid.dualId && <button
-                    type="button"
-                    className="btn btn-warning btn-sm px-3 py-2 text-nowrap"
-                    onClick={() => startTransition('dual')}
-                    disabled={dualTransition}
-                    aria-label="Dual"
-                    title={`Show dual: ${getSolid(solid.dualId).name}`}
-                  >
-                    <RefreshCw size={16} aria-hidden="true" /> Dual
-                  </button>}
-                {routesFrom(solidId).some(route => route.kind === 'stellate') && <div className="d-flex">
-                  <button
-                    type="button"
-                    className="btn btn-warning btn-sm px-3 py-2 text-nowrap"
-                    aria-label={unstellate ? 'Unstellate' : 'Stellate'}
-                    disabled={dualTransition || !stellationDestination}
-                    onClick={() => startTransition('stellate')}
-                    title={stellationTargets[solidId] ? `Transform to ${getSolid(stellationTargets[solidId]!).name}` : 'No regular Kepler–Poinsot stellation for this solid'}
-                  >
-                    <Sparkles size={16} aria-hidden="true" /> {unstellate ? 'Unstellate' : 'Stellate'}
-                  </button>
-                  <Dropdown>
-                    <Dropdown.Toggle variant="warning" size="sm" className="h-100" split aria-label="Choose stellation destination" title="Choose a stellation"
-                      disabled={dualTransition || !routesFrom(solidId).some((route) => route.kind === 'stellate')} />
-                    <Dropdown.Menu>
-                      {routesFrom(solidId).filter((route) => route.kind === 'stellate').map((route) => (
-                        <Dropdown.Item key={route.destination} title={`Transform to ${getSolid(route.destination).name}`} disabled={!route.implemented} onClick={() => startTransition('stellate',route.destination)}>
-                          {getSolid(route.destination).name}
-                        </Dropdown.Item>
-                      ))}
-                    </Dropdown.Menu>
-                  </Dropdown>
-                </div>}
-                {rectificationRoute && <div className="d-flex">
-                  <button className="btn btn-warning btn-sm px-3 py-2 text-nowrap" aria-label={rectificationLabel}
-                    title={rectificationLabel === 'Rectify' ? 'Cut corners to edge midpoints' : 'Restore the parent solid'} disabled={dualTransition}
-                    onClick={() => startTransition('rectify',rectificationRoute.destination)}>
-                    <Scissors size={16} aria-hidden="true" /> {rectificationLabel}
-                  </button>
-                  <Dropdown>
-                    <Dropdown.Toggle variant="warning" size="sm" className="h-100" split aria-label="Choose rectification destination" title="Choose a rectification" disabled={dualTransition} />
-                    <Dropdown.Menu>
-                      {rectificationRoutes.map((route) => <Dropdown.Item key={route.destination} title={`${routeLabel('rectify',solidId,route.destination)} to ${getSolid(route.destination).name}`}
-                        onClick={() => startTransition('rectify',route.destination)}>
-                        {routeLabel('rectify',solidId,route.destination)} → {getSolid(route.destination).name}
-                      </Dropdown.Item>)}
-                    </Dropdown.Menu>
-                  </Dropdown>
-                </div>}
-                {truncationRoute && <button type="button" className="btn btn-warning btn-sm px-3 py-2 text-nowrap" aria-label={truncationLabel} title={`${truncationLabel}: ${getSolid(truncationRoute.destination).name}`} disabled={dualTransition} onClick={() => startTransition('truncate',truncationTargets[solidId] ?? truncationRoute.destination)}>
-                  <Slice size={16} aria-hidden="true" /> {truncationLabel}
-                </button>}
-            </div>
-            <Row className="align-items-center g-2 mt-1">
-              <Col xs={12}>
+            <ViewerToolbar solid={solid} disabled={dualTransition} autoRotate={autoRotate} onRotate={()=>setAutoRotate(value=>!value)} onReset={()=>setResetNonce(value=>value+1)} onZoom={changeZoom}
+              color={color} onColor={setColor} opacity={opacity} onOpacity={setOpacity} showOpacity={showDisplay} onToggleOpacity={setShowDisplay} onTransform={startTransition} />
+            <div className="mt-1">
                 <TransformationPlayer originId={originId} destinationId={destinationId} progress={progress} playing={playing} kind={kind} onSeek={seek}
                   duration={duration} onDurationChange={setDuration}
                   onExplain={() => { setPlaying(false); setShowExplanation(true) }}
@@ -424,8 +233,7 @@ export function App() {
                       else if (progress > 0 && progress < 1) setPlaying(true)
                       else startTransition(kind,progress === 1 ? originId : destinationId)
                     }} />
-              </Col>
-            </Row>
+            </div>
           </Card.Header>
 
           <Card.Body className="p-0 bg-body position-relative flex-grow-1 overflow-hidden">

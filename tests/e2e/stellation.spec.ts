@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test'
-import { setTransformationTime } from './controls'
+import { setTransformationTime, clickControl, chooseStellation } from './controls'
 
 for (const [from,origin,name] of [
   ['dodecahedron','Dodecahedron','Small stellated dodecahedron'],
@@ -11,8 +11,7 @@ for (const [from,origin,name] of [
   test(`${origin} reshapes into ${name} on one surface and reverses`, async ({ page }) => {
     await page.goto(`./?solid=${from}`)
     await setTransformationTime(page,0.5)
-    await page.getByRole('button', { name: 'Choose stellation destination' }).click()
-    await page.getByRole('button', { name, exact: true }).click()
+    await chooseStellation(page, name)
     await expect(page.getByRole('heading', { name, exact: true })).toBeVisible()
     const player = page.getByRole('group', { name: 'Transformation player' })
     await expect(player.getByRole('button', { name: /checkpoint/ })).toHaveCount(0)
@@ -68,7 +67,7 @@ test('time and explanation controls belong to playback, with centered transforma
 test('map arrows and line patterns distinguish reversible relationships without color', async ({ page }) => {
   await page.goto('./?solid=dodecahedron')
   await setTransformationTime(page,0.5)
-  await page.getByRole('button', { name: 'Map', exact: true }).click()
+  await clickControl(page, 'Map')
   const map = page.getByRole('dialog', { name: 'Transformation map' })
   const edges = map.locator('path[data-route-kind]')
   await expect(edges).toHaveCount(32)

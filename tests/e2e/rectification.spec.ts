@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test'
-import { setTransformationTime } from './controls'
+import { setTransformationTime, clickControl, chooseSolid } from './controls'
 
 for (const [from,origin,target] of [
   ['tetrahedron','Tetrahedron','Octahedron'],
@@ -36,8 +36,7 @@ for (const [id,name,faces,edges,vertices,breakdown,angles,pattern,dual,parents] 
     await page.goto('./')
     await expect(page).toHaveTitle('Polyhedra Explorer')
     await expect(page.getByRole('link', { name: 'Polyhedra Explorer', exact: true })).toBeVisible()
-    await page.locator('#solid-selector').click()
-    await page.getByRole('button', { name, exact: true }).click()
+    await chooseSolid(page, id)
     await expect(page.getByRole('heading', { name, exact: true })).toBeVisible()
     for (const [label,value] of [['Faces',faces],['Edges',edges],['Vertices',vertices]] as const) {
       await expect(page.getByText(label,{ exact: true }).locator('..')).toContainText(String(value))
@@ -55,7 +54,7 @@ for (const [id,name,faces,edges,vertices,breakdown,angles,pattern,dual,parents] 
     await expect(page.getByRole('heading', { name, exact: true })).toBeVisible()
     await expect(page).toHaveURL(new RegExp(`solid=${id}`))
     await setTransformationTime(page,0.5)
-    await page.getByRole('button', { name: 'Map', exact: true }).click()
+    await clickControl(page, 'Map')
     const map = page.getByRole('dialog', { name: 'Transformation map' })
     await expect(map.getByRole('button', { name: /^Inspect / })).toHaveCount(23)
     for (const parent of parents) await expect(map.getByRole('button', { name: `Unrectify → ${parent}`, exact: true })).toBeEnabled()

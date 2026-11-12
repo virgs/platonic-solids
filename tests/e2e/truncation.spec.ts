@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test'
-import { setTransformationTime } from './controls'
+import { setTransformationTime, clickControl } from './controls'
 
 for (const [parent,name,breakdown,angles,dual] of [
   ['Tetrahedron','Truncated tetrahedron','4 triangles · 4 hexagons','Triangle 60° · hexagon 120°','Triakis tetrahedron'],
@@ -30,7 +30,7 @@ for (const [parent,name,breakdown,angles,dual] of [
     await page.screenshot({path:test.info().outputPath('truncated-solid.png')})
     await page.reload()
     await expect(page.getByRole('heading', { name, exact: true })).toBeVisible()
-    await page.getByRole('button',{name:'Map',exact:true}).click()
+    await clickControl(page, 'Map')
     const map=page.getByRole('dialog',{name:'Transformation map'})
     await expect(map.getByRole('button',{name:/^Inspect /})).toHaveCount(23)
     await map.getByRole('button',{name:`Untruncate → ${parent}`,exact:true}).click()

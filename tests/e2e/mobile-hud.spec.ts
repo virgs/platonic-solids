@@ -1,4 +1,5 @@
 import { expect, test } from '@playwright/test'
+import { openNavigation } from './controls'
 
 test('mobile HUD prioritizes the canvas and expands the remaining properties on demand', async ({ page, isMobile }) => {
   test.skip(!isMobile, 'Mobile-specific compact controls')
@@ -9,14 +10,14 @@ test('mobile HUD prioritizes the canvas and expands the remaining properties on 
   const stage = page.getByLabel('Interactive 3D model of a Cube')
   const compact = (await stage.boundingBox())!.height
   expect(compact).toBeGreaterThan(page.viewportSize()!.height * 0.45)
-  for (const name of ['Zoom out','Zoom in','Toggle automatic rotation','Reset view','Map','History','Choose a solid']) {
+  for (const name of ['Zoom out','Zoom in','Choose solid color']) {
     const button = page.getByRole('button', { name, exact: true })
     await expect(button).toBeVisible()
     expect((await button.innerText()).trim(), name).toBe('')
     await expect(button).toHaveAttribute('title', /.+/)
   }
   for (const name of ['Dual','Rectify','Truncate']) {
-    await expect(page.getByRole('button', { name, exact: true })).toHaveText(name)
+    expect((await page.getByRole('button', { name, exact: true }).innerText()).trim()).toBe('')
   }
   await expect(page.getByRole('button', { name: 'Toggle solid opacity' })).toContainText('85%')
   await expect(page.getByRole('button', { name: 'Adjust transformation time' })).toContainText('s')
@@ -33,7 +34,8 @@ test('mobile HUD prioritizes the canvas and expands the remaining properties on 
 
 test('GitHub link uses an active filled theme color', async ({ page }) => {
   await page.goto('./')
+  await openNavigation(page)
   const github = page.getByRole('link', { name: 'GitHub', exact: true })
-  await expect(github).toHaveClass(/btn-success/)
+  await expect(github).toHaveClass(/bg-success/)
   await expect(github).toHaveAttribute('href','https://github.com/virgs/platonic-solids')
 })

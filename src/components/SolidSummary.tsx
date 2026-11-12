@@ -2,7 +2,8 @@ import { useState, type ReactNode } from 'react'
 import { ChevronDown, ChevronUp } from 'lucide-react'
 import { Badge, Col, Row } from 'react-bootstrap'
 import type { Highlight } from '../three/highlights'
-import { getSolid, type SolidDefinition } from '../data/solids'
+import { SolidPicker } from './SolidPicker'
+import { getSolid, type SolidDefinition, type SolidId } from '../data/solids'
 
 /** Bootstrap-only line slots keep the model and controls still as values change. */
 function Property({ label,value,multiline = false, twoLines = false, title, action }: { label: string; value: ReactNode; multiline?: boolean; twoLines?: boolean; title?: string; action?: { active: boolean; disabled: boolean; toggle: () => void } }) {
@@ -16,22 +17,17 @@ function Property({ label,value,multiline = false, twoLines = false, title, acti
   return action ? <button type="button" data-property={label} className={`btn btn-sm p-0 border-0 text-start lh-sm ${action.active ? 'btn-info' : 'btn-link link-info text-decoration-none'}`} aria-label={`Highlight ${label.toLowerCase()}`} title={`Highlight ${label.toLowerCase()} on the solid`} aria-pressed={action.active} disabled={action.disabled} onClick={action.toggle}>{content}</button> : <div data-property={label} title={title}>{content}</div>
 }
 
-export function SolidSummary({ solid, highlight, onHighlight, disabled }: { solid: SolidDefinition; highlight: Highlight; onHighlight: (highlight: Highlight) => void; disabled: boolean }) {
+export function SolidSummary({ solid, highlight, onHighlight, disabled, onSelect }: { solid: SolidDefinition; highlight: Highlight; onHighlight: (highlight: Highlight) => void; disabled: boolean; onSelect: (id: SolidId) => void }) {
   const [expanded, setExpanded] = useState(false)
   const detailsClass = expanded ? '' : 'd-none d-lg-block'
   const action = (value: Exclude<Highlight,null>) => ({ active: highlight === value, disabled, toggle: () => onHighlight(highlight === value ? null : value) })
   const dual = solid.dualName ?? (solid.dualId ? getSolid(solid.dualId).name : '—')
   return <section className="small" aria-label="Solid properties" data-testid="solid-summary">
-    <div className="d-flex align-items-center gap-2">
-      <div className="flex-grow-1 overflow-hidden">
-        <div className="text-info small fw-semibold text-uppercase text-nowrap">{solid.family}</div>
-        <div className="position-relative">
-          <div className="h4 mb-0 invisible" aria-hidden="true">&nbsp;<br className="d-lg-none" /><span className="d-lg-none">&nbsp;</span></div>
-          <h1 className="h4 mb-0 position-absolute top-0 start-0 w-100">{solid.name}</h1>
-        </div>
-      </div>
+    <div className="d-flex align-items-center justify-content-between gap-2">
+      <div className="text-info small fw-semibold text-uppercase text-nowrap">{solid.family}</div>
       <Badge bg="secondary" className="flex-shrink-0">{solid.symbol}</Badge>
     </div>
+    <SolidPicker solid={solid} disabled={disabled} onSelect={onSelect} />
     <div className="lh-sm mt-2">
       <Row className="gx-3 gy-1">
         <Col xs={12} lg={4}>

@@ -1,10 +1,10 @@
 import { expect, test } from '@playwright/test'
-import { setTransformationTime } from './controls'
+import { setTransformationTime, clickControl } from './controls'
 
 test('the map supports inspection and all implemented destinations', async ({ page }) => {
   await page.goto('./?solid=cube')
   await setTransformationTime(page,0.5)
-  await page.getByRole('button', { name: 'Map', exact: true }).click()
+  await clickControl(page, 'Map')
   const map = page.getByRole('dialog', { name: 'Transformation map' })
   await expect(map.getByRole('button', { name: /^Inspect / })).toHaveCount(23)
   await page.screenshot({ path: test.info().outputPath('relationship-map.png'), animations: 'disabled' })
@@ -14,8 +14,8 @@ test('the map supports inspection and all implemented destinations', async ({ pa
   await map.getByRole('button', { name: 'Stellation → Small stellated dodecahedron', exact: true }).click()
   await expect(page.getByRole('heading', { name: 'Small stellated dodecahedron', exact: true })).toBeVisible()
   await expect(map).not.toBeVisible()
-  await page.getByRole('button', { name: 'Choose stellation destination' }).click()
-  await expect(page.getByRole('button', { name: 'Dodecahedron', exact: true })).toBeVisible()
+  await expect(page.getByRole('button', { name: 'Unstellate', exact: true })).toBeEnabled()
+  await expect(page.getByRole('button', { name: 'Choose stellation destination' })).toHaveCount(0)
 })
 
 test('long action labels stay on one line and color follows reset', async ({ page }) => {
@@ -26,7 +26,7 @@ test('long action labels stay on one line and color follows reset', async ({ pag
     expect(box!.height).toBeLessThan(50)
     expect(await button.evaluate((element) => element.scrollWidth <= element.clientWidth)).toBe(true)
   }
-  const reset = await page.getByRole('button', { name: 'Reset view', exact: true }).boundingBox()
+  const reset = await page.getByRole('button', { name: 'Zoom in', exact: true }).boundingBox()
   const color = await page.getByLabel('Color', { exact: true }).boundingBox()
   expect(color!.x).toBeGreaterThanOrEqual(reset!.x+reset!.width)
   const opacity = await page.getByRole('button', { name: 'Toggle solid opacity' }).boundingBox()
@@ -36,7 +36,8 @@ test('long action labels stay on one line and color follows reset', async ({ pag
   await expect(page.getByRole('button', { name: 'Stellate', exact: true })).toHaveClass(/btn-warning/)
   const camera = await page.getByRole('group', { name: 'Camera controls' }).boundingBox()
   const actions = await page.getByRole('group', { name: 'Solid transformations' }).boundingBox()
-  expect(actions!.y-(camera!.y+camera!.height)).toBeGreaterThanOrEqual(page.viewportSize()!.width >= 992 ? 24 : 8)
+  expect(Math.abs(actions!.y-camera!.y)).toBeLessThan(1)
+  expect(camera!.x+camera!.width).toBeLessThanOrEqual(actions!.x)
   await expect(page.getByText(/choose a transformation|New actions unlock/)).toHaveCount(0)
   await expect(page.locator('[data-testid="transformation-status"]')).toHaveCount(0)
   const stage = page.getByLabel('Interactive 3D model of a Great dodecahedron')
@@ -80,7 +81,7 @@ test('history restores the reached geometry and its camera view', async ({ page 
   const before = await page.locator('canvas').screenshot()
   await page.getByRole('button', { name: 'Dual', exact: true }).click()
   await expect(page.getByRole('heading', { name: 'Great dodecahedron', exact: true })).toBeVisible()
-  await page.getByRole('button', { name: 'History', exact: true }).click()
+  await clickControl(page, 'History')
   await page.getByRole('button', { name: '2. Small stellated dodecahedron', exact: true }).click()
   await expect(page.getByRole('heading', { name: 'Small stellated dodecahedron', exact: true })).toBeVisible()
   await expect(page.locator('canvas')).toHaveAttribute('data-engine', /three.js/)

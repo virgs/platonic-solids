@@ -1,7 +1,7 @@
 import { expect, test } from '@playwright/test'
 import packageInfo from '../../package.json' with { type: 'json' }
 import { solids } from '../../src/data/solids'
-import { setTransformationTime } from './controls'
+import { setTransformationTime, clickControl, openNavigation, chooseSolid } from './controls'
 
 test('color, display preferences, selected solid and zoom survive reload', async ({ page }) => {
   await page.goto('./?solid=cube')
@@ -18,13 +18,11 @@ test('color, display preferences, selected solid and zoom survive reload', async
   })
   await page.getByRole('button', { name: 'Zoom out', exact: true }).click()
   const beforeSelection = await page.evaluate(() => Math.hypot(...JSON.parse(localStorage.getItem('platonic-solids.settings.v1')!).cameraPosition))
-  await page.locator('#solid-selector').click()
-  await page.getByRole('button', { name: 'Octahedron', exact: true }).click()
+  await chooseSolid(page, 'octahedron')
   await expect(page.locator('canvas')).toHaveAttribute('data-engine', /three.js/)
   await expect.poll(async () => page.evaluate(() => Math.hypot(...JSON.parse(localStorage.getItem('platonic-solids.settings.v1')!).cameraPosition))).toBeCloseTo(beforeSelection,3)
-  await page.locator('#solid-selector').click()
-  await page.getByRole('button', { name: 'Cube', exact: true }).click()
-  await page.getByRole('button', { name: 'Toggle automatic rotation' }).click()
+  await chooseSolid(page, 'cube')
+  await clickControl(page, 'Toggle automatic rotation')
   await expect.poll(async () => page.evaluate(() => JSON.parse(localStorage.getItem('platonic-solids.settings.v1')!).color)).toBe('#ff6633')
   const radius = await page.evaluate(() => Math.hypot(...JSON.parse(localStorage.getItem('platonic-solids.settings.v1')!).cameraPosition))
   expect(radius).toBeGreaterThan(4.5)
@@ -36,6 +34,7 @@ test('color, display preferences, selected solid and zoom survive reload', async
   await expect(page.getByRole('button', { name: 'Toggle solid opacity' })).toContainText('65%')
   await page.getByRole('button', { name: 'Toggle solid opacity', exact: true }).click()
   await expect(page.getByRole('button', { name: 'Adjust transformation time' })).toContainText('4.0 s')
+  if (!await page.getByRole('button', { name: 'Toggle automatic rotation' }).isVisible()) await openNavigation(page)
   await expect(page.getByRole('button', { name: 'Toggle automatic rotation' })).toHaveAttribute('aria-pressed','true')
   await expect(page.locator('canvas')).toHaveAttribute('data-engine', /three.js/)
   await expect.poll(async () => page.evaluate(() => Math.hypot(...JSON.parse(localStorage.getItem('platonic-solids.settings.v1')!).cameraPosition))).toBeCloseTo(radius, 3)
@@ -55,6 +54,7 @@ test('D20 stellates into a great icosahedron and back', async ({ page }) => {
 test('release identity is visible and uses the shared favicon', async ({ page }) => {
   await page.goto('./')
 
+  await openNavigation(page)
   await expect(page.getByText(`v${packageInfo.version}`, { exact: true })).toBeVisible()
   await expect(page.locator('nav img[src$="favicon.svg"]')).toBeVisible()
   await expect(page.locator('link[rel="icon"]')).toHaveAttribute(
@@ -102,8 +102,7 @@ test('completed endpoints unlock the correct actions for every solid', async ({ 
 
 test('solid selection updates the model, properties, and URL', async ({ page }) => {
   await page.goto('./')
-  await page.getByRole('button', { name: 'Choose a solid', exact: true }).click()
-  await page.getByRole('button', { name: 'Cube', exact: true }).click()
+  await chooseSolid(page, 'cube')
 
   await expect(page.getByRole('heading', { name: 'Cube' })).toBeVisible()
   await expect(page).toHaveURL(/solid=cube/)
@@ -132,6 +131,7 @@ test('dual animates before committing the target solid', async ({ page }) => {
 test('rotation defaults off and zoom out uses the expected icon', async ({ page }) => {
   await page.goto('./')
 
+  if (!await page.getByRole('button', { name: 'Toggle automatic rotation' }).isVisible()) await openNavigation(page)
   await expect(
     page.getByRole('button', { name: 'Toggle automatic rotation' }),
   ).toHaveAttribute('aria-pressed', 'false')
@@ -203,8 +203,7 @@ test('all four Kepler–Poinsot models are selectable', async ({ page }) => {
   page.on('pageerror', (error) => errors.push(error.message))
   await page.goto('./')
   for (const name of ['Small stellated dodecahedron', 'Great dodecahedron', 'Great stellated dodecahedron', 'Great icosahedron']) {
-    await page.locator('#solid-selector').click()
-    await page.getByRole('button', { name, exact: true }).click()
+    await chooseSolid(page, name.toLowerCase().replaceAll(' ','-'))
     await expect(page.getByRole('heading', { name, exact: true })).toBeVisible()
     await expect(page.getByRole('button', { name: 'Dual', exact: true })).toBeEnabled()
   }
@@ -214,13 +213,11 @@ test('all four Kepler–Poinsot models are selectable', async ({ page }) => {
   await page.screenshot({ path: test.info().outputPath('star-viewer.png') })
 })
 
-test('camera controls follow zoom, auto-rotate, reset order', async ({ page }) => {
+test('camera controls keep their order with compact mobile view actions in the menu', async ({ page }) => {
   await page.goto('./')
-  const controls = page.getByRole('group', { name: 'Camera controls' })
-  await expect(controls.getByRole('button')).toHaveCount(5)
-  expect(await controls.getByRole('button').evaluateAll((buttons) => buttons.map((button) => button.getAttribute('aria-label')))).toEqual([
-    'Zoom out', 'Zoom in', 'Toggle automatic rotation', 'Reset view', 'Toggle solid opacity',
-  ])
+  const controls=page.getByRole('group',{name:'Camera controls'})
+  const names=await controls.getByRole('button').evaluateAll(buttons=>buttons.filter(button=>button.getClientRects().length).map(button=>button.getAttribute('aria-label')))
+  expect(names).toEqual(page.viewportSize()!.width>=992 ? ['Zoom out','Zoom in','Toggle automatic rotation','Reset view','Choose solid color','Toggle solid opacity'] : ['Zoom out','Zoom in','Choose solid color','Toggle solid opacity'])
 })
 
 test('star duals, stellation, and unstellation share the player', async ({ page }) => {
@@ -271,13 +268,13 @@ test('the complete desktop HUD fits within one viewport', async ({ page }) => {
   expect(dimensions.document).toBeLessThanOrEqual(dimensions.viewport)
 })
 
-test('camera controls are horizontally centered on desktop', async ({ page }) => {
-  test.skip((page.viewportSize()?.width ?? 0) < 768)
-  await page.goto('./')
-
-  const controls = await page.getByRole('group', { name: 'Camera controls' }).boundingBox()
-  const viewportWidth = page.viewportSize()!.width
-
-  expect(controls).not.toBeNull()
-  expect(controls!.x + controls!.width / 2).toBeCloseTo(viewportWidth / 2, -1)
+test('view tools sit left and transformations sit right on the same row', async ({ page }) => {
+  await page.goto('./?solid=dodecahedron')
+  const toolbar=await page.getByRole('toolbar',{name:'Solid controls'}).boundingBox()
+  const view=await page.getByRole('group',{name:'Camera controls'}).boundingBox()
+  const transformations=await page.getByRole('group',{name:'Solid transformations'}).boundingBox()
+  expect(view!.x).toBeCloseTo(toolbar!.x,1)
+  expect(transformations!.x+transformations!.width).toBeCloseTo(toolbar!.x+toolbar!.width,1)
+  expect(Math.abs(view!.y-transformations!.y)).toBeLessThan(1)
+  expect(view!.x+view!.width).toBeLessThanOrEqual(transformations!.x)
 })
