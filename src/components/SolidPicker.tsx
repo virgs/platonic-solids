@@ -1,4 +1,5 @@
 import { useRef, useState } from 'react'
+import { createPortal } from 'react-dom'
 import { ChevronDown, ChevronUp } from 'lucide-react'
 import { Dropdown, Form } from 'react-bootstrap'
 import { solids, type SolidDefinition, type SolidId } from '../data/solids'
@@ -18,7 +19,7 @@ export function SolidPicker({ solid, disabled, onSelect }: { solid: SolidDefinit
         </Dropdown.Toggle>
       </h1>
     </div>
-    <Dropdown.Menu className="p-2 w-auto" popperConfig={{ strategy: 'fixed' }}>
+    {createPortal(<Dropdown.Menu className="p-2 w-auto" popperConfig={{ strategy: 'fixed' }}>
       <Form.Label htmlFor="solid-catalog" className="small mb-1">Choose a solid</Form.Label>
       <Form.Select id="solid-catalog" aria-label="Solid catalog" title="Choose a solid" htmlSize={9} value={solid.id} disabled={disabled}
         onKeyDown={event => {
@@ -30,6 +31,6 @@ export function SolidPicker({ solid, disabled, onSelect }: { solid: SolidDefinit
           {solids.filter(option => option.family === family).map(option => <option key={option.id} value={option.id}>{option.name}</option>)}
         </optgroup>)}
       </Form.Select>
-    </Dropdown.Menu>
+    </Dropdown.Menu>, document.body)}
   </Dropdown>
 }

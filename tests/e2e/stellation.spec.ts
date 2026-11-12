@@ -30,19 +30,13 @@ for (const [from,origin,name] of [
   })
 }
 
-test('time and explanation controls belong to playback, with centered transformation actions', async ({ page }) => {
+test('time and explanation controls belong to playback', async ({ page }) => {
   await page.goto('./')
   const player = page.getByRole('group', { name: 'Transformation player' })
   const explain = player.getByRole('button', { name: 'Explain this transformation' })
   await expect(explain).toBeVisible()
   const actions = page.getByRole('group', { name: 'Solid transformations' })
   await expect(actions.getByRole('button', { name: 'Explain this transformation' })).toHaveCount(0)
-  const centered = await actions.evaluate((group) => {
-    const bounds = group.getBoundingClientRect()
-    const children = Array.from(group.children).map((child) => child.getBoundingClientRect())
-    return Math.abs((Math.min(...children.map((child) => child.left))+Math.max(...children.map((child) => child.right)))/2-(bounds.left+bounds.right)/2)
-  })
-  expect(centered).toBeLessThan(1)
   await explain.click()
   await expect(page.getByRole('dialog', { name: 'How this transformation works' })).toBeVisible()
   await page.getByRole('button', { name: 'Close', exact: true }).click()

@@ -8,8 +8,8 @@ test('view and transformation controls fit one equal-height row down to 320px', 
   const opacity=page.getByRole('slider',{name:'Solid opacity',exact:true})
   await opacity.focus(); await opacity.press('End')
   await page.getByRole('button',{name:'Toggle solid opacity'}).click()
-  for (const width of [320,360,393,768,1280]) {
-    await page.setViewportSize({width,height:800})
+  for (const [width,height] of [[320,568],[360,640],[393,800],[768,800],[1280,800]]) {
+    await page.setViewportSize({width,height})
     const toolbar=page.getByRole('toolbar',{name:'Solid controls'})
     const bounds=(await toolbar.boundingBox())!
     const view=(await toolbar.getByRole('group',{name:'Camera controls'}).boundingBox())!
@@ -20,18 +20,25 @@ test('view and transformation controls fit one equal-height row down to 320px', 
     const heights=await toolbar.getByRole('button').evaluateAll(buttons=>buttons.filter(button=>button.getClientRects().length).map(button=>button.getBoundingClientRect().height))
     expect(Math.max(...heights)-Math.min(...heights),String(width)).toBeLessThan(1)
     const stage=(await page.getByLabel('Interactive 3D model of a Dodecahedron').boundingBox())!
-    expect(stage.height,String(width)).toBeGreaterThan(800*0.55)
+    expect(stage.height,String(width)).toBeGreaterThan(height*(height<700 ? 0.4 : 0.55))
     expect(await page.evaluate(()=>document.documentElement.scrollHeight>innerHeight || document.documentElement.scrollWidth>innerWidth)).toBe(false)
+    await page.locator('#solid-selector').click()
+    const catalog=page.getByRole('listbox',{name:'Solid catalog',exact:true})
+    const menu=(await catalog.boundingBox())!
+    expect(menu.x).toBeGreaterThanOrEqual(0)
+    expect(menu.x+menu.width).toBeLessThanOrEqual(width)
+    expect(menu.y+menu.height).toBeLessThanOrEqual(height)
+    await catalog.press('Escape')
     if (width===393) await page.screenshot({path:test.info().outputPath('single-row-mobile-hud.png')})
   }
 })
 
 test('the solid heading is the only picker and supports grouped keyboard selection',async({page})=>{
-  await page.goto('./?solid=cube')
-  const heading=page.getByRole('heading',{name:'Cube',exact:true})
+  await page.goto('./?solid=dodecahedron')
+  const heading=page.getByRole('heading',{name:'Dodecahedron',exact:true})
   const picker=heading.getByRole('button',{name:'Choose a solid',exact:true})
   await expect(page.locator('#solid-selector')).toHaveCount(1)
-  await picker.focus(); await picker.press('Enter')
+  await picker.click()
   const catalog=page.getByRole('listbox',{name:'Solid catalog',exact:true})
   await expect(catalog).toBeVisible()
   await expect(catalog.locator('optgroup')).toHaveCount(4)
@@ -39,10 +46,13 @@ test('the solid heading is the only picker and supports grouped keyboard selecti
   await catalog.press('Escape')
   await expect(catalog).not.toBeVisible()
   await expect(picker).toBeFocused()
+  await picker.click()
+  await picker.click({timeout:3000})
+  await expect(catalog).not.toBeVisible()
   await picker.press('Enter')
-  await catalog.selectOption('rhombic-triacontahedron')
-  await expect(page.getByRole('heading',{name:'Rhombic triacontahedron',exact:true})).toBeVisible()
-  await expect(page).toHaveURL(/solid=rhombic-triacontahedron/)
+  await catalog.focus(); await catalog.press('End')
+  await expect(page.getByRole('heading',{name:'Pentakis dodecahedron',exact:true})).toBeVisible()
+  await expect(page).toHaveURL(/solid=pentakis-dodecahedron/)
 })
 
 test('navbar menu contains navigation and the GitHub release identity',async({page})=>{

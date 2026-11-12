@@ -1,4 +1,5 @@
 import { expect, test, type Page } from '@playwright/test'
+import { clickControl } from './controls'
 
 async function comparePixels(page: Page, reference: Buffer, screenshot: Buffer) {
   return page.evaluate(async (images) => {

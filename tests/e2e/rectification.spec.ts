@@ -43,7 +43,7 @@ for (const [id,name,faces,edges,vertices,breakdown,angles,pattern,dual,parents] 
     }
     const more = page.getByRole('button', { name: 'Show all properties' })
     if (await more.isVisible()) await more.click()
-    for (const value of [breakdown,angles,pattern,dual]) await expect(page.getByTestId('solid-summary').getByText(value,{ exact: true })).toBeVisible()
+    for (const value of [breakdown,angles,pattern,dual]) await expect(page.getByTestId('solid-summary').locator('[data-property]').getByText(value,{ exact: true })).toBeVisible()
     await expect(page.getByRole('button', { name: 'Dual', exact: true })).toBeEnabled()
     await expect(page.getByRole('button', { name: 'Unrectify', exact: true })).toBeEnabled()
     await page.getByRole('button', { name: 'Choose rectification destination' }).click()

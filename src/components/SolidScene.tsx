@@ -3,7 +3,7 @@ import { OrbitControls } from '@react-three/drei'
 import { Canvas, useThree } from '@react-three/fiber'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { Alert } from 'react-bootstrap'
-import { BufferGeometry, DoubleSide, EdgesGeometry, Float32BufferAttribute, GreaterDepth, type LineSegments, type Mesh } from 'three'
+import { BufferGeometry, DoubleSide, EdgesGeometry, Float32BufferAttribute, GreaterDepth, PerspectiveCamera, type LineSegments, type Mesh } from 'three'
 import type { OrbitControls as OrbitControlsImpl } from 'three-stdlib'
 import type { SolidId, PlatonicId } from '../data/solids'
 import { getSolid } from '../data/solids'
@@ -14,6 +14,7 @@ import { createTruncationPath } from '../three/truncation'
 import { createRectificationPath } from '../three/rectification'
 import { createStarDualPath } from '../three/starDualPaths'
 import { renderSurface } from '../three/exterior'
+import { viewerFieldOfView } from '../three/camera'
 import { defaults, type CameraPosition } from '../settings'
 
 interface SolidSceneProps {
@@ -168,9 +169,19 @@ function CameraControls({
   onCameraChange,
 }: Pick<SolidSceneProps, 'autoRotate' | 'resetNonce' | 'zoom' | 'onCameraChange'>) {
   const controls = useRef<OrbitControlsImpl>(null)
-  const { camera } = useThree()
+  const { camera, size, invalidate } = useThree()
   const lastReset = useRef(resetNonce)
   const lastZoom = useRef(zoom.nonce)
+
+  useEffect(() => {
+    if (camera instanceof PerspectiveCamera) {
+      // Three owns this mutable camera; update its projection after a resize.
+      // eslint-disable-next-line react-hooks/immutability
+      camera.fov=viewerFieldOfView(size.width,size.height)
+      camera.updateProjectionMatrix()
+      invalidate()
+    }
+  }, [camera,size.width,size.height,invalidate])
 
   useEffect(() => {
     if (lastReset.current === resetNonce) return
