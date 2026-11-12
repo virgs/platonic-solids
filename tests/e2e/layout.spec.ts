@@ -3,6 +3,7 @@ import { clickControl, chooseSolid } from './controls'
 import { solids } from '../../src/data/solids'
 
 for (const expanded of [false,true]) test(`all solids keep the same property area and every value fits its reserved lines (${expanded ? 'expanded' : 'default'})`, async ({ page, isMobile }) => {
+  test.slow(Boolean(process.env.CI) && isMobile, 'The hosted software renderer builds all 23 mobile models in this test')
   test.skip(expanded && !isMobile, 'Desktop already shows the full summary')
   await page.goto('./')
   if (expanded) await page.getByRole('button', { name: 'Show all properties' }).click()

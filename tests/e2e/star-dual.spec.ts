@@ -2,7 +2,8 @@ import { expect, test } from '@playwright/test'
 import { starSolids, getSolid } from '../../src/data/solids'
 import { setTransformationTime } from './controls'
 
-for (const solid of starSolids) test(`${solid.name} dual has stable seekable surface frames and reverses`, async ({page})=>{
+for (const solid of starSolids) test(`${solid.name} dual has stable seekable surface frames and reverses`, async ({page,isMobile})=>{
+  test.slow(Boolean(process.env.CI) && isMobile, 'The hosted software renderer seeks three star-surface frames and reverses the path')
   await page.goto(`./?solid=${solid.id}`)
   await setTransformationTime(page,0.5)
   await page.getByRole('button',{name:'Dual',exact:true}).click()
