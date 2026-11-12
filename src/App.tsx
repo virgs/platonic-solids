@@ -61,7 +61,7 @@ interface HistoryStop { solidId: SolidId; model: Polyhedron; camera: CameraPosit
 export function App() {
   const [saved] = useState(readSettings)
   const [solidId, setSolidId] = useState<SolidId>(() => initialSolid(saved).id)
-  const [highlight, setHighlight] = useState<Highlight>(null)
+  const [highlight, setHighlight] = useState<Highlight>(saved.highlight)
   const [autoRotate, setAutoRotate] = useState(saved.autoRotate)
   const [originId, setOriginId] = useState<SolidId>(() => initialSolid(saved).id)
   const [progress, setProgress] = useState(0)
@@ -112,9 +112,9 @@ export function App() {
   }, [])
 
   useEffect(() => {
-    latestSettings.current = { solidId, autoRotate, duration, opacity, color, cameraPosition: cameraPosition.current, displayOpen: showDisplay }
+    latestSettings.current = { solidId, autoRotate, duration, opacity, color, cameraPosition: cameraPosition.current, displayOpen: showDisplay, highlight }
     writeSettings(latestSettings.current)
-  }, [solidId, autoRotate, duration, opacity, color, showDisplay])
+  }, [solidId, autoRotate, duration, opacity, color, showDisplay, highlight])
 
   const saveCamera = useCallback((position: CameraPosition) => {
     cameraPosition.current = position

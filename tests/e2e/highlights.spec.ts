@@ -16,6 +16,9 @@ test('counts toggle model highlights without moving the HUD and clear for transf
     await expect(stage).toHaveAttribute('data-highlight','none')
   }
   await page.getByRole('button', { name: 'Highlight vertices' }).click()
+  await page.reload()
+  await expect(page.getByRole('button', { name: 'Highlight vertices' })).toHaveAttribute('aria-pressed','true')
+  await expect(stage).toHaveAttribute('data-highlight','vertices')
   await setTransformationTime(page,0.5)
   await page.getByRole('button', { name: 'Dual', exact: true }).click()
   await expect(page.getByRole('button', { name: 'Highlight vertices' })).toBeDisabled()

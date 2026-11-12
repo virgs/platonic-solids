@@ -7,11 +7,11 @@ describe('saved preferences', () => {
   it('validates every saved value and recovers from corrupt storage', () => {
     expect(parseSettings('{')).toEqual(defaults)
     expect(parseSettings('null')).toEqual(defaults)
-    expect(parseSettings(JSON.stringify({ solidId: 'missing', color: 'red', duration: -1, opacity: 3, autoRotate: 'yes', cameraPosition: [0,0,0] }))).toEqual(defaults)
+    expect(parseSettings(JSON.stringify({ solidId: 'missing', color: 'red', duration: -1, opacity: 3, autoRotate: 'yes', highlight: 'missing', cameraPosition: [0,0,0] }))).toEqual(defaults)
   })
 
   it('restores valid settings including camera distance and color', () => {
-    const saved = { ...defaults, solidId: 'great-icosahedron', color: '#ff6633', duration: 10, autoRotate: true, opacity: 1, cameraPosition: [0,0,5] }
+    const saved = { ...defaults, highlight: 'vertices', solidId: 'great-icosahedron', color: '#ff6633', duration: 10, autoRotate: true, opacity: 1, cameraPosition: [0,0,5] }
     expect(parseSettings(JSON.stringify(saved))).toEqual(saved)
   })
 

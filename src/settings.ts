@@ -1,3 +1,4 @@
+import type { Highlight } from './three/highlights'
 import { solids, type SolidId } from './data/solids'
 
 export const SETTINGS_KEY = 'platonic-solids.settings.v1'
@@ -10,10 +11,11 @@ export interface Settings {
   color: string
   cameraPosition: CameraPosition
   displayOpen: boolean
+  highlight: Highlight
 }
 export const defaults: Settings = {
   solidId: 'tetrahedron', autoRotate: false, duration: 1.8,
-  opacity: 0.85, color: '#3498db', cameraPosition: [2.4,1.7,2.4], displayOpen: false,
+  opacity: 0.85, color: '#3498db', cameraPosition: [2.4,1.7,2.4], displayOpen: false, highlight: null,
 }
 
 export function parseSettings(raw: string | null): Settings {
@@ -31,6 +33,7 @@ export function parseSettings(raw: string | null): Settings {
       opacity: inRange(value.opacity,0.2,1,defaults.opacity),
       color: typeof value.color === 'string' && /^#[\da-f]{6}$/i.test(value.color) ? value.color : defaults.color,
       cameraPosition: validPosition ? [position[0],position[1],position[2]] : [...defaults.cameraPosition],
+      highlight: ['faces','edges','vertices'].includes(value.highlight) ? value.highlight : null,
       displayOpen: typeof value.displayOpen === 'boolean' ? value.displayOpen : defaults.displayOpen,
     }
   } catch {
