@@ -11,8 +11,9 @@ for (const solid of starSolids) test(`${solid.name} dual has stable seekable sur
   for (const value of [0.2,0.5,0.8]) {
     await progress.fill(String(value))
     await page.evaluate(()=>new Promise<void>(resolve=>requestAnimationFrame(()=>requestAnimationFrame(()=>resolve()))))
-    await page.locator('canvas').screenshot({path:test.info().outputPath(`star-dual-${value}.png`)})
     if (value===0.5) {
+      // One viewport capture avoids repeated element-stability waits on software WebGL.
+      await page.screenshot({path:test.info().outputPath('star-dual-midpoint.png'),animations:'disabled'})
       await page.getByRole('button',{name:'Explain this transformation'}).click()
       await expect(page.getByRole('dialog')).toContainText('without repeatedly revealing different intersecting sheets')
       await page.getByRole('button',{name:'Close',exact:true}).click()
