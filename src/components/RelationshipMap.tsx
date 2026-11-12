@@ -81,13 +81,13 @@ export function RelationshipMap({ show, onHide, current, activeRoute, onInspect,
           const family = families[solid.family]
           const words = solid.name.split(' ')
           const lines = words.length > 2 ? [words.slice(0,-1).join(' '), words.at(-1)!] : [solid.name]
-          return <g key={solid.id} role="button" tabIndex={0} aria-label={`Inspect ${solid.name}`}
+          return <g key={solid.id} role="button" tabIndex={0} aria-label={`Inspect ${solid.name}`} aria-describedby={`map-family-${solid.id}`}
             onClick={() => onInspect(solid.id)} onKeyDown={(event) => { if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); onInspect(solid.id) } }}>
             <title>Inspect {solid.name} · {family.label}</title>
             <rect x={x-115} y={y-40} width={230} height={80} rx={10}
               fill={solid.id === current ? '#375a7f' : '#303030'} stroke={solid.id === current ? '#4cc9f0' : family.color} strokeWidth={solid.id === current ? 3 : 1} />
             {lines.map((line,i) => <text key={line} x={x} y={y+(lines.length === 1 ? -5 : -18+i*22)} textAnchor="middle" fill="#f8f9fa" fontSize={20}>{line}</text>)}
-            <text x={x} y={y+27} textAnchor="middle" fill={family.color} fontSize={16} data-family-label={solid.family}>{family.label}</text>
+            <text id={`map-family-${solid.id}`} x={x} y={y+27} textAnchor="middle" fill={family.color} fontSize={16} data-family-label={solid.family}>{family.label}</text>
           </g>
         })}
       </svg>

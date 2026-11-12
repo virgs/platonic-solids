@@ -32,7 +32,7 @@ for (const [id,name,faces,edges,vertices,breakdown,angles,pattern,dual,parents] 
   ['cuboctahedron','Cuboctahedron',14,24,12,'8 triangles · 6 squares','Triangle 60° · square 90°','3.4.3.4','Rhombic dodecahedron',['Cube','Octahedron']],
   ['icosidodecahedron','Icosidodecahedron',32,60,30,'20 triangles · 12 pentagons','Triangle 60° · pentagon 108°','3.5.3.5','Rhombic triacontahedron',['Dodecahedron','Icosahedron']],
 ] as const) {
-  test(`${name} is selectable, reports mixed face types, and exposes both parents`, async ({ page }) => {
+  test(`${name} is selectable, reports mixed face types, and exposes its original parents and Catalan dual`, async ({ page }) => {
     await page.goto('./')
     await expect(page).toHaveTitle('Polyhedra Explorer')
     await expect(page.getByRole('link', { name: 'Polyhedra Explorer', exact: true })).toBeVisible()
@@ -44,7 +44,7 @@ for (const [id,name,faces,edges,vertices,breakdown,angles,pattern,dual,parents] 
     }
     const more = page.getByRole('button', { name: 'Show all properties' })
     if (await more.isVisible()) await more.click()
-    for (const value of [breakdown,angles,pattern,dual]) await expect(page.getByText(value,{ exact: true })).toBeVisible()
+    for (const value of [breakdown,angles,pattern,dual]) await expect(page.getByTestId('solid-summary').getByText(value,{ exact: true })).toBeVisible()
     await expect(page.getByRole('button', { name: 'Dual', exact: true })).toBeEnabled()
     await expect(page.getByRole('button', { name: 'Unrectify', exact: true })).toBeEnabled()
     await page.getByRole('button', { name: 'Choose rectification destination' }).click()

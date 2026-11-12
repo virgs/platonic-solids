@@ -1,8 +1,10 @@
 import { expect, test } from '@playwright/test'
 import { solids } from '../../src/data/solids'
 
-test('all solids keep the same property area and every value fits its reserved lines', async ({ page }) => {
+for (const expanded of [false,true]) test(`all solids keep the same property area and every value fits its reserved lines (${expanded ? 'expanded' : 'default'})`, async ({ page, isMobile }) => {
+  test.skip(expanded && !isMobile, 'Desktop already shows the full summary')
   await page.goto('./')
+  if (expanded) await page.getByRole('button', { name: 'Show all properties' }).click()
   let height: number | undefined
   for (const solid of solids) {
     await page.locator('#solid-selector').click()
@@ -28,6 +30,7 @@ test('map links do not intersect and use drawn icons', async ({ page }) => {
   await page.getByRole('button', { name: 'Map', exact: true }).click()
   const map = page.getByRole('group', { name: 'Relationships between all 23 solids' })
   await expect(map.locator('svg.lucide')).toHaveCount(32)
+  for (const [family,count] of [['Platonic solid',5],['Archimedean solid',7],['Catalan solid',7],['Kepler–Poinsot polyhedron',4]] as const) await expect(map.locator(`[data-family-label="${family}"]`)).toHaveCount(count)
   const crossings = await map.evaluate((svg) => {
     const paths = [...svg.querySelectorAll<SVGPathElement>('path[data-route-kind]')]
     const points = paths.map(path => Array.from({ length: 101 }, (_, i) => path.getPointAtLength(path.getTotalLength() * i / 100)))
@@ -41,6 +44,8 @@ test('map links do not intersect and use drawn icons', async ({ page }) => {
       }
       if (hit) intersections.push(`${paths[i].textContent} / ${paths[j].textContent}`)
     }
+    const nodes=[...svg.querySelectorAll('g[role="button"] rect')].map(rect => (rect as SVGGraphicsElement).getBBox())
+    points.forEach((line,i) => { if (line.some(p=>nodes.some(box=>p.x>box.x && p.x<box.x+box.width && p.y>box.y && p.y<box.y+box.height))) intersections.push(`Link passes through a node: ${paths[i].textContent}`) })
     return intersections
   })
   expect(crossings).toEqual([])

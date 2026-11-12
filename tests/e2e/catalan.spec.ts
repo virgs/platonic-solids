@@ -21,6 +21,7 @@ for (const solid of catalanSolids) {
     await expect(page.getByRole('heading',{name:solid.name,exact:true})).toBeVisible()
     await page.getByRole('button',{name:'Map',exact:true}).click()
     const map=page.getByRole('dialog',{name:'Transformation map'})
+    await expect(map.getByRole('button',{name:`Inspect ${solid.name}`,exact:true})).toHaveAccessibleDescription('Catalan')
     await expect(map.getByRole('button',{name:`Inspect ${solid.name}`,exact:true}).locator('[data-family-label]')).toHaveText('Catalan')
     await expect(map.getByRole('button',{name:`Inspect ${parent.name}`,exact:true}).locator('[data-family-label]')).toHaveText('Archimedean')
     await map.getByRole('button',{name:`Dual → ${parent.name}`,exact:true}).click()
