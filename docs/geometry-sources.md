@@ -32,20 +32,38 @@ The truncated catalog uses the following definitions and metrics:
 - [Truncated tetrahedron](https://dmccooey.com/polyhedra/TruncatedTetrahedron.html)
 - [Truncated cube](https://dmccooey.com/polyhedra/TruncatedCube.html)
 - [Truncated octahedron](https://dmccooey.com/polyhedra/TruncatedOctahedron.html)
+- [Truncated dodecahedron](https://dmccooey.com/polyhedra/TruncatedDodecahedron.html)
+- [Truncated icosahedron](https://dmccooey.com/polyhedra/TruncatedIcosahedron.html)
 
 MathWorld also describes the uniform shapes and their duals:
 [truncated tetrahedron](https://mathworld.wolfram.com/TruncatedTetrahedron.html),
 [truncated cube](https://mathworld.wolfram.com/TruncatedCube.html),
 [truncated octahedron](https://mathworld.wolfram.com/TruncatedOctahedron.html).
-Their Catalan duals are named but remain outside the rendered collection.
+The rendered Catalan models are polar reciprocals of those seven Archimedean
+models. Counts and dihedral angles are independently tested against McCooey:
+
+| Model | Faces | Edges | Vertices | Dihedral |
+| --- | --- | --- | --- | --- |
+| [Rhombic dodecahedron](https://dmccooey.com/polyhedra/RhombicDodecahedron.html) | 12 | 24 | 14 | 120° |
+| [Rhombic triacontahedron](https://dmccooey.com/polyhedra/RhombicTriacontahedron.html) | 30 | 60 | 32 | 144° |
+| [Triakis tetrahedron](https://dmccooey.com/polyhedra/TriakisTetrahedron.html) | 12 | 18 | 8 | 129.52° |
+| [Triakis octahedron](https://dmccooey.com/polyhedra/TriakisOctahedron.html) | 24 | 36 | 14 | 147.35° |
+| [Tetrakis hexahedron](https://dmccooey.com/polyhedra/TetrakisHexahedron.html) | 24 | 36 | 14 | 143.13° |
+| [Triakis icosahedron](https://dmccooey.com/polyhedra/TriakisIcosahedron.html) | 60 | 90 | 32 | 160.61° |
+| [Pentakis dodecahedron](https://dmccooey.com/polyhedra/PentakisDodecahedron.html) | 60 | 90 | 32 | 156.72° |
+
+Catalan vertex radii and some edge lengths vary. Their actual polar geometry is
+normalized globally, never vertex-by-vertex. Face angle sets, vertex incidence,
+and dihedral angles are computed from those coordinates. Face congruence is
+verified without incorrectly requiring equilateral triangles.
 
 ## Uniform truncation and element highlights
 
 Truncation shares the closed corner-cut construction with rectification, but
 stops before the midpoints. For an original face with p sides and edge length L,
 the retained original edge is (1 − 2t)L; the new corner edge is
-2t cos(π/p)L. Equating these gives t = 1 / (2 + 2 cos(π/p)). Thus tetrahedron and
-octahedron use 1/3; cube uses 1/(2 + √2). Every frame is normalized uniformly.
+2t cos(π/p)L. Equating these gives t = 1 / (2 + 2 cos(π/p)). Thus tetrahedron, octahedron, and icosahedron use 1/3; cube uses
+1/(2 + √2), and dodecahedron uses 1/(2 + 2 cos(π/5)). Every frame is normalized uniformly.
 The target retains its parent geometry for an exact inverse, including direct
 selection, history restoration, and chaining after a dual operation.
 
@@ -58,7 +76,21 @@ presented as catalog counts.
 
 Tests verify closed surfaces, planarity, regular endpoint faces, equal edges,
 computed dihedral angles, unit circumradius, endpoint continuity, and an exact
-oriented reverse for all three truncations.
+oriented reverse for all five truncations.
+
+Each truncated endpoint continues to its parent's rectification by advancing
+the same directed-edge cut fraction from the uniform value to 1/2. Reversal
+stops at the uniform truncated solid. The original parent is retained; if
+provenance is unavailable or stale, its orientation is recovered from corner
+face centers before reconstructing the convex parent.
+
+Archimedean/Catalan dual animations use one vertex per source vertex/face flag,
+interpolating from the original corner to its polar face vertex. Source face
+regions, target face regions, and edge quadrilaterals form a closed convex
+boundary throughout. All seven pairs are tested for planarity, convexity,
+constant circumradius, and pointwise agreement with reversed playback. The
+original endpoint geometry/provenance is retained for exact chaining back into
+truncation or rectification.
 
 ## Rectification
 

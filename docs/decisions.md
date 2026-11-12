@@ -5,16 +5,18 @@
 - Public name: Polyhedra Explorer.
 - Repository and GitHub Pages path remain `platonic-solids`.
 - Static educational application; no accounts, backend, or database.
-- Current collection: five Platonic, four Kepler–Poinsot, and five Archimedean solids (two rectified, three truncated).
+- Current collection: five Platonic, four Kepler–Poinsot, seven Archimedean
+  solids (two rectified, five truncated), and seven Catalan duals.
 - Transformation-first experience: Dual, Stellate/Unstellate, Rectify/Unrectify, Truncate/Untruncate,
   a scrub-capable player, a relationship map, and geometry-preserving history.
 - Every displayed model and intermediate surface has the same circumradius.
 - Orbit and zoom move the camera; panning is disabled and rotation defaults off.
 - Mathematical counts are independent of surface-mesh subdivisions.
-- The five Archimedean entries are implemented; the remaining family and Catalan duals
-  are deferred for a separate scope discussion.
-- The Catalan dual names of the Archimedean solids are shown in their properties;
-  unsupported dual actions are not offered.
+- Every included Archimedean solid has its rendered Catalan dual. Remaining
+  Archimedean/Catalan pairs are future scope.
+- Catalan models use polar reciprocity, congruent nonregular faces, and varying
+  vertex radii. Global circumradius remains normalized to one.
+- The map labels all four families in text; color is supplemental.
 
 ## Technical direction
 
@@ -43,7 +45,8 @@ Rectification moves edge points to their midpoints. Both parents of each new
 rectified solid are explicit destinations.
 
 Uniform truncation cuts to equal endpoint edges, before rectification. The
-exact parent is retained for reverse playback. Count-based highlights identify
+exact parent is retained for reverse playback. Uniform truncated shapes can
+continue to their rectified endpoints, with explicit reverse destination choices. Count-based highlights identify
 mathematical elements at endpoints and clear on playback/scrubbing.
 
 ## Future discussion

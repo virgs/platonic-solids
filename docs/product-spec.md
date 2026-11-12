@@ -10,7 +10,7 @@ The broader title covers the regular and Archimedean polyhedra in the collection
 
 Polyhedra Explorer is a static educational web application that lets a
 visitor inspect, compare, and transform the five Platonic solids and four
-Kepler–Poinsot polyhedra, plus five Archimedean solids, in an
+Kepler–Poinsot polyhedra, plus seven Archimedean solids and their seven Catalan duals, in an
 interactive 3D scene.
 
 It should make the relationships between these solids understandable without
@@ -47,16 +47,30 @@ to be useful as a reference.
 2. Icosidodecahedron: rectification of the dodecahedron or icosahedron
 
 The Archimedean group also includes truncated tetrahedron, truncated cube,
-and truncated octahedron. Their Truncate/Untruncate routes preserve orientation
-and stop at regular equal-edge endpoints. The rest of the family and the
-Catalan duals remain outside the current milestone. Their summaries list mixed face
+truncated octahedron, truncated dodecahedron, and truncated icosahedron. Their Truncate/Untruncate routes preserve orientation
+and stop at regular equal-edge endpoints. Every included Archimedean solid has a rendered, playable Catalan dual.
+The remaining pairs are outside the current milestone. Their summaries list mixed face
 types and angles, vertex configuration, and the names of their external duals.
+
+### Catalan solids and map families
+
+Rhombic dodecahedron, rhombic triacontahedron, triakis tetrahedron, triakis
+octahedron, tetrakis hexahedron, triakis icosahedron, and pentakis dodecahedron
+are selectable. Dual animations use a closed convex surface and exact polar
+endpoints, retaining orientation and reversibility. Their faces are congruent
+but need not be regular, and vertex radii can differ.
+
+Map nodes explicitly identify Platonic, Kepler–Poinsot, Archimedean, or Catalan
+membership with text labels. Family-colored borders and a legend supplement
+those labels; the inspection selector is grouped by family.
 
 ### Rectification and simpler stellation
 
 Rectify cuts vertices back to edge midpoints; Unrectify reverses toward the
 chosen parent. Tetrahedron ↔ octahedron is also supported. All five paths are
-playable from the toolbar and map.
+playable from the toolbar and map. In addition, all five uniform truncated
+solids continue to their rectified endpoints through the same corner cuts.
+The reverse menu can stop at either an original parent or a truncated parent.
 
 Stellation animations use one connected exterior. Dodecahedron ↔ small stellated
 dodecahedron grows/retracts pentagonal pyramids. The other pairs use direct
@@ -246,7 +260,7 @@ self-intersection status, and external references.
 
 ## Success criteria for version 1
 
-- All fourteen solids can be selected and rendered accurately
+- All twenty-three solids can be selected and rendered accurately
 - Each solid has reviewed property data and a reference link
 - Camera controls work with mouse, keyboard-supported controls, and touch
 - All dual relationships with both endpoints in the catalog can be demonstrated

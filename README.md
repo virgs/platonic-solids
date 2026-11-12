@@ -1,7 +1,8 @@
 # Polyhedra Explorer
 
-An interactive guide to fourteen polyhedra and their transformations: five
-Platonic solids, four Kepler–Poinsot polyhedra, and five Archimedean solids (two rectified and three truncated).
+An interactive guide to twenty-three polyhedra and their transformations: five
+Platonic solids, four Kepler–Poinsot polyhedra, and seven Archimedean solids (two rectified and five truncated),
+and their seven Catalan duals.
 
 [Open the explorer](https://virgs.github.io/platonic-solids/)
 
@@ -42,7 +43,9 @@ camera; mouse, touch, wheel, and pinch gestures orbit and zoom the centered mode
 
 - **Dual:** progressive corner cuts connect Platonic pairs. Polar reciprocity
   determines the Kepler–Poinsot dual endpoints; their connected exterior follows
-  the corner-splitting construction.
+  the corner-splitting construction. Archimedean ↔ Catalan pairs use polar
+  dual endpoints and a closed convex corner/face/edge construction, with exact
+  reverse playback and no internal sheets.
 - **Stellate / Unstellate:** dodecahedron ↔ each of its three regular stellations,
   great dodecahedron ↔ great stellated dodecahedron, and icosahedron ↔ great
   icosahedron. Twelve pentagonal pyramids grow for the small stellated
@@ -51,18 +54,23 @@ camera; mouse, touch, wheel, and pinch gestures orbit and zoom the centered mode
 - **Rectify / Unrectify:** cut corners to the original edge midpoints.
   Tetrahedron → octahedron; cube and octahedron → cuboctahedron; dodecahedron and
   icosahedron → icosidodecahedron. The destination menu and map expose each
-  reverse parent choice.
-- **Truncate / Untruncate:** tetrahedron, cube, and octahedron connect to their
+  reverse parent choice. Each uniform truncated solid can also continue its
+  existing cuts to the rectified endpoint, then reverse to the truncated shape.
+- **Truncate / Untruncate:** all five Platonic solids connect to their
   uniform truncated solids. The cut stops when all endpoint edges have equal
   length, before reaching their midpoints. Reverse playback restores the parent
   without an orientation jump.
 
-The cuboctahedron has 8 triangles and 6 squares. The icosidodecahedron has
-20 triangles and 12 pentagons. Their summaries show face-type counts, angles,
-vertex patterns, dihedral angles, and their named Catalan duals. Those duals
-are outside this collection. The truncated tetrahedron, cube, and octahedron
-include the same complete summaries, with both dihedral angles and named duals.
-The remaining Archimedean and Catalan solids are future scope.
+The Archimedean group includes cuboctahedron, icosidodecahedron, and the five
+uniform truncations of Platonic solids, including the football-shaped truncated
+icosahedron. Every one has a selectable, playable Catalan dual: rhombic
+dodecahedron, rhombic triacontahedron, triakis tetrahedron, triakis octahedron,
+tetrakis hexahedron, triakis icosahedron, and pentakis dodecahedron.
+
+All summaries include counts, face types and angles, vertex incidence, dihedral
+angles, and duals. Catalan metrics come from the actual polar geometry; their
+faces are congruent but not necessarily regular, and their vertices can have
+different radii. The maximum radius stays one for every model.
 
 The catalog counts full mathematical faces, edges, and vertices. The connected
 exterior used to display a star solid has extra surface patches at face
@@ -90,11 +98,13 @@ reveals the remaining properties. Icon-only controls and short transformation
 labels leave more room for the canvas. Opacity and duration keep their values
 visible, and every control retains an accessible name and tooltip.
 
-The map shows all fourteen solids and eighteen reversible relationships.
+The map shows all twenty-three solids and thirty-two reversible relationships.
 Solid lines/diamonds identify duals, dashed lines/stars identify stellation,
 dash-dot lines/scissors identify rectification, and short dashes/blade icons
 identify truncation. All links have arrowheads
-at both ends, and every listed route is playable.
+at both ends, and every listed route is playable. Each node names its family
+(Platonic, Kepler–Poinsot, Archimedean, or Catalan); family badges and grouped
+inspection options provide the same information without relying on color.
 
 “How it works” explains the current operation. Session history retains up to
 30 endpoint geometry/view snapshots. All buttons and menu actions have short

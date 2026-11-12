@@ -7,15 +7,17 @@ The public title is Polyhedra Explorer; the repository and Pages path remain
 ## Current collection and actions
 
 The grouped selector contains five Platonic solids, four Kepler–Poinsot
-polyhedra, and five Archimedean solids: two rectified and three truncated. The summary follows the completed endpoint.
+polyhedra, and seven Archimedean solids (two rectified and five truncated), plus their seven
+Catalan duals. The summary follows the completed endpoint.
 Property rows and the title reserve consistent line slots across all solids,
 including mixed face descriptions and long dual names, so changing the solid
 does not resize the summary. These slots use Bootstrap utilities only.
 
 Cuboctahedron and icosidodecahedron summaries include their mixed face counts,
 per-face angles, vertex configuration, dihedral angle, and named Catalan dual.
-The Catalan duals are outside the rendered collection, so these two entries
-expose their unrectification paths rather than an unavailable Dual action.
+Every Archimedean entry exposes its playable Catalan Dual, and Catalan entries
+expose the inverse. Catalan summaries derive counts, face angles, dihedral
+angles, and vertex incidence from the actual polar model.
 
 Rectify cuts corners to edge midpoints. Its menu also exposes reverse choices,
 including both parents for each newly added solid. Tetrahedron ↔ octahedron is
@@ -33,8 +35,10 @@ clear on playback or scrubbing and counts disable between endpoints. The last
 highlight mode is saved locally along with the other display preferences.
 
 Truncate stops the corner cuts at the uniform-edge endpoint; Untruncate restores
-the exact parent and orientation. Its three paths connect tetrahedron, cube,
-and octahedron to their corresponding truncated solids. Unavailable stellation
+the exact parent and orientation. Its five paths connect every Platonic solid to its corresponding uniform
+truncation. Every truncated solid also exposes Rectify to continue its existing
+cuts to the edge midpoints. The rectified destination menu includes both
+original and truncated parents. Unavailable stellation
 buttons are hidden to keep the mobile operation row compact. The truncated
 summaries list both dihedral angles, with face-pair detail in the tooltip;
 all solids reserve two dihedral value lines to prevent layout shifts.
@@ -70,7 +74,7 @@ filled success color at every size.
 
 ## Transformation map
 
-All fourteen nodes and eighteen links are shown. Selecting a node inspects its
+All twenty-three nodes and thirty-two links are shown. Selecting a node inspects its
 solid; the route list starts an operation to an explicit destination.
 
 - Dual: solid line and diamond.
@@ -80,7 +84,10 @@ solid; the route list starts an operation to an explicit destination.
 
 Color is supplemental. Every link has arrowheads at both ends. The nodes form
 two planar groups, with no crossing links. All operation symbols are Lucide SVG
-icons rather than emoji characters. The map dialog expands on smaller screens,
+icons rather than emoji characters. Each node includes a text family label
+and a corresponding border color. The legend, selected-family badge, and
+family-grouped inspection menu make classification explicit on every viewport.
+The graph uses the full dialog width, with inspection/actions beneath it. The map dialog expands on smaller screens,
 and the native solid selector and route list provide a readable mobile fallback.
 
 ## Scope
@@ -89,5 +96,6 @@ The user excluded the before/after property-comparison panel. Status badges,
 generic midpoint links, and endpoint-unlock messages remain removed.
 
 The broader Archimedean/Catalan collection, face tracking, and shareable scene
-state remain future work. The two rectified solids, three uniform truncations, count-based highlighting,
-and simpler stellation animations are implemented.
+state remain future work. The two rectified solids, five uniform truncations, seven Catalan duals,
+continuation routes, count-based highlighting, and simpler stellation animations
+are implemented. Highlight tracking during playback remains deferred.
