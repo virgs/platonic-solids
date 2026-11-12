@@ -67,6 +67,13 @@ exact parent is retained for reverse playback. Uniform truncated shapes can
 continue to their rectified endpoints, with explicit reverse destination choices. Count-based highlights identify
 mathematical elements at endpoints and clear on playback/scrubbing.
 
+## Completion follow-ups
+
+The current catalog has 23 solids and all 32 mapped relationships implemented.
+Motion handling still needs reduced-motion preference support and explicit
+pausing when the tab is hidden. The player currently measures elapsed frame
+time, so resuming a backgrounded tab can jump playback forward.
+
 ## Future discussion
 
 - Broader Archimedean and Catalan catalogs and additional operations.

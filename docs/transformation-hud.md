@@ -66,6 +66,10 @@ all solids reserve two dihedral value lines to prevent layout shifts.
 
 ## Mobile layout
 
+Summary count buttons use Bootstrap padding in both their active and inactive
+states, preserving layout while highlighting. The compact summary uses an info
+icon to reveal extra properties and a close icon to collapse them.
+
 The current title doubles as the solid picker, with a chevron and a native,
 family-grouped listbox in its dropdown. The list has nine visible rows and its
 own scrolling, keeping all 23 entries reachable without growing the HUD.
@@ -73,10 +77,10 @@ The title retains heading semantics, and Escape/selection restores focus.
 The family caption and symbol share the line above it. Reserved title slots
 and property slots keep the summary height stable across selections.
 
-The far-right navbar hamburger opens Map, History, and a filled green GitHub
-link with the current version badge. It also contains Auto-rotate and Reset
-view at every screen size. Navigation closes before opening a dialog and restores focus
-to the menu trigger afterward.
+The far-right navbar hamburger opens Map, History, and a GitHub link using
+the same menu styling, separated by a divider, with the current version badge.
+It also contains Auto-rotate and Reset view at every screen size. Navigation
+closes before opening a dialog and restores focus to the menu trigger afterward.
 
 Below 992px the toolbar buttons show icons only, with accessible names and
 tooltips. Opacity and duration retain their values. View tools and all four

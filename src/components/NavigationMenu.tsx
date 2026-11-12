@@ -20,7 +20,7 @@ export function NavigationMenu({ disabled, autoRotate, onRotate, onReset, onMap,
       <Dropdown.Item aria-label="Toggle automatic rotation" aria-pressed={autoRotate} active={autoRotate} title="Toggle automatic rotation" onClick={()=>run(onRotate)}><Rotate3D size={16} aria-hidden="true" /> Auto-rotate</Dropdown.Item>
       <Dropdown.Item aria-label="Reset view" title="Reset view" onClick={()=>run(onReset)}><RotateCcw size={16} aria-hidden="true" /> Reset view</Dropdown.Item>
       <Dropdown.Divider />
-      <a className="dropdown-item bg-success text-white d-flex align-items-center justify-content-between gap-3" title="View source on GitHub" aria-label="GitHub" aria-describedby="app-version" href="https://github.com/virgs/platonic-solids" target="_blank" rel="noreferrer" onClick={()=>setShow(false)}>
+      <a className="dropdown-item d-flex align-items-center justify-content-between gap-3" title="View source on GitHub" aria-label="GitHub" aria-describedby="app-version" href="https://github.com/virgs/platonic-solids" target="_blank" rel="noreferrer" onClick={()=>setShow(false)}>
         <span><Github size={16} aria-hidden="true" /> GitHub</span><Badge id="app-version" bg="dark">v{version}</Badge>
       </a>
     </Dropdown.Menu>

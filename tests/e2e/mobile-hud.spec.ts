@@ -32,10 +32,13 @@ test('mobile HUD prioritizes the canvas and expands the remaining properties on 
   await page.screenshot({ path: test.info().outputPath('compact-mobile-hud.png') })
 })
 
-test('GitHub link uses an active filled theme color', async ({ page }) => {
+test('GitHub link matches the other navbar menu items', async ({ page }) => {
   await page.goto('./')
   await openNavigation(page)
   const github = page.getByRole('link', { name: 'GitHub', exact: true })
-  await expect(github).toHaveClass(/bg-success/)
+  await expect(github).toHaveClass(/dropdown-item/)
+  const map=page.getByRole('button',{name:'Map',exact:true})
+  const background=await map.evaluate(element=>getComputedStyle(element).backgroundColor)
+  expect(await github.evaluate(element=>getComputedStyle(element).backgroundColor)).toBe(background)
   await expect(github).toHaveAttribute('href','https://github.com/virgs/platonic-solids')
 })

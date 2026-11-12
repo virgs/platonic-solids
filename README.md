@@ -101,7 +101,7 @@ release version, plus Auto-rotate and Reset view at every screen size.
 View tools sit left and transformations sit right on a single row, using the
 same button height. Smaller screens show icons, with opacity and duration
 values retained. Destination arrows appear only when there are alternatives.
-The summary starts with Faces, Edges, and Vertices; its chevron reveals the
+The summary starts with padded Faces, Edges, and Vertices buttons; its info button reveals the
 rest. Every control retains an accessible name and tooltip. The canvas uses
 the remaining height and keeps the default model uncropped on portrait screens;
 zoom and the saved camera distance remain under user control.
