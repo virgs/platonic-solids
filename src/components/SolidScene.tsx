@@ -8,7 +8,7 @@ import type { OrbitControls as OrbitControlsImpl } from 'three-stdlib'
 import type { SolidId, PlatonicId } from '../data/solids'
 import { getSolid } from '../data/solids'
 import { createCornerMorph } from '../three/cornerMorph'
-import { createStarDual, dualModel, loadPolyhedron, renderPolyhedron, type TransformationKind, type Polyhedron } from '../three/transformations'
+import { createConvexDual, createStarDual, dualModel, loadPolyhedron, renderPolyhedron, type TransformationKind, type Polyhedron } from '../three/transformations'
 import { createStellationPath } from '../three/stellationPaths'
 import { createTruncationPath } from '../three/truncation'
 import { createRectificationPath } from '../three/rectification'
@@ -55,7 +55,11 @@ function TransformationMesh({ highlight, originId, progress, opacity, kind, tran
       const model = createRectificationPath(source,originId,destinationId)
       return { ...model, render: (t: number) => renderPolyhedron(model.at(t)) }
     }
-    if (getSolid(originId).family !== 'Platonic solid') {
+    if (getSolid(originId).family === 'Archimedean solid' || getSolid(originId).family === 'Catalan solid') {
+      const model = createConvexDual(source)
+      return { ...model, render: (t: number) => renderPolyhedron(model.at(t)) }
+    }
+    if (getSolid(originId).family === 'Kepler–Poinsot polyhedron') {
       const model = createStarDual(source)
       const surface = createExteriorProjection(source,model.target,model.at)
       return { ...model, render: (t: number) => renderSurface(surface(t)) }

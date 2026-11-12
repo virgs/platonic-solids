@@ -5,6 +5,8 @@ for (const [parent,name,breakdown,angles,dual] of [
   ['Tetrahedron','Truncated tetrahedron','4 triangles · 4 hexagons','Triangle 60° · hexagon 120°','Triakis tetrahedron'],
   ['Cube','Truncated cube','8 triangles · 6 octagons','Triangle 60° · octagon 135°','Triakis octahedron'],
   ['Octahedron','Truncated octahedron','6 squares · 8 hexagons','Square 90° · hexagon 120°','Tetrakis hexahedron'],
+  ['Dodecahedron','Truncated dodecahedron','20 triangles · 12 decagons','Triangle 60° · decagon 144°','Triakis icosahedron'],
+  ['Icosahedron','Truncated icosahedron','12 pentagons · 20 hexagons','Pentagon 108° · hexagon 120°','Pentakis dodecahedron'],
 ] as const) {
   test(`${parent} truncates into ${name}, scrubs, reverses, and exposes complete properties`, async ({ page }) => {
     await page.goto(`./?solid=${parent.toLowerCase()}`)
@@ -30,7 +32,7 @@ for (const [parent,name,breakdown,angles,dual] of [
     await expect(page.getByRole('heading', { name, exact: true })).toBeVisible()
     await page.getByRole('button',{name:'Map',exact:true}).click()
     const map=page.getByRole('dialog',{name:'Transformation map'})
-    await expect(map.getByRole('button',{name:/^Inspect /})).toHaveCount(14)
+    await expect(map.getByRole('button',{name:/^Inspect /})).toHaveCount(23)
     await map.getByRole('button',{name:`Untruncate → ${parent}`,exact:true}).click()
     await expect(page.getByRole('heading',{name:parent,exact:true})).toBeVisible()
   })

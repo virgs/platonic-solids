@@ -4,9 +4,10 @@ import { extractPolyhedron } from './geometry'
 import { starModels, type StarSolidId } from './starPolyhedra'
 import type { SolidId, PlatonicId } from '../data/solids'
 import { truncateModel, truncationParents } from './truncation'
+import { catalanParents, type CatalanId } from '../data/catalanPairs'
 import { rectifyModel } from './rectification'
 
-export interface Polyhedron { vertices: Vector3[]; faces: number[][]; edgeOpacities?: number[]; rectifiedFrom?: { id: PlatonicId; model: Polyhedron }; truncatedFrom?: { id: PlatonicId; model: Polyhedron } }
+export interface Polyhedron { vertices: Vector3[]; faces: number[][]; edgeOpacities?: number[]; rectifiedFrom?: { id: PlatonicId; model: Polyhedron }; truncatedFrom?: { id: PlatonicId; model: Polyhedron }; dualFrom?: Polyhedron }
 export type TransformationKind = 'dual' | 'stellate' | 'rectify' | 'truncate'
 export const stellationTargets: Partial<Record<SolidId, SolidId>> = {
   dodecahedron: 'small-stellated-dodecahedron',
@@ -18,6 +19,10 @@ export const stellationTargets: Partial<Record<SolidId, SolidId>> = {
 }
 
 export function loadPolyhedron(id: SolidId): Polyhedron {
+  if (id in catalanParents) {
+    const source = loadPolyhedron(catalanParents[id as CatalanId])
+    return { ...dualModel(source), dualFrom: source }
+  }
   const parent = truncationParents[id]
   if (parent) return truncateModel(loadPolyhedron(parent),parent)
   if (id === 'cuboctahedron') return rectifyModel(loadPolyhedron('cube'),'cube')
@@ -112,6 +117,12 @@ export function dualModel(source: Polyhedron): Polyhedron {
     return ordered
   })
   return normalize({ vertices, faces })
+}
+
+export function createConvexDual(source: Polyhedron) {
+  const path = createStarDual(source)
+  const target = source.dualFrom ?? { ...path.target, dualFrom: source }
+  return { source, target, at: (progress: number) => progress <= 0 ? source : progress >= 1 ? target : path.at(progress) }
 }
 
 export function createStarDual(source: Polyhedron) {

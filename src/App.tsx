@@ -47,6 +47,7 @@ import {
   platonicSolids,
   starSolids,
   archimedeanSolids,
+  catalanSolids,
   type SolidDefinition,
   type SolidId,
 } from './data/solids'
@@ -303,6 +304,9 @@ export function App() {
                         {option.name}
                       </Dropdown.Item>
                     ))}
+                    <Dropdown.Divider />
+                    <Dropdown.Header>Catalan solids</Dropdown.Header>
+                    {catalanSolids.map(option => <Dropdown.Item key={option.id} title={`View ${option.name}`} active={option.id === solidId} onClick={() => changeSolid(option.id)}>{option.name}</Dropdown.Item>)}
                   </Dropdown.Menu>
                 </Dropdown>
               </Col>

@@ -13,7 +13,7 @@ export function normalizeCircumradius(
   source: BufferGeometry,
   radius = 1,
 ): BufferGeometry {
-  const geometry = source.toNonIndexed()
+  const geometry = source.index ? source.toNonIndexed() : source.clone()
   const positions = geometry.getAttribute('position')
   let maximumRadius = 0
 

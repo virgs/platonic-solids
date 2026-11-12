@@ -10,10 +10,10 @@ describe('relationship map', () => {
   it.each(solids.filter((solid) => solid.dualId))('exposes the implemented catalog dual for $name', (solid) => {
     expect(routesFrom(solid.id).some((route) => route.kind === 'dual' && route.implemented && route.destination === solid.dualId)).toBe(true)
   })
-  it.each(rectifiedSolids)('$name exposes both parent paths and names its external Catalan dual', (solid) => {
-    expect(routesFrom(solid.id).filter((route) => route.kind === 'rectify')).toHaveLength(2)
+  it.each(rectifiedSolids)('$name exposes original and truncated parents and a playable Catalan dual', (solid) => {
+    expect(routesFrom(solid.id).filter((route) => route.kind === 'rectify')).toHaveLength(4)
     expect(solid.dualName).toBeTruthy()
-    expect(routesFrom(solid.id).some((route) => route.kind === 'dual')).toBe(false)
+    expect(routesFrom(solid.id).some((route) => route.kind === 'dual' && route.destination === solid.dualId)).toBe(true)
   })
   it('implements every listed route and exposes all three D12 stellations', () => {
     expect(routes.every((route) => route.implemented)).toBe(true)

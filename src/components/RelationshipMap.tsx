@@ -1,16 +1,21 @@
-import { Col, Form, ListGroup, Modal, Row } from 'react-bootstrap'
+import { Badge, Col, Form, ListGroup, Modal, Row } from 'react-bootstrap'
 import { getSolid, solids, type SolidId } from '../data/solids'
+import { families } from '../data/families'
 import { routeLabel, routes, routesFrom, type Route } from '../data/routes'
 import type { TransformationKind } from '../three/transformations'
 import { DialogCloseButton } from './DialogCloseButton'
 import { Diamond, Scissors, Slice, Star } from 'lucide-react'
 
 const positions: Record<SolidId, [number, number]> = {
-  'truncated-tetrahedron': [480,630], 'truncated-cube': [480,80], 'truncated-octahedron': [480,445],
-  tetrahedron: [150,590], cube: [150,100], octahedron: [150,410], cuboctahedron: [420,255],
-  dodecahedron: [920,210], icosahedron: [1230,210], icosidodecahedron: [1075,70],
-  'small-stellated-dodecahedron': [740,430], 'great-dodecahedron': [920,620],
-  'great-stellated-dodecahedron': [1230,620], 'great-icosahedron': [1280,430],
+  cube: [340,300], octahedron: [340,700], tetrahedron: [340,1000], cuboctahedron: [760,500],
+  'truncated-cube': [760,230], 'truncated-octahedron': [760,770], 'truncated-tetrahedron': [150,850],
+  'rhombic-dodecahedron': [1060,500], 'triakis-octahedron': [1060,230],
+  'tetrakis-hexahedron': [1060,770], 'triakis-tetrahedron': [150,600],
+  dodecahedron: [1520,500], icosahedron: [1940,500], icosidodecahedron: [1730,200],
+  'truncated-dodecahedron': [1370,250], 'truncated-icosahedron': [2090,250],
+  'rhombic-triacontahedron': [1730,60], 'triakis-icosahedron': [1370,60], 'pentakis-dodecahedron': [2090,60],
+  'small-stellated-dodecahedron': [1370,760], 'great-dodecahedron': [1520,1000],
+  'great-stellated-dodecahedron': [1940,1000], 'great-icosahedron': [2090,760],
 }
 const styles = {
   truncate: { color: '#adb5bd', dash: '3 5', icon: Slice },
@@ -21,9 +26,9 @@ const styles = {
 
 function edgeShape(route: Route): { path: string; middle: [number,number] } {
   const [x,y] = positions[route.from], [xx,yy] = positions[route.to]
-  if (route.from === route.to) return { path: `M ${x-120} ${y-12} C 10 ${y-65}, 10 ${y+65}, ${x-120} ${y+12}`, middle: [15,y] }
+  if (route.from === route.to) return { path: `M ${x-120} ${y-12} C 10 ${y-65}, 10 ${y+65}, ${x-120} ${y+12}`, middle: [(x-120)/4+7.5,y] }
   const dx = xx-x, dy = yy-y
-  const f = Math.min(dx ? 120/Math.abs(dx) : Infinity,dy ? 33/Math.abs(dy) : Infinity)
+  const f = Math.min(dx ? 120/Math.abs(dx) : Infinity,dy ? 45/Math.abs(dy) : Infinity)
   return { path: `M ${x+dx*f} ${y+dy*f} L ${xx-dx*f} ${yy-dy*f}`, middle: [(x+xx)/2,(y+yy)/2] }
 }
 export function RelationshipMap({ show, onHide, current, activeRoute, onInspect, onTransform }: {
@@ -41,8 +46,11 @@ export function RelationshipMap({ show, onHide, current, activeRoute, onInspect,
         <span className="text-success"><Scissors size={16} aria-hidden="true" /> Dash-dot: rectification</span>
         <span><Slice size={16} aria-hidden="true" /> Short dash: truncation</span>
       </div>
-      <Row className="g-3 align-items-center"><Col xs={12} lg={9}>
-      <svg viewBox="0 0 1440 700" width="100%" role="group" aria-label={`Relationships between all ${solids.length} solids`}>
+      <div className="d-flex align-items-center gap-2 flex-wrap small mb-2" aria-label="Solid families">
+        <span>Solid families:</span>{Object.entries(families).map(([family,appearance]) => <Badge key={family} bg={appearance.badge}>{appearance.label}</Badge>)}
+      </div>
+      <Row className="g-3 align-items-center"><Col xs={12}>
+      <svg viewBox="0 0 2260 1100" width="100%" role="group" aria-label={`Relationships between all ${solids.length} solids`}>
         <defs>
           {Object.entries(styles).map(([id,{ color }]) => (
             <marker key={id} id={`map-arrow-${id}`} viewBox="0 0 10 10" refX="8" refY="5" markerWidth="12" markerHeight="12" markerUnits="userSpaceOnUse" orient="auto-start-reverse">
@@ -70,25 +78,29 @@ export function RelationshipMap({ show, onHide, current, activeRoute, onInspect,
         })}
         {solids.map((solid) => {
           const [x,y] = positions[solid.id]
+          const family = families[solid.family]
           const words = solid.name.split(' ')
           const lines = words.length > 2 ? [words.slice(0,-1).join(' '), words.at(-1)!] : [solid.name]
           return <g key={solid.id} role="button" tabIndex={0} aria-label={`Inspect ${solid.name}`}
             onClick={() => onInspect(solid.id)} onKeyDown={(event) => { if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); onInspect(solid.id) } }}>
-            <title>Inspect {solid.name}</title>
-            <rect x={x-115} y={y-28} width={230} height={56} rx={10}
-              fill={solid.id === current ? '#375a7f' : '#303030'} stroke={solid.id === current ? '#4cc9f0' : '#adb5bd'} strokeWidth={solid.id === current ? 3 : 1} />
-            {lines.map((line,i) => <text key={line} x={x} y={y+(lines.length === 1 ? 6 : -4+i*22)} textAnchor="middle" fill="#f8f9fa" fontSize={18}>{line}</text>)}
+            <title>Inspect {solid.name} · {family.label}</title>
+            <rect x={x-115} y={y-40} width={230} height={80} rx={10}
+              fill={solid.id === current ? '#375a7f' : '#303030'} stroke={solid.id === current ? '#4cc9f0' : family.color} strokeWidth={solid.id === current ? 3 : 1} />
+            {lines.map((line,i) => <text key={line} x={x} y={y+(lines.length === 1 ? -5 : -18+i*22)} textAnchor="middle" fill="#f8f9fa" fontSize={20}>{line}</text>)}
+            <text x={x} y={y+27} textAnchor="middle" fill={family.color} fontSize={16} data-family-label={solid.family}>{family.label}</text>
           </g>
         })}
       </svg>
-      </Col><Col xs={12} lg={3}>
+      </Col><Col xs={12} lg={4}>
       <Form.Label htmlFor="map-solid">Inspect a solid</Form.Label>
       <Form.Select id="map-solid" value={current} className="mb-3" onChange={(event) => onInspect(event.target.value as SolidId)}>
-        {solids.map((solid) => <option key={solid.id} value={solid.id}>{solid.name}</option>)}
+        {Object.entries(families).map(([family,appearance]) => <optgroup key={family} label={appearance.label}>{solids.filter(solid=>solid.family===family).map(solid=><option key={solid.id} value={solid.id}>{solid.name}</option>)}</optgroup>)}
       </Form.Select>
+      <Badge bg={families[getSolid(current).family].badge}>{families[getSolid(current).family].label}</Badge>
+      </Col><Col xs={12} lg={8}>
       <h2 className="h6">From {getSolid(current).name}</h2>
-      <ListGroup>
-        {routesFrom(current).map((route) => <ListGroup.Item key={`${route.kind}:${route.destination}`} title={`Transform to ${getSolid(route.destination).name}`} action disabled={!route.implemented}
+      <ListGroup className="flex-row flex-wrap gap-2">
+        {routesFrom(current).map((route) => <ListGroup.Item className="border rounded w-auto" key={`${route.kind}:${route.destination}`} title={`Transform to ${getSolid(route.destination).name}`} action disabled={!route.implemented}
           onClick={() => { onHide(); onTransform(route.kind,route.destination) }}>
           {routeLabel(route.kind,current,route.destination)} → {getSolid(route.destination).name}
         </ListGroup.Item>)}

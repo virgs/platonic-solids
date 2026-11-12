@@ -1,8 +1,17 @@
+import { catalanParents } from './catalanPairs'
 import type { SolidId } from './solids'
 import type { TransformationKind } from '../three/transformations'
 
 export interface Route { from: SolidId; to: SolidId; kind: TransformationKind; implemented: boolean }
 export const routes: Route[] = [
+  ...Object.entries(catalanParents).map(([to,from]) => ({ from, to: to as SolidId, kind: 'dual' as const, implemented: true })),
+  { from: 'dodecahedron', to: 'truncated-dodecahedron', kind: 'truncate', implemented: true },
+  { from: 'icosahedron', to: 'truncated-icosahedron', kind: 'truncate', implemented: true },
+  { from: 'truncated-tetrahedron', to: 'octahedron', kind: 'rectify', implemented: true },
+  { from: 'truncated-cube', to: 'cuboctahedron', kind: 'rectify', implemented: true },
+  { from: 'truncated-octahedron', to: 'cuboctahedron', kind: 'rectify', implemented: true },
+  { from: 'truncated-dodecahedron', to: 'icosidodecahedron', kind: 'rectify', implemented: true },
+  { from: 'truncated-icosahedron', to: 'icosidodecahedron', kind: 'rectify', implemented: true },
   { from: 'tetrahedron', to: 'truncated-tetrahedron', kind: 'truncate', implemented: true },
   { from: 'cube', to: 'truncated-cube', kind: 'truncate', implemented: true },
   { from: 'octahedron', to: 'truncated-octahedron', kind: 'truncate', implemented: true },

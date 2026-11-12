@@ -86,7 +86,7 @@ test('the canvas fills the available stage without a spacer gap', async ({
 test('completed endpoints unlock the correct actions for every solid', async ({ page }) => {
   test.setTimeout(60000)
   const stellatable = new Set(['dodecahedron','icosahedron','small-stellated-dodecahedron','great-dodecahedron','great-stellated-dodecahedron','great-icosahedron'])
-  for (const solid of solids.filter((entry) => entry.dualId)) {
+  for (const solid of solids.filter((entry) => entry.family === 'Platonic solid' || entry.family === 'Kepler–Poinsot polyhedron')) {
     await page.goto(`./?solid=${solid.id}`)
     await setTransformationTime(page,0.5)
     await page.getByRole('button', { name: 'Dual', exact: true }).click()
