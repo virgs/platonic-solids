@@ -1,14 +1,14 @@
 import { useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { ChevronDown, ChevronUp } from 'lucide-react'
-import { Dropdown, Form } from 'react-bootstrap'
+import { Dropdown } from 'react-bootstrap'
 import { solids, type SolidDefinition, type SolidId } from '../data/solids'
 import { families } from '../data/families'
 
 export function SolidPicker({ solid, disabled, onSelect }: { solid: SolidDefinition; disabled: boolean; onSelect: (id: SolidId) => void }) {
   const [show, setShow] = useState(false)
   const toggle = useRef<HTMLButtonElement>(null)
-  return <Dropdown show={show} onToggle={setShow} autoClose="outside" className="position-static">
+  return <Dropdown show={show} onToggle={setShow} focusFirstItemOnShow="keyboard" className="position-static">
     <div className="position-relative">
       <div className="h4 mb-0 invisible" aria-hidden="true">&nbsp;<br className="d-lg-none" /><span className="d-lg-none">&nbsp;</span></div>
       <h1 className="h4 mb-0 position-absolute top-0 start-0 w-100" aria-label={solid.name}>
@@ -19,18 +19,18 @@ export function SolidPicker({ solid, disabled, onSelect }: { solid: SolidDefinit
         </Dropdown.Toggle>
       </h1>
     </div>
-    {createPortal(<Dropdown.Menu className="p-2 w-auto" popperConfig={{ strategy: 'fixed' }}>
-      <Form.Label htmlFor="solid-catalog" className="small mb-1">Choose a solid</Form.Label>
-      <Form.Select id="solid-catalog" aria-label="Solid catalog" title="Choose a solid" htmlSize={9} value={solid.id} disabled={disabled}
-        onKeyDown={event => {
-          event.stopPropagation()
-          if (event.key === 'Escape') { event.preventDefault(); setShow(false); toggle.current?.focus() }
-        }}
-        onChange={event => { onSelect(event.target.value as SolidId); setShow(false); toggle.current?.focus() }}>
-        {Object.entries(families).map(([family, appearance]) => <optgroup key={family} label={appearance.label}>
-          {solids.filter(option => option.family === family).map(option => <option key={option.id} value={option.id}>{option.name}</option>)}
-        </optgroup>)}
-      </Form.Select>
+    {createPortal(<Dropdown.Menu id="solid-catalog" role="menu"
+      className="h-50 overflow-y-auto mw-100" popperConfig={{ strategy: 'fixed' }}>
+      {Object.entries(families).map(([family, appearance]) => <div key={family} role="group" aria-label={appearance.label}>
+        <Dropdown.Header>{appearance.label}</Dropdown.Header>
+        {solids.filter(option => option.family === family).map(option => <Dropdown.Item
+          key={option.id} as="button" role="menuitemradio" data-solid-id={option.id}
+          active={option.id === solid.id} aria-checked={option.id === solid.id}
+          disabled={disabled} className="text-wrap" title={`Show ${option.name}`}
+          onClick={() => { setShow(false); toggle.current?.focus(); onSelect(option.id) }}>
+          {option.name}
+        </Dropdown.Item>)}
+      </div>)}
     </Dropdown.Menu>, document.body)}
   </Dropdown>
 }

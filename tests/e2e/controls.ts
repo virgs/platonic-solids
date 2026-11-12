@@ -24,7 +24,7 @@ export async function clickControl(page: Page, name: string) {
 
 export async function chooseSolid(page: Page, id: string) {
   await page.locator('#solid-selector').click()
-  await page.getByRole('listbox',{name:'Solid catalog',exact:true}).selectOption(id)
+  await page.getByRole('menu',{name:'Choose a solid',exact:true}).locator(`[data-solid-id="${id}"]`).click()
 }
 
 export async function chooseStellation(page: Page, name: string) {
