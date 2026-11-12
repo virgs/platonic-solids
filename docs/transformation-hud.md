@@ -7,7 +7,7 @@ The public title is Polyhedra Explorer; the repository and Pages path remain
 ## Current collection and actions
 
 The grouped selector contains five Platonic solids, four Kepler–Poinsot
-polyhedra, and two rectified solids. The summary follows the completed endpoint.
+polyhedra, and five Archimedean solids: two rectified and three truncated. The summary follows the completed endpoint.
 Property rows and the title reserve consistent line slots across all solids,
 including mixed face descriptions and long dual names, so changing the solid
 does not resize the summary. These slots use Bootstrap utilities only.
@@ -24,6 +24,20 @@ included. Every operation is disabled while playing or held between endpoints.
 Dual and Stellate/Unstellate retain their destination labels. The simple
 stellation constructions use a connected exterior; the information dialog
 explains the distinction between mathematical faces and visible patches.
+
+The Faces, Edges, and Vertices counts toggle one highlight mode at a time.
+Adjacent mathematical faces use distinct colors; edges thicken and vertex
+markers identify actual catalog elements. Star intersections and tessellation
+seams do not create extra markers. Active counts use a pressed state. Highlights
+clear on playback or scrubbing and counts disable between endpoints. The last
+highlight mode is saved locally along with the other display preferences.
+
+Truncate stops the corner cuts at the uniform-edge endpoint; Untruncate restores
+the exact parent and orientation. Its three paths connect tetrahedron, cube,
+and octahedron to their corresponding truncated solids. Unavailable stellation
+buttons are hidden to keep the mobile operation row compact. The truncated
+summaries list both dihedral angles, with face-pair detail in the tooltip;
+all solids reserve two dihedral value lines to prevent layout shifts.
 
 ## Player and view controls
 
@@ -56,12 +70,13 @@ filled success color at every size.
 
 ## Transformation map
 
-All eleven nodes and fifteen links are shown. Selecting a node inspects its
+All fourteen nodes and eighteen links are shown. Selecting a node inspects its
 solid; the route list starts an operation to an explicit destination.
 
 - Dual: solid line and diamond.
 - Stellation: dashed line and star.
 - Rectification: dash-dot line and scissors.
+- Truncation: short dashes and a blade icon.
 
 Color is supplemental. Every link has arrowheads at both ends. The nodes form
 two planar groups, with no crossing links. All operation symbols are Lucide SVG
@@ -74,5 +89,5 @@ The user excluded the before/after property-comparison panel. Status badges,
 generic midpoint links, and endpoint-unlock messages remain removed.
 
 The broader Archimedean/Catalan collection, face tracking, and shareable scene
-state remain future work. The two rectified intermediates and the simpler
-stellation animations are implemented.
+state remain future work. The two rectified solids, three uniform truncations, count-based highlighting,
+and simpler stellation animations are implemented.

@@ -1,7 +1,7 @@
 # Polyhedra Explorer
 
-An interactive guide to eleven polyhedra and their transformations: five
-Platonic solids, four Kepler–Poinsot polyhedra, and two rectified solids.
+An interactive guide to fourteen polyhedra and their transformations: five
+Platonic solids, four Kepler–Poinsot polyhedra, and five Archimedean solids (two rectified and three truncated).
 
 [Open the explorer](https://virgs.github.io/platonic-solids/)
 
@@ -52,11 +52,17 @@ camera; mouse, touch, wheel, and pinch gestures orbit and zoom the centered mode
   Tetrahedron → octahedron; cube and octahedron → cuboctahedron; dodecahedron and
   icosahedron → icosidodecahedron. The destination menu and map expose each
   reverse parent choice.
+- **Truncate / Untruncate:** tetrahedron, cube, and octahedron connect to their
+  uniform truncated solids. The cut stops when all endpoint edges have equal
+  length, before reaching their midpoints. Reverse playback restores the parent
+  without an orientation jump.
 
 The cuboctahedron has 8 triangles and 6 squares. The icosidodecahedron has
 20 triangles and 12 pentagons. Their summaries show face-type counts, angles,
 vertex patterns, dihedral angles, and their named Catalan duals. Those duals
-are outside this collection; broader Archimedean/Catalan expansion is deferred.
+are outside this collection. The truncated tetrahedron, cube, and octahedron
+include the same complete summaries, with both dihedral angles and named duals.
+The remaining Archimedean and Catalan solids are future scope.
 
 The catalog counts full mathematical faces, edges, and vertices. The connected
 exterior used to display a star solid has extra surface patches at face
@@ -73,16 +79,21 @@ The half-filled-circle button beside the color picker always shows Solid opacity
 Its vertical slider ranges from 20% to 100% in 1% steps. Faces and edges follow
 that setting; rear edges fade in with transparency. The default is 85% opacity
 and Bootswatch Darkly's info blue (`#3498db`). Saved colors are preserved.
-There are no separate vertex markers.
+Tap Faces, Edges, or Vertices in the summary to toggle element highlighting.
+Faces use distinct colors for adjacent mathematical faces; edges thicken and
+vertices gain markers. Markers and highlighted edges follow solid opacity.
+Tap the active count to clear; starting or scrubbing a transformation clears
+highlighting. Star crossings are never counted or marked as extra vertices.
 
 On mobile, the summary starts with Faces, Edges, and Vertices; a chevron
 reveals the remaining properties. Icon-only controls and short transformation
 labels leave more room for the canvas. Opacity and duration keep their values
 visible, and every control retains an accessible name and tooltip.
 
-The map shows all eleven solids and fifteen reversible relationships.
+The map shows all fourteen solids and eighteen reversible relationships.
 Solid lines/diamonds identify duals, dashed lines/stars identify stellation,
-and dash-dot lines/scissors identify rectification. All links have arrowheads
+dash-dot lines/scissors identify rectification, and short dashes/blade icons
+identify truncation. All links have arrowheads
 at both ends, and every listed route is playable.
 
 “How it works” explains the current operation. Session history retains up to
@@ -90,7 +101,7 @@ at both ends, and every listed route is playable.
 native tooltips. No before/after property-comparison panel is included.
 
 Color, opacity, transformation time, auto-rotation, the last completed solid,
-camera position, and opacity-popup state are saved locally. An explicit
+camera position, element highlight mode, and opacity-popup state are saved locally. An explicit
 `?solid=<slug>` takes precedence over the saved solid. Corrupt or unavailable
 storage falls back to defaults. Reloading opens the last completed solid.
 

@@ -4,13 +4,13 @@
 
 Polyhedra Explorer
 
-The broader title covers the regular and rectified polyhedra in the collection.
+The broader title covers the regular and Archimedean polyhedra in the collection.
 
 ## Product statement
 
 Polyhedra Explorer is a static educational web application that lets a
 visitor inspect, compare, and transform the five Platonic solids and four
-Kepler–Poinsot polyhedra, plus the cuboctahedron and icosidodecahedron, in an
+Kepler–Poinsot polyhedra, plus five Archimedean solids, in an
 interactive 3D scene.
 
 It should make the relationships between these solids understandable without
@@ -46,8 +46,10 @@ to be useful as a reference.
 1. Cuboctahedron: rectification of the cube or octahedron
 2. Icosidodecahedron: rectification of the dodecahedron or icosahedron
 
-These two are Archimedean solids. Adding the broader family and its Catalan
-duals remains outside the current milestone. Their summaries list mixed face
+The Archimedean group also includes truncated tetrahedron, truncated cube,
+and truncated octahedron. Their Truncate/Untruncate routes preserve orientation
+and stop at regular equal-edge endpoints. The rest of the family and the
+Catalan duals remain outside the current milestone. Their summaries list mixed face
 types and angles, vertex configuration, and the names of their external duals.
 
 ### Rectification and simpler stellation
@@ -60,6 +62,13 @@ Stellation animations use one connected exterior. Dodecahedron ↔ small stellat
 dodecahedron grows/retracts pentagonal pyramids. The other pairs use direct
 surface reshaping with planar patches and exact mathematical endpoints. Their
 intermediate frames are visual morphs, not literal fixed-plane stellations.
+
+### Element highlighting
+
+Tapping the Faces, Edges, or Vertices count toggles a single highlight mode.
+Faces have distinct colors across shared edges, edges are emphasized, and
+vertices receive markers. Star crossings do not create extra elements.
+Highlighting is available at endpoints and clears on playback or scrubbing.
 
 ## Core experience
 
@@ -237,7 +246,7 @@ self-intersection status, and external references.
 
 ## Success criteria for version 1
 
-- All eleven solids can be selected and rendered accurately
+- All fourteen solids can be selected and rendered accurately
 - Each solid has reviewed property data and a reference link
 - Camera controls work with mouse, keyboard-supported controls, and touch
 - All dual relationships with both endpoints in the catalog can be demonstrated

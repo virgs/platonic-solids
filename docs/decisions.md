@@ -5,15 +5,15 @@
 - Public name: Polyhedra Explorer.
 - Repository and GitHub Pages path remain `platonic-solids`.
 - Static educational application; no accounts, backend, or database.
-- Current collection: five Platonic, four Kepler–Poinsot, and two rectified solids.
-- Transformation-first experience: Dual, Stellate/Unstellate, Rectify/Unrectify,
+- Current collection: five Platonic, four Kepler–Poinsot, and five Archimedean solids (two rectified, three truncated).
+- Transformation-first experience: Dual, Stellate/Unstellate, Rectify/Unrectify, Truncate/Untruncate,
   a scrub-capable player, a relationship map, and geometry-preserving history.
 - Every displayed model and intermediate surface has the same circumradius.
 - Orbit and zoom move the camera; panning is disabled and rotation defaults off.
 - Mathematical counts are independent of surface-mesh subdivisions.
-- The two added solids are Archimedean, but the full family and its Catalan duals
+- The five Archimedean entries are implemented; the remaining family and Catalan duals
   are deferred for a separate scope discussion.
-- The Catalan dual names of the two rectified solids are shown in their properties;
+- The Catalan dual names of the Archimedean solids are shown in their properties;
   unsupported dual actions are not offered.
 
 ## Technical direction
@@ -41,6 +41,10 @@ mathematical faces. Forward and reverse controls preserve endpoint orientation.
 
 Rectification moves edge points to their midpoints. Both parents of each new
 rectified solid are explicit destinations.
+
+Uniform truncation cuts to equal endpoint edges, before rectification. The
+exact parent is retained for reverse playback. Count-based highlights identify
+mathematical elements at endpoints and clear on playback/scrubbing.
 
 ## Future discussion
 

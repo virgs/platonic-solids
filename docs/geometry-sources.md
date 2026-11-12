@@ -27,8 +27,38 @@ The mixed-face catalog and metrics also follow McCooey:
   30 vertices, 60 edges, 20 equilateral triangles, 12 regular pentagons;
   dihedral angle 142.622631859°; dual rhombic triacontahedron.
 
-Only the two rectified solids are added in this release. Their Catalan duals
-are named but not added as rendered catalog entries.
+The truncated catalog uses the following definitions and metrics:
+
+- [Truncated tetrahedron](https://dmccooey.com/polyhedra/TruncatedTetrahedron.html)
+- [Truncated cube](https://dmccooey.com/polyhedra/TruncatedCube.html)
+- [Truncated octahedron](https://dmccooey.com/polyhedra/TruncatedOctahedron.html)
+
+MathWorld also describes the uniform shapes and their duals:
+[truncated tetrahedron](https://mathworld.wolfram.com/TruncatedTetrahedron.html),
+[truncated cube](https://mathworld.wolfram.com/TruncatedCube.html),
+[truncated octahedron](https://mathworld.wolfram.com/TruncatedOctahedron.html).
+Their Catalan duals are named but remain outside the rendered collection.
+
+## Uniform truncation and element highlights
+
+Truncation shares the closed corner-cut construction with rectification, but
+stops before the midpoints. For an original face with p sides and edge length L,
+the retained original edge is (1 − 2t)L; the new corner edge is
+2t cos(π/p)L. Equating these gives t = 1 / (2 + 2 cos(π/p)). Thus tetrahedron and
+octahedron use 1/3; cube uses 1/(2 + √2). Every frame is normalized uniformly.
+The target retains its parent geometry for an exact inverse, including direct
+selection, history restoration, and chaining after a dual operation.
+
+Highlighting uses mathematical polygon tessellation with a nonzero winding
+rule and distinct neighboring-face colors. Edge tubes and vertex markers come
+from the catalog topology, not the connected star exterior subdivisions.
+Both visible and hidden highlight passes respect solid opacity. Highlights
+are intentionally limited to endpoints; in-flight subdivision counts are not
+presented as catalog counts.
+
+Tests verify closed surfaces, planarity, regular endpoint faces, equal edges,
+computed dihedral angles, unit circumradius, endpoint continuity, and an exact
+oriented reverse for all three truncations.
 
 ## Rectification
 
