@@ -23,14 +23,14 @@ export function SolidSummary({ solid, highlight, onHighlight, disabled }: { soli
   const dual = solid.dualName ?? (solid.dualId ? getSolid(solid.dualId).name : '—')
   return <section className="small" aria-label="Solid properties" data-testid="solid-summary">
     <div className="d-flex align-items-center gap-2">
-      <div className="flex-grow-1">
+      <div className="flex-grow-1 overflow-hidden">
         <div className="text-info small fw-semibold text-uppercase text-nowrap">{solid.family}</div>
         <div className="position-relative">
           <div className="h4 mb-0 invisible" aria-hidden="true">&nbsp;<br className="d-lg-none" /><span className="d-lg-none">&nbsp;</span></div>
           <h1 className="h4 mb-0 position-absolute top-0 start-0 w-100">{solid.name}</h1>
         </div>
       </div>
-      <Badge bg="secondary">{solid.symbol}</Badge>
+      <Badge bg="secondary" className="flex-shrink-0">{solid.symbol}</Badge>
     </div>
     <div className="lh-sm mt-2">
       <Row className="gx-3 gy-1">

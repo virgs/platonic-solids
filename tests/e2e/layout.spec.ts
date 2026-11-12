@@ -21,6 +21,11 @@ for (const expanded of [false,true]) test(`all solids keep the same property are
       })
     })
     expect(overflow, solid.name).toEqual([])
+    const outside = await summary.evaluate(element => {
+      const region=element.getBoundingClientRect()
+      return [...element.querySelectorAll('h1, .badge, [data-testid="property-value"]')].filter(value=>value.getClientRects().length).flatMap(value=>{ const box=value.getBoundingClientRect(); return box.left<region.left-1 || box.right>region.right+1 ? [value.textContent] : [] })
+    })
+    expect(outside, solid.name).toEqual([])
   }
   await page.screenshot({ path: test.info().outputPath('stable-properties.png') })
 })
