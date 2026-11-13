@@ -2,38 +2,36 @@ import { expect, test } from '@playwright/test'
 import packageInfo from '../../package.json' with { type: 'json' }
 import { openNavigation } from './controls'
 
-test('view and transformation controls fit one equal-height row down to 320px', async ({page})=>{
+for (const [width,height] of [[320,568],[360,640],[393,800],[768,800],[1280,800]]) test(`view and transformation controls fit one equal-height row at ${width}×${height}`, async ({page})=>{
   await page.goto('./?solid=dodecahedron')
   await page.getByRole('button',{name:'Toggle solid opacity'}).click()
   const opacity=page.getByRole('slider',{name:'Solid opacity',exact:true})
   await opacity.focus(); await opacity.press('End')
   await page.getByRole('button',{name:'Toggle solid opacity'}).click()
-  for (const [width,height] of [[320,568],[360,640],[393,800],[768,800],[1280,800]]) {
-    await page.setViewportSize({width,height})
-    const toolbar=page.getByRole('toolbar',{name:'Solid controls'})
-    const bounds=(await toolbar.boundingBox())!
-    const view=(await toolbar.getByRole('group',{name:'Camera controls'}).boundingBox())!
-    const actions=(await toolbar.getByRole('group',{name:'Solid transformations'}).boundingBox())!
-    expect(Math.abs(view.y-actions.y),String(width)).toBeLessThan(1)
-    expect(view.x+view.width,String(width)).toBeLessThanOrEqual(actions.x)
-    expect(actions.x+actions.width,String(width)).toBeLessThanOrEqual(bounds.x+bounds.width+1)
-    const heights=await toolbar.getByRole('button').evaluateAll(buttons=>buttons.filter(button=>button.getClientRects().length).map(button=>button.getBoundingClientRect().height))
-    expect(Math.max(...heights)-Math.min(...heights),String(width)).toBeLessThan(1)
-    const stage=(await page.getByLabel('Interactive 3D model of a Dodecahedron').boundingBox())!
-    expect(stage.height,String(width)).toBeGreaterThan(height*(height<700 ? 0.4 : 0.55))
-    expect(await page.evaluate(()=>document.documentElement.scrollHeight>innerHeight || document.documentElement.scrollWidth>innerWidth)).toBe(false)
-    await page.locator('#solid-selector').click()
-    const catalog=page.getByRole('menu',{name:'Choose a solid',exact:true})
-    const menu=(await catalog.boundingBox())!
-    expect(menu.x).toBeGreaterThanOrEqual(0)
-    expect(menu.x+menu.width).toBeLessThanOrEqual(width)
-    expect(menu.y+menu.height).toBeLessThanOrEqual(height)
-    expect(menu.y).toBeGreaterThanOrEqual(0)
-    expect(await catalog.evaluate(element=>element.scrollHeight>element.clientHeight)).toBe(true)
-    if (width===393 || width===1280) await page.screenshot({path:test.info().outputPath(`themed-picker-${width}.png`)})
-    await catalog.getByRole('menuitemradio',{name:'Dodecahedron',exact:true}).press('Escape')
-    if (width===393) await page.screenshot({path:test.info().outputPath('single-row-mobile-hud.png')})
-  }
+  await page.setViewportSize({width,height})
+  const toolbar=page.getByRole('toolbar',{name:'Solid controls'})
+  const bounds=(await toolbar.boundingBox())!
+  const view=(await toolbar.getByRole('group',{name:'Camera controls'}).boundingBox())!
+  const actions=(await toolbar.getByRole('group',{name:'Solid transformations'}).boundingBox())!
+  expect(Math.abs(view.y-actions.y),String(width)).toBeLessThan(1)
+  expect(view.x+view.width,String(width)).toBeLessThanOrEqual(actions.x)
+  expect(actions.x+actions.width,String(width)).toBeLessThanOrEqual(bounds.x+bounds.width+1)
+  const heights=await toolbar.getByRole('button').evaluateAll(buttons=>buttons.filter(button=>button.getClientRects().length).map(button=>button.getBoundingClientRect().height))
+  expect(Math.max(...heights)-Math.min(...heights),String(width)).toBeLessThan(1)
+  const stage=(await page.getByLabel('Interactive 3D model of a Dodecahedron').boundingBox())!
+  expect(stage.height,String(width)).toBeGreaterThan(height*(height<700 ? 0.4 : 0.55))
+  expect(await page.evaluate(()=>document.documentElement.scrollHeight>innerHeight || document.documentElement.scrollWidth>innerWidth)).toBe(false)
+  await page.locator('#solid-selector').click()
+  const catalog=page.getByRole('menu',{name:'Choose a solid',exact:true})
+  const menu=(await catalog.boundingBox())!
+  expect(menu.x).toBeGreaterThanOrEqual(0)
+  expect(menu.x+menu.width).toBeLessThanOrEqual(width)
+  expect(menu.y+menu.height).toBeLessThanOrEqual(height)
+  expect(menu.y).toBeGreaterThanOrEqual(0)
+  expect(await catalog.evaluate(element=>element.scrollHeight>element.clientHeight)).toBe(true)
+  if (width===393 || width===1280) await page.screenshot({path:test.info().outputPath(`themed-picker-${width}.png`)})
+  await catalog.getByRole('menuitemradio',{name:'Dodecahedron',exact:true}).press('Escape')
+  if (width===393) await page.screenshot({path:test.info().outputPath('single-row-mobile-hud.png')})
 })
 
 test('the solid heading is the only picker and supports grouped keyboard selection',async({page})=>{
