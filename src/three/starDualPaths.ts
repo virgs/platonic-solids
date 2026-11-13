@@ -1,4 +1,5 @@
 import { createExteriorMorph } from './exterior'
+import { starMesh } from './starMesh'
 import { dualModel, type Polyhedron } from './transformations'
 
 interface StoredPath { source: Polyhedron; at: (t: number) => Polyhedron }
@@ -12,7 +13,7 @@ export function createStarDualPath(source: Polyhedron) {
   const previous = reversePaths.get(source)
   if (previous) return { source, target: previous.source, at: (t: number) => previous.at(1-Math.max(0,Math.min(1,t))) }
   const target = dualModel(source)
-  const surface = createExteriorMorph(source,target)
+  const surface = createExteriorMorph(source,target,starMesh([source,target]))
   const path = { source, target, at: (t: number) => surface(Math.max(0,Math.min(1,t))) }
   reversePaths.set(target,{ source, at: path.at })
   return path

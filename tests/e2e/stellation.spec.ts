@@ -23,6 +23,7 @@ for (const [from,origin,name] of [
     await page.getByRole('button', { name: 'Explain this transformation' }).click()
     await expect(page.getByRole('dialog', { name: 'How this transformation works' })).toContainText('The exterior stays connected throughout')
     if (name === 'Small stellated dodecahedron') await expect(page.getByRole('dialog')).toContainText('One pentagonal pyramid grows')
+    if (from === 'great-dodecahedron') await expect(page.getByRole('dialog')).toContainText('Twenty triangular dimples share one icosahedral framework')
     await page.getByRole('button', { name: 'Close', exact: true }).click()
     await player.getByRole('button', { name: 'Go to transformation end' }).click()
     await page.getByRole('button', { name: 'Play transformation', exact: true }).click()

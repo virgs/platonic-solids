@@ -1,8 +1,8 @@
 import { BufferGeometry, Float32BufferAttribute, OctahedronGeometry, Vector3 } from 'three'
 import { renderPolyhedron, type Polyhedron } from './transformations'
+import { starMesh, type AngularMesh } from './starMesh'
 
 interface Plane { normal: Vector3; distance: number }
-interface AngularMesh { directions: Vector3[]; faces: number[][] }
 const exteriorCache = new WeakMap<Polyhedron,Polyhedron>()
 const adjacencyCache = new WeakMap<number[][],Array<{ a: number; b: number; faces: number[] }>>()
 
@@ -140,7 +140,7 @@ export function exterior(model: Polyhedron): Polyhedron {
   const cached = exteriorCache.get(model)
   if (cached) return cached
   if (convex(model)) { exteriorCache.set(model,model); return model }
-  const mesh = angularMesh([model])
+  const mesh = starMesh([model],model.vertices.length === 20 && model.faces.length === 12)
   const surface = projected(mesh,surfaceRadii(model,mesh.directions))
   surface.edgeOpacities = creaseWeights(surface).map((weight) => weight>0.5 ? 1 : 0)
   exteriorCache.set(model,surface)
@@ -148,8 +148,7 @@ export function exterior(model: Polyhedron): Polyhedron {
 }
 
 /** One closed surface; old peaks retract while the target peaks rise. */
-export function createExteriorMorph(source: Polyhedron, target: Polyhedron) {
-  const mesh = angularMesh([source,target])
+export function createExteriorMorph(source: Polyhedron, target: Polyhedron, mesh = angularMesh([source,target])) {
   const a = surfaceRadii(source,mesh.directions), b = surfaceRadii(target,mesh.directions)
   const aa = creaseWeights(projected(mesh,a)).map((weight) => weight>0.5 ? 1 : 0)
   const bb = creaseWeights(projected(mesh,b)).map((weight) => weight>0.5 ? 1 : 0)
@@ -176,6 +175,21 @@ export function createPyramidMorph(core: Polyhedron, star: Polyhedron) {
     const radius = Math.max(...vertices.map((p) => p.length()))
     vertices.forEach((p) => p.divideScalar(radius))
     return { vertices, faces }
+  }
+}
+
+/** Twenty attached dimples flatten into an icosahedron, then rise into tips.
+ * Hold the framework's scale while moving the face centers linearly; only the
+ * final common circumradius normalization changes the apparent framework size.
+ */
+export function createDimplePyramidMorph(core: Polyhedron, star: Polyhedron) {
+  const mesh = starMesh([core,star],true)
+  const a = surfaceRadii(core,mesh.directions), b = surfaceRadii(star,mesh.directions)
+  const scale = a[0]/b[0]
+  return (progress: number): Polyhedron => {
+    if (progress<=0) return exterior(core)
+    if (progress>=1) return exterior(star)
+    return projected(mesh,a.map((radius,i) => radius+(b[i]*scale-radius)*progress))
   }
 }
 

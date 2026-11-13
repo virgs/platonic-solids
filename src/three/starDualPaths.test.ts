@@ -1,5 +1,5 @@
 import { expect, it } from 'vitest'
-import { Quaternion, Vector3 } from 'three'
+import { Line3, Quaternion, Vector3 } from 'three'
 import { getSolid, starSolids } from '../data/solids'
 import { createStarDualPath } from './starDualPaths'
 import { exterior, renderSurface } from './exterior'
@@ -14,6 +14,24 @@ function area(model: Polyhedron) {
   }
   rendered.geometry.dispose(); rendered.edgeGeometry.dispose()
   return sum
+}
+
+function ridgeSegments(model: Polyhedron) {
+  const rendered = renderSurface(model), positions = rendered.edgeGeometry.getAttribute('position'), colors = rendered.edgeGeometry.getAttribute('color')
+  const lines: Line3[] = []
+  for (let i=0;i<positions.count;i+=2) if (!colors || colors.getW(i)>0.01) {
+    lines.push(new Line3(new Vector3().fromBufferAttribute(positions,i),new Vector3().fromBufferAttribute(positions,i+1)))
+  }
+  rendered.geometry.dispose(); rendered.edgeGeometry.dispose()
+  return lines
+}
+
+function checkRidges(near: Polyhedron, endpoint: Polyhedron) {
+  const a = ridgeSegments(near), b = ridgeSegments(endpoint)
+  for (const [left,right] of [[a,b],[b,a]]) for (const edge of left) for (const t of [0,0.5,1]) {
+    const point = edge.at(t,new Vector3())
+    expect(Math.min(...right.map(line => line.closestPointToPoint(point,true,new Vector3()).distanceTo(point)))).toBeLessThan(1e-5)
+  }
 }
 
 it.each(starSolids)('$name reaches the exact polar dual continuously and reverses along the identical surface', solid=>{
@@ -32,6 +50,8 @@ it.each(starSolids)('$name reaches the exact polar dual continuously and reverse
   }
   expect(area(path.at(1e-7))).toBeCloseTo(area(exterior(source)),4)
   expect(area(path.at(1-1e-7))).toBeCloseTo(area(exterior(path.target)),4)
+  checkRidges(path.at(1e-7),exterior(source))
+  checkRidges(path.at(1-1e-7),exterior(path.target))
   expect(path.at(0)).toBe(exterior(source))
   expect(path.at(1)).toBe(exterior(path.target))
 })

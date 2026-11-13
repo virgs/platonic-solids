@@ -1,8 +1,9 @@
 import type { SolidId } from '../data/solids'
 import { createDestellation, createStarDual, createStellation, type Polyhedron } from './transformations'
-import { createExteriorMorph, createPyramidMorph } from './exterior'
+import { createDimplePyramidMorph, createExteriorMorph, createPyramidMorph } from './exterior'
+import { starMesh } from './starMesh'
 
-interface StoredPath { origin: SolidId; source: Polyhedron; mode: 'pyramids' | 'surface'; at: (t: number) => Polyhedron }
+interface StoredPath { origin: SolidId; source: Polyhedron; mode: 'pyramids' | 'dimples' | 'surface'; at: (t: number) => Polyhedron }
 const reversePaths = new WeakMap<Polyhedron,StoredPath>()
 
 function constructionStops(from: SolidId, to: SolidId): SolidId[] {
@@ -27,10 +28,12 @@ export function createStellationPath(source: Polyhedron, from: SolidId, to: Soli
   }
   if (stops.length < 2) throw new Error('A route needs distinct endpoints')
   const pyramid = (from === 'dodecahedron' && to === 'small-stellated-dodecahedron') || (to === 'dodecahedron' && from === 'small-stellated-dodecahedron')
+  const dimples = [from,to].includes('great-dodecahedron') && [from,to].includes('great-stellated-dodecahedron')
+  const unfoldDimples = dimples ? createDimplePyramidMorph(from === 'great-dodecahedron' ? source : model,from === 'great-dodecahedron' ? model : source) : undefined
   const growPyramids = pyramid ? createPyramidMorph(from === 'dodecahedron' ? source : model,from === 'dodecahedron' ? model : source) : undefined
-  const surface = growPyramids ? (t: number) => growPyramids(from === 'dodecahedron' ? t : 1-t) : createExteriorMorph(source,model)
+  const surface = growPyramids ? (t: number) => growPyramids(from === 'dodecahedron' ? t : 1-t) : unfoldDimples ? (t: number) => unfoldDimples(from === 'great-dodecahedron' ? t : 1-t) : createExteriorMorph(source,model,starMesh([source,model]))
   const path = {
-    source, target: model, mode: pyramid ? 'pyramids' as const : 'surface' as const,
+    source, target: model, mode: pyramid ? 'pyramids' as const : dimples ? 'dimples' as const : 'surface' as const,
     at(progress: number): Polyhedron {
       return surface(Math.max(0,Math.min(1,progress)))
     },
