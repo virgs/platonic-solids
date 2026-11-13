@@ -1,8 +1,10 @@
 # Transformation simplicity audit
 
-This is an investigation of alternatives, not a change to the production
-animations. Counts below describe rendering geometry, not mathematical faces
-or vertices in the catalog. No construction is claimed to be a proven minimum.
+Implementation update: v0.17.0 adopts the compact star templates and the
+twenty-dimple pyramid construction recommended below. The Archimedean/Catalan
+alternative remains experimental. This document records the original audit.
+Counts below describe rendering geometry, not mathematical faces or vertices
+in the catalog. No construction is claimed to be a proven minimum.
 
 ## Star transformations
 
@@ -53,8 +55,9 @@ tessellation work, but frame-rate gains have not been benchmarked.
   routes produced mismatched boundary subdivisions or numerically unstable
   polygons. Explicit templates are a better implementation direction.
 - These are sampled numerical results, not a proof of exact equivalence or
-  global minimality. Production work still needs rotated-source, reverse,
-  ridge-opacity, endpoint-continuity, and browser checks for the new code.
+  global minimality. The implementation now adds rotated-source, reverse,
+  mesh-size, and dense reference comparisons, alongside the existing ridge
+  opacity, endpoint continuity, and browser checks.
 
 ## Archimedean/Catalan duals
 

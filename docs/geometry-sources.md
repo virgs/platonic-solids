@@ -120,8 +120,19 @@ Dodecahedron ↔ small stellated dodecahedron grows twelve pentagonal pyramids:
 each original face center moves outward to its apex while the original edge
 boundary stays attached. Uniform normalization maintains the common radius.
 
-The other four pairs reshape one closed exterior. An angular arrangement
-splits directions at projected face boundaries and face-depth intersections.
+Great dodecahedron ↔ great stellated dodecahedron unfolds twenty triangular
+dimples into pyramids on a shared icosahedral framework. The face centers move
+linearly outward in the fixed framework scale, passing through its face planes.
+The whole surface is then normalized uniformly. Both explicit pyramid paths
+use 32 vertices and 60 triangles.
+
+The remaining three stellation pairs and both star-dual pairs reshape one
+closed exterior. An oriented icosahedral framework supplies vertex directions,
+face centers, and edge midpoints: 62 vertices and 120 triangles. Great
+icosahedron routes add a point normalize(φa + b) on each directed framework
+edge (a,b), where φ is the golden ratio. These retain its additional ridges
+with 122 vertices and 240 triangles. This replaces the previous global angular
+arrangement, which generated up to 6,840 triangles.
 The furthest face intersection gives each endpoint's exterior radius.
 Interpolating reciprocal radius keeps cells that share endpoint planes on a
 common moving plane, avoiding a faceted subdivision grid. Intermediate shapes
@@ -136,9 +147,10 @@ Completed star solids consistently display the same cached exterior when
 another operation starts or history restores them. Their full mathematical
 definitions remain separate for catalog properties and subsequent operations.
 The reverse constructor retains the original surface path when available.
-Shared boundary vertices are welded, while each cell keeps its own interior
-triangulation point. This prevents thin cells from losing faces when their
-centers nearly coincide with boundary vertices.
+Shared framework edges reuse the same midpoint and directed golden-section
+indices, keeping the compact mesh closed. Framework orientation is recovered
+from the actual endpoint hull, including after chained transformations.
+Completed star exteriors use the same compact constructions.
 
 ## Duality
 
@@ -153,8 +165,8 @@ The previous star-dual animation projected a moving self-intersecting flag
 construction onto an angular mesh. Changing outermost sheets introduced sharp
 folds along thousands of subdivision edges that should have stayed planar,
 producing a boiling appearance. Both star-dual pairs and both directions now
-use the direct exterior path. The mathematical duals, endpoint orientation,
-and common circumradius are unchanged.
+use the direct exterior path on compact symmetry meshes. The mathematical
+duals, endpoint orientation, and common circumradius are unchanged.
 
 The transformation audit covers all 32 relationships by construction family:
 Platonic corner clipping, Archimedean/Catalan convex flag duality, truncation
@@ -182,6 +194,12 @@ Browser coverage includes all five rectification sources, both reverse parents
 of directly selected rectified solids, all five stellation pairs, route-map
 actions, mixed-face summaries, persistent selection, history restoration,
 and the 100%/99%/95% opacity transition.
+
+The compact mesh tests compare sampled endpoint and intermediate radial
+profiles with the dense reference path in both directions from rotated sources.
+They enforce the 60/120/240 triangle bounds. A separate test verifies linear
+apex heights, a flat icosahedral intermediate, and exact reversed playback for
+the twenty-dimple path.
 
 - [Ghent University: constructions of the four regular non-convex polyhedra](https://cage.ugent.be/~hs/polyhedra/keplerpoinsot.html)
 - [Small stellated dodecahedron: pyramid construction](https://mathworld.wolfram.com/SmallStellatedDodecahedron.html)

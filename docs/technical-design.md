@@ -1,7 +1,7 @@
 # Technical design
 
 This document records the original architectural design. For the implemented
-v0.16.3 geometry and controls, see [geometry sources](geometry-sources.md) and
+v0.17.0 geometry and controls, see [geometry sources](geometry-sources.md) and
 [the transformation HUD](transformation-hud.md). The public name is now
 Polyhedra Explorer, with twenty-three catalog solids, reversible rectification
 and truncation, Archimedean/Catalan polar duals, and count-based element

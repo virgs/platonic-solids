@@ -1,6 +1,6 @@
 # Simpler stellation animations
 
-Implemented in v0.12.0. The animations prioritize a single connected exterior
+Initial implementation in v0.12.0; compact meshes and triangular dimples in v0.17.0. The animations prioritize a single connected exterior
 and use a construction suited to each pair.
 
 | Pair | Visual construction |
@@ -8,11 +8,13 @@ and use a construction suited to each pair.
 | Dodecahedron ↔ small stellated dodecahedron | Grow twelve pentagonal pyramids, moving each face center into its tip. |
 | Dodecahedron ↔ great dodecahedron | Reshape the exterior toward the target tips and indentations. |
 | Dodecahedron ↔ great stellated dodecahedron | Reshape between the twenty existing vertex directions to expose the star exterior. |
-| Great dodecahedron ↔ great stellated dodecahedron | Reshape between the twelve-tip and twenty-tip arrangements. |
+| Great dodecahedron ↔ great stellated dodecahedron | Unfold twenty triangular dimples through the icosahedral framework into pyramids. |
 | Icosahedron ↔ great icosahedron | Reshape the exterior toward the target triangular regions. |
 
-The first pair has a direct physical pyramid construction. The other pairs use
-connected surface morphs with planar patches. They are not presented as the
+The small stellated pair grows pentagonal pyramids; the great-dodecahedron
+pair unfolds triangular dimples into pyramids. The remaining pairs use connected
+surface morphs with planar patches. Their compact symmetry meshes use 120 or
+240 triangles; the explicit pyramid paths use 60. They are not presented as the
 same extrusion or as literal face-plane extension during every intermediate
 frame. Exact mathematical endpoint definitions determine the finished solids.
 

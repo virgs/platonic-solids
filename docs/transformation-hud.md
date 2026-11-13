@@ -27,7 +27,9 @@ Dual and Stellate/Unstellate use short operation labels; menus and the player
 name their destinations. Star duals now reshape one connected exterior through
 stable planar regions, without the old moving-sheet projection. The information
 dialog explains this visual motion separately from the exact polar endpoint.
-Stellation retains its direct surfaces or explicit pentagonal pyramids.
+Stellation uses compact direct surfaces, twelve pentagonal pyramids, or twenty
+triangular dimples unfolding into pyramids. The explanation describes the
+construction for the selected pair. Display meshes use 60, 120, or 240 triangles.
 
 The Faces, Edges, and Vertices counts toggle one highlight mode at a time.
 Adjacent mathematical faces use distinct colors; edges thicken and vertex

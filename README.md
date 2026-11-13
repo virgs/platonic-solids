@@ -50,8 +50,11 @@ camera; mouse, touch, wheel, and pinch gestures orbit and zoom the centered mode
 - **Stellate / Unstellate:** dodecahedron ↔ each of its three regular stellations,
   great dodecahedron ↔ great stellated dodecahedron, and icosahedron ↔ great
   icosahedron. Twelve pentagonal pyramids grow for the small stellated
-  dodecahedron. Other pairs use a direct connected exterior reshape, with
-  planar patches, retained orientation, and exact reverse playback.
+  dodecahedron. Great dodecahedron ↔ great stellated dodecahedron unfolds
+  twenty triangular dimples into pyramids. The remaining pairs use a compact
+  connected exterior reshape, with planar patches, retained orientation, and
+  exact reverse playback. Star surfaces use 60, 120, or 240 triangles rather
+  than thousands of hidden subdivisions.
 - **Rectify / Unrectify:** cut corners to the original edge midpoints.
   Tetrahedron → octahedron; cube and octahedron → cuboctahedron; dodecahedron and
   icosahedron → icosidodecahedron. The destination menu and map expose each
